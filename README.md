@@ -17,6 +17,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build      # typecheck + production build to dist/
 npm run preview    # serve the production build
+npm run check:images   # verify every photo source actually resolves
 ```
 
 Node 20 or newer.
@@ -100,8 +101,10 @@ responsive sources, and absolute or root-relative paths pass through untouched,
 so a self-hosted library drops straight in.
 
 The entries currently point at Unsplash photo IDs. **These were written without
-network access and have not been verified against the live CDN**, so check them
-before you show this to anyone, and expect to swap a few.
+network access and have not been verified against the live CDN.** Run
+`npm run check:images` from an unrestricted connection before you show this to
+anyone: it requests every source and names any that fail, so you know exactly
+which lines to replace.
 
 Nothing breaks if one is wrong. `Figure` falls back to a generated architectural
 plate — a seeded, brand-coloured composition drawn in `src/lib/plate.ts` — so a
