@@ -18,9 +18,19 @@ npm run dev        # http://localhost:5173
 npm run build      # typecheck + production build to dist/
 npm run preview    # serve the production build
 npm run check:images   # verify every photo source actually resolves
+npm run build:static   # a build for plain static hosting (see below)
 ```
 
 Node 20 or newer.
+
+### Hosting it somewhere
+
+`npm run build:static` produces the same site with relative asset paths and
+hash-based routing, so `dist/` can be dropped on any static host — S3, Netlify
+drop, GitHub Pages, a plain directory — with no server rewrites and no
+configuration. Deep links become `/#/residences/casa-aurelia` and survive a hard
+reload. The ordinary `npm run build` keeps clean paths and history routing for
+hosts that can rewrite unknown paths to `index.html`.
 
 ---
 

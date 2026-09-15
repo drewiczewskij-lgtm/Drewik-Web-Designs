@@ -12,6 +12,7 @@ import { cn } from '@/lib/cn';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { useHasFinePointer, useMediaQuery } from '@/lib/useMediaQuery';
+import { useSmoothScroll } from '@/lib/smoothScroll';
 import { Figure } from './Figure';
 import { Cta } from './Cta';
 import { Label, MaskedLines } from './Type';
@@ -94,6 +95,7 @@ export function PropertyMap() {
   const reduced = usePrefersReducedMotion();
   const fine = useHasFinePointer();
   const showLabels = useMediaQuery('(min-width: 768px)');
+  const { scrollTo } = useSmoothScroll();
 
   const active = PLACES.find((p) => p.id === activeId) ?? PLACES[0];
   const ax = active.col * CELL_X + CELL_X / 2;
@@ -270,7 +272,7 @@ export function PropertyMap() {
                     View Residence
                   </Cta>
                 ) : (
-                  <Cta href="#contact" dark>
+                  <Cta onClick={() => scrollTo('#contact', -1)} dark>
                     Enquire Privately
                   </Cta>
                 )}
@@ -324,11 +326,11 @@ function Marker({
 
       {active && !reduced && (
         <motion.circle
-          r="6"
           fill="none"
           stroke="currentColor"
           strokeWidth="0.8"
           className="text-bronze-soft"
+          initial={{ r: 6, opacity: 0.7 }}
           animate={{ r: [6, 22], opacity: [0.7, 0] }}
           transition={{ duration: 2.8, repeat: Infinity, ease: 'easeOut' }}
         />

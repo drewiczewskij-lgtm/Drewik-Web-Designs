@@ -102,7 +102,11 @@ export default function PropertyDetail() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: reduced ? 0.01 : 0.9, ease: EASE_OUT_EXPO, delay: 0.2 }}
                 >
-                  <Link to="/#residences" className="link-rule t-label text-paper/70">
+                  <Link
+                    to="/"
+                    state={{ section: '#residences' }}
+                    className="link-rule t-label text-paper/70"
+                  >
                     ← All Residences
                   </Link>
                   <span className="bg-paper/40 h-px w-9" aria-hidden="true" />

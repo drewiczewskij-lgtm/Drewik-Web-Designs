@@ -24,7 +24,8 @@ export function Navigation({ ready = true }: { ready?: boolean }) {
   const [menu, setMenu] = useState(false);
   const [search, setSearch] = useState(false);
   const { scrollTo } = useSmoothScroll();
-  const { pathname, hash } = useLocation();
+  const location = useLocation();
+  const { pathname } = location;
   const navigate = useNavigate();
   const lastY = useRef(0);
 
@@ -70,19 +71,21 @@ export function Navigation({ ready = true }: { ready?: boolean }) {
     };
   }, [pathname]);
 
-  // Deep links from the property page land on the right section of the home page.
+  // Arriving from a residence page with a section in hand: go to it once the
+  // new page has laid out.
+  const section = (location.state as { section?: string } | null)?.section;
   useEffect(() => {
-    if (!onHome || !hash) return;
-    const id = window.setTimeout(() => scrollTo(hash, -1), 120);
+    if (!onHome || !section) return;
+    const id = window.setTimeout(() => scrollTo(section, -1), 140);
     return () => window.clearTimeout(id);
-  }, [onHome, hash, scrollTo]);
+  }, [onHome, section, scrollTo, location.key]);
 
   const go = useCallback(
     (href: string) => {
       setMenu(false);
       setSearch(false);
       if (!onHome) {
-        navigate(`/${href}`);
+        navigate('/', { state: { section: href } });
         return;
       }
       scrollTo(href, -1);
