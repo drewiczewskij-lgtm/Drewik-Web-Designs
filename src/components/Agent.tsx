@@ -104,7 +104,10 @@ export function Agent() {
                   { label: 'Closed volume', value: elena.volume },
                   { label: 'Markets', value: String(elena.markets.length) },
                 ].map((s) => (
-                  <div key={s.label} className="border-ink/14 border-b py-5 pr-5 sm:border-b-0">
+                  <div
+                    key={s.label}
+                    className="border-ink/14 flex h-full flex-col justify-between border-b py-5 pr-5 sm:border-b-0"
+                  >
                     <dt className="t-label text-stone-deep mb-3 leading-relaxed">
                       {s.label}
                     </dt>

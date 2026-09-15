@@ -181,7 +181,10 @@ export default function PropertyDetail() {
                     { label: 'Completed', value: String(p.year) },
                     { label: 'Status', value: 'Available' },
                   ].map((s) => (
-                    <div key={s.label} className="border-ink/14 border-b py-4 pr-4">
+                    <div
+                      key={s.label}
+                      className="border-ink/14 flex h-full flex-col justify-between border-b py-4 pr-4"
+                    >
                       <dt className="t-label text-stone-deep mb-2">{s.label}</dt>
                       <dd className="font-display t-num text-[1.45rem] leading-none font-light">
                         {s.value}

@@ -74,8 +74,7 @@ export function Figure({
         alt={alt ?? asset.alt}
         loading={priority ? 'eager' : 'lazy'}
         decoding={priority ? 'sync' : 'async'}
-        // @ts-expect-error — fetchPriority is valid HTML, typings lag in places.
-        fetchpriority={priority ? 'high' : undefined}
+        fetchPriority={priority ? 'high' : undefined}
         draggable={false}
         onLoad={() => setLoaded(true)}
         onError={() => {

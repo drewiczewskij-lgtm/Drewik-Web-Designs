@@ -108,7 +108,10 @@ export function FeaturedResidence() {
           <Reveal delay={0.18} className="mt-9">
             <dl className="border-ink/14 grid grid-cols-2 gap-x-6 border-t">
               {stats.map((s) => (
-                <div key={s.label} className="border-ink/14 border-b py-4">
+                <div
+                  key={s.label}
+                  className="border-ink/14 flex h-full flex-col justify-between border-b py-4"
+                >
                   <dt className="t-label text-stone-deep mb-2">{s.label}</dt>
                   <dd className="font-display t-num text-[1.6rem] leading-none font-light">
                     {s.value}
@@ -164,12 +167,12 @@ export function Intent() {
         <div className="col-span-12 mt-8 lg:col-span-9 lg:mt-0">
           <MaskedLines
             as="h2"
-            className="t-h2 max-w-[19ch]"
+            className="t-h2 max-w-[28ch]"
             id="intent-title"
             lines={[
-              'We represent houses that',
-              'were argued over — by the',
-              'people who drew them.',
+              'We represent the houses',
+              'that were argued over by',
+              'the people who drew them.',
             ]}
           />
 
@@ -200,7 +203,10 @@ export function Intent() {
                 { label: 'Markets', value: 'Five' },
                 { label: 'Off-market share', value: '58%' },
               ].map((s) => (
-                <div key={s.label} className="border-ink/14 border-b py-5 pr-6 md:border-b-0">
+                <div
+                  key={s.label}
+                  className="border-ink/14 flex h-full flex-col justify-between border-b py-5 pr-6 md:border-b-0"
+                >
                   <dt className="t-label text-stone-deep mb-3">{s.label}</dt>
                   <dd className="font-display t-num text-[clamp(1.6rem,2.6vw,2.2rem)] leading-none font-light">
                     {s.value}

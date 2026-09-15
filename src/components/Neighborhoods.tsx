@@ -38,8 +38,8 @@ export function Neighborhoods() {
           <MaskedLines
             as="h2"
             id="neighborhoods-title"
-            className="t-h1 max-w-[16ch]"
-            lines={['The Places', 'Behind the Addresses']}
+            className="t-h1 max-w-[12ch]"
+            lines={['The Places', 'Behind the', 'Addresses']}
           />
           <motion.p
             className="t-body text-ink/70 max-w-[34ch]"
@@ -169,7 +169,7 @@ function Panel({ neighborhood: n, index }: { neighborhood: Neighborhood; index: 
               transition={{ duration: 0.9, ease: EASE_OUT_EXPO, delay: 0.38 }}
             >
               {n.stats.map((s) => (
-                <div key={s.label}>
+                <div key={s.label} className="flex h-full flex-col justify-between">
                   <dt className="t-label text-paper/55 mb-2 leading-relaxed">{s.label}</dt>
                   <dd className="font-display t-num text-[clamp(1.2rem,2vw,1.7rem)] leading-none font-light">
                     {s.value}

@@ -85,7 +85,7 @@ export function Contact({
           <MaskedLines
             as="h2"
             id="contact-title"
-            className="t-h1 max-w-[15ch]"
+            className="t-h1 max-w-[26ch]"
             lines={['Your next address', 'deserves a conversation.']}
           />
         </div>

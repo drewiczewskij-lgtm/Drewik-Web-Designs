@@ -339,16 +339,13 @@
     height: 200%;
     pointer-events: none;
     z-index: 60;
-    opacity: 0.32;
-    mix-blend-mode: multiply;
+    /* soft-light reads on paper and on charcoal alike; multiply vanishes on
+       the dark sections, which is where the flat areas are largest. */
+    opacity: 0.55;
+    mix-blend-mode: soft-light;
     background-image: var(--grain-url);
     background-size: 220px 220px;
     animation: grain-shift 7s steps(6) infinite;
-  }
-
-  .grain-overlay[data-dark='true'] {
-    mix-blend-mode: overlay;
-    opacity: 0.22;
   }
 
   @keyframes grain-shift {
