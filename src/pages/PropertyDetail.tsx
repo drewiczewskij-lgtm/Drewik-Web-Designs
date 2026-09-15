@@ -56,7 +56,7 @@ export default function PropertyDetail() {
   return (
     <>
       {/* ---------------- HERO ---------------- */}
-      <div ref={heroWrap} data-nav-theme="light" className="relative h-[118svh]">
+      <div ref={heroWrap} data-nav-theme="light" className="relative h-[142svh]">
         <section className="bg-charcoal sticky top-0 h-[100svh] overflow-hidden">
           <motion.div className="absolute inset-0" style={{ scale: plateScale }}>
             <motion.div

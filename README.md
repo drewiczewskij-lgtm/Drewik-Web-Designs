@@ -147,7 +147,10 @@ The rules the site holds itself to:
 
 ## Performance
 
-- Route-level code splitting plus separate chunks for motion, router and scroll.
+- The home page ships in the entry bundle; residence detail, the legal pages and
+  the 404 are fetched on first navigation, and motion, router and scroll are
+  their own chunks. Initial payload is roughly 97 KB of JavaScript and 9 KB of
+  CSS over the wire.
 - Responsive `srcset` at five widths; everything below the fold is lazy and
   async-decoded; only the hero plate is preloaded.
 - Pointer tracking for the custom cursor writes straight to the DOM, so moving

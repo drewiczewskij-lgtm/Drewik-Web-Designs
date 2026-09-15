@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { Cursor } from '@/components/Cursor';
 import { Grain } from '@/components/Grain';
@@ -8,9 +8,13 @@ import { Navigation } from '@/components/Navigation';
 import { SmoothScrollProvider, useSmoothScroll } from '@/lib/smoothScroll';
 import { EASE_IN_OUT_QUART } from '@/lib/motion';
 import Home from '@/pages/Home';
-import PropertyDetail from '@/pages/PropertyDetail';
-import NotFound from '@/pages/NotFound';
-import { Privacy, Terms } from '@/pages/Legal';
+
+/* The home page is the entry point and stays in the main bundle. Everything
+   else is fetched on the first navigation to it. */
+const PropertyDetail = lazy(() => import('@/pages/PropertyDetail'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
+const Privacy = lazy(() => import('@/pages/Legal').then((m) => ({ default: m.Privacy })));
+const Terms = lazy(() => import('@/pages/Legal').then((m) => ({ default: m.Terms })));
 
 /** Routes start at the top; the browser's restoration fights the smooth scroller. */
 function ScrollReset() {
@@ -79,6 +83,9 @@ export default function App() {
 
       <main id="main">
         <RouteTransition>
+          <Suspense
+            fallback={<div className="bg-charcoal min-h-[100svh] w-full" aria-hidden="true" />}
+          >
           <Routes>
             <Route path="/" element={<Home ready={ready} />} />
             <Route path="/residences/:slug" element={<PropertyDetail />} />
@@ -86,6 +93,7 @@ export default function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </RouteTransition>
       </main>
     </SmoothScrollProvider>

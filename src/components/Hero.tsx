@@ -42,7 +42,7 @@ export function Hero({ ready }: { ready: boolean }) {
       ref={wrap}
       data-nav-theme="light"
       id="hero"
-      className="relative h-[128svh]"
+      className="relative h-[150svh]"
     >
       <section
         className="bg-charcoal sticky top-0 h-[100svh] overflow-hidden"
