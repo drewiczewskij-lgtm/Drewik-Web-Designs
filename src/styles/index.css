@@ -1,0 +1,404 @@
+@import 'tailwindcss';
+
+/* ============================================================================
+   ARCADIA ESTATES — DESIGN SYSTEM
+   A warm, architectural palette. Paper and ink, stone and bronze.
+   The accent is deliberately rationed: it appears on rules, indices and
+   one-word emphases, never on a surface.
+   ========================================================================= */
+
+@theme {
+  --color-paper: #f4f1ea;
+  --color-paper-2: #ece7dd;
+  --color-bone: #e2dbcf;
+  --color-stone: #a39c90;
+  --color-stone-deep: #6e6960;
+  --color-ink: #1c1b17;
+  --color-charcoal: #14130f;
+  --color-charcoal-2: #1e1c17;
+  --color-bronze: #9b7c4e;
+  --color-bronze-soft: #bc9b69;
+
+  --font-display: 'Cormorant Garamond', 'Cormorant', 'Times New Roman', Times,
+    'Hoefler Text', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
+    'Helvetica Neue', Arial, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+@layer base {
+  :root {
+    --gutter: clamp(1.25rem, 5vw, 5.5rem);
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    background-color: var(--color-charcoal);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Lenis drives scroll; native smooth would fight it. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 400;
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-bronze);
+    outline-offset: 4px;
+  }
+
+  /* Only a link that draws its own underline may drop the ring. Everything
+     else — buttons, the walkthrough stage, map markers, plan rooms — keeps it. */
+  .link-rule.focus-bare:focus-visible {
+    outline: none;
+  }
+
+  /* Form fields carry their rule as the indicator, thickened on focus. */
+  .field-line:focus-visible {
+    outline: none;
+    border-bottom-width: 2px;
+    border-bottom-color: var(--color-bronze-soft);
+  }
+
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Firefox scrollbar, kept thin and neutral */
+  @supports (scrollbar-width: thin) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-stone) transparent;
+    }
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-stone) 60%, transparent);
+  }
+}
+
+/* ============================================================================
+   TYPOGRAPHY PRIMITIVES
+   ========================================================================= */
+
+@layer components {
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-variant-ligatures: common-ligatures;
+  }
+
+  /* Editorial display sizes. Restrained: the largest is a hero-only size. */
+  .t-display {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(3.2rem, 9.2vw, 9.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.028em;
+  }
+
+  .t-h1 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2.6rem, 6.4vw, 6rem);
+    line-height: 0.98;
+    letter-spacing: -0.024em;
+  }
+
+  .t-h2 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2rem, 4.4vw, 3.9rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+
+  .t-h3 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.5rem, 2.6vw, 2.35rem);
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+  }
+
+  .t-quote {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(1.45rem, 2.9vw, 2.6rem);
+    line-height: 1.26;
+    letter-spacing: -0.014em;
+  }
+
+  /* The small uppercase label. Used everywhere; the spine of the layout. */
+  .t-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 768px) {
+    .t-label {
+      font-size: 11px;
+    }
+  }
+
+  .t-body {
+    font-size: clamp(0.9375rem, 1.05vw, 1.0625rem);
+    line-height: 1.75;
+    letter-spacing: -0.003em;
+  }
+
+  .t-lead {
+    font-size: clamp(1.0625rem, 1.5vw, 1.375rem);
+    line-height: 1.6;
+    letter-spacing: -0.012em;
+    font-weight: 300;
+  }
+
+  /* Tabular figures for prices, stats and indices. */
+  .t-num {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+  }
+
+}
+
+/* ============================================================================
+   LAYOUT
+   ========================================================================= */
+
+@layer components {
+  .shell {
+    padding-inline: var(--gutter);
+  }
+
+  /* A 12-column editorial grid used for the asymmetric compositions. */
+  .grid-editorial {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(1rem, 2.2vw, 2rem);
+  }
+}
+
+/* ============================================================================
+   MOTION PRIMITIVES
+   ========================================================================= */
+
+@layer components {
+  /* Text mask reveal — lines clipped by an overflow box, translated up. */
+  .mask-line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  .mask-line > span {
+    display: block;
+    will-change: transform;
+  }
+
+  /* Link with an underline that expands from the left. */
+  .link-rule {
+    position: relative;
+    display: inline-block;
+  }
+  .link-rule::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.32em;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.55s var(--ease-out-expo);
+    opacity: 0.75;
+  }
+  .link-rule:hover::after,
+  .link-rule[data-active='true']::after,
+  .link-rule:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  /* Arrow that steps right on hover. */
+  .arrow-step {
+    display: inline-block;
+    transition: transform 0.5s var(--ease-out-expo);
+  }
+  .group\/cta:hover .arrow-step,
+  .arrow-host:hover .arrow-step,
+  .arrow-host:focus-visible .arrow-step {
+    transform: translateX(0.45em);
+  }
+
+  /* Image container: the standard hover zoom for editorial figures. */
+  .zoom-host img,
+  .zoom-host .zoom-target {
+    transition:
+      transform 1.4s var(--ease-out-expo),
+      filter 1.4s var(--ease-out-expo);
+    will-change: transform;
+  }
+  .zoom-host:hover img,
+  .zoom-host:hover .zoom-target,
+  .zoom-host:focus-visible img,
+  .zoom-host:focus-visible .zoom-target {
+    transform: scale(1.045);
+  }
+}
+
+/* ============================================================================
+   TEXTURE — film grain
+   ========================================================================= */
+
+@layer components {
+  .grain-overlay {
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+    z-index: 60;
+    opacity: 0.32;
+    mix-blend-mode: multiply;
+    background-image: var(--grain-url);
+    background-size: 220px 220px;
+    animation: grain-shift 7s steps(6) infinite;
+  }
+
+  .grain-overlay[data-dark='true'] {
+    mix-blend-mode: overlay;
+    opacity: 0.22;
+  }
+
+  @keyframes grain-shift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    16% {
+      transform: translate3d(-3%, 2%, 0);
+    }
+    33% {
+      transform: translate3d(2%, -3%, 0);
+    }
+    50% {
+      transform: translate3d(-2%, -2%, 0);
+    }
+    66% {
+      transform: translate3d(3%, 1%, 0);
+    }
+    83% {
+      transform: translate3d(-1%, 3%, 0);
+    }
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   Everything animated above collapses to a plain, legible state.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .grain-overlay {
+    animation: none;
+  }
+}
+
+/* Hide the custom cursor wherever a fine pointer is unavailable. */
+@media (hover: none), (pointer: coarse) {
+  .cursor-layer {
+    display: none !important;
+  }
+}
