@@ -48,11 +48,29 @@ hosts that can rewrite unknown paths to `index.html`.
 | 05 | Exceptional Places | The continental United States as a field of points. Five markets, all interactive. |
 | 06 | Neighborhoods | Three full-bleed plates, each opening from a different inset on scroll. |
 | 07 | The Principal | Portrait spread for Elena Marlowe, with Thomas Reyes beneath. |
-| 08 | Enquiries | Underlined fields, real validation, a composed success state. |
+| 08 | The Private Office | Booking, deposits and the broker thread, opened from here. |
+| 09 | Enquiries | Underlined fields, real validation, a composed success state. |
 
 **Residence detail** (`/residences/:slug`) — overview, architecture narrative,
 walkthrough, gallery with a full-screen viewer, an interactive floor plan,
 specification, location, representation, next residence, enquiry form.
+
+**The Private Office** — three panels that slide from the right on a pointer and
+rise as a draggable sheet on a thumb:
+
+- **Book a viewing** — a month calendar with real availability, 45-minute slots
+  (some already taken), party size, and a confirmation with a reference number.
+- **Reserve a residence** — a deposit of one per cent against the guide price,
+  with card formatting, brand detection, a Luhn check and expiry validation.
+  **Nothing is live.** No request leaves the browser and no card is charged; the
+  panel says so beside the pay button. To make it real, replace `settle()` in
+  `src/components/office/Reserve.tsx` with a payment processor's client SDK and
+  never let a card number reach your own server.
+- **Message the broker** — a thread with the agent who holds the listing, which
+  answers in that property's terms.
+
+All three persist to `localStorage` on that one device and are read back by the
+home section, which shows what you have booked, reserved and asked.
 
 **Also** `/privacy`, `/terms`, and a designed 404 that lists the portfolio.
 
@@ -87,6 +105,8 @@ src/
     Gallery.tsx           editorial plate sequence
     Lightbox.tsx          full-screen viewer (portalled to <body>)
     FloorPlan.tsx         drawn SVG plan with a linked room schedule
+    PrivateOffice.tsx     the section that opens the three panels
+    office/               Panel, BookViewing, Reserve, Messages, the dock
     Agent.tsx, Contact.tsx, Footer.tsx
     Figure.tsx            every photograph in the site goes through here
     Cursor.tsx, Grain.tsx, Loader.tsx, Type.tsx, Cta.tsx
@@ -96,7 +116,7 @@ src/
     properties.ts         listings, tour scenes, floor plans, map positions
     site.ts               brand, navigation, neighborhoods, agents
   lib/                    smooth scroll, motion tokens, focus trap, pointer parallax,
-                          the generated fallback plate
+                          office state and diary, the drawn scene plates
 ```
 
 ---

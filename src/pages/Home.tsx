@@ -6,6 +6,7 @@ import { PropertyCollection } from '@/components/PropertyCollection';
 import { PropertyMap } from '@/components/PropertyMap';
 import { Neighborhoods } from '@/components/Neighborhoods';
 import { Agent } from '@/components/Agent';
+import { PrivateOffice } from '@/components/PrivateOffice';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
 import { FEATURED } from '@/data/properties';
@@ -29,7 +30,8 @@ export default function Home({ ready }: { ready: boolean }) {
       <PropertyMap />
       <Neighborhoods />
       <Agent />
-      <Contact />
+      <PrivateOffice />
+      <Contact index="09" />
       <Footer />
     </>
   );

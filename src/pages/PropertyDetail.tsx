@@ -5,7 +5,7 @@ import { PROPERTIES, getProperty } from '@/data/properties';
 import { BRAND, AGENTS } from '@/data/site';
 import { EASE_IN_OUT_QUART, EASE_OUT_EXPO } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
-import { useSmoothScroll } from '@/lib/smoothScroll';
+import { depositFor, money, useOffice } from '@/lib/office';
 import { Figure } from '@/components/Figure';
 import { Gallery } from '@/components/Gallery';
 import { FloorPlan } from '@/components/FloorPlan';
@@ -25,7 +25,7 @@ export default function PropertyDetail() {
   const { slug } = useParams();
   const property = getProperty(slug);
   const reduced = usePrefersReducedMotion();
-  const { scrollTo } = useSmoothScroll();
+  const { open: openDesk } = useOffice();
   const heroWrap = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -200,8 +200,8 @@ export default function PropertyDetail() {
 
               <Reveal delay={0.1} className="mt-9">
                 <button
-                  onClick={() => scrollTo('#contact', -1)}
-                  className="group/submit focus-bare border-ink/30 relative inline-flex w-full items-center justify-between gap-5 overflow-hidden border px-7 py-5"
+                  onClick={() => openDesk('booking', p)}
+                  className="group/submit press focus-bare border-ink/30 relative inline-flex w-full items-center justify-between gap-5 overflow-hidden border px-7 py-5"
                 >
                   <span
                     aria-hidden="true"
@@ -214,6 +214,34 @@ export default function PropertyDetail() {
                     <Arrow />
                   </span>
                 </button>
+
+                {/* Reserve and message sit under the primary action, quieter. */}
+                <div className="border-ink/14 mt-6 border-t pt-5">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <span className="t-label text-stone-deep">Reservation deposit</span>
+                    <span className="t-label t-num">{money(depositFor(p))}</span>
+                  </div>
+                  <p className="t-body text-ink/65 mt-3 text-[0.85rem] leading-relaxed">
+                    One per cent holds it off the open market for fourteen days, refundable
+                    in full.
+                  </p>
+                  <div className="mt-5 flex flex-wrap items-center gap-x-8 gap-y-3">
+                    <button
+                      onClick={() => openDesk('reserve', p)}
+                      className="press focus-bare arrow-host group/cta inline-flex items-center gap-3"
+                    >
+                      <span className="t-label">Reserve</span>
+                      <Arrow />
+                    </button>
+                    <button
+                      onClick={() => openDesk('messages', p)}
+                      className="press focus-bare arrow-host group/cta inline-flex items-center gap-3"
+                    >
+                      <span className="t-label">Message {agent.name.split(' ')[0]}</span>
+                      <Arrow />
+                    </button>
+                  </div>
+                </div>
               </Reveal>
             </div>
           </div>
@@ -416,7 +444,9 @@ export default function PropertyDetail() {
                 <p className="t-body text-ink/78 max-w-[52ch]">{agent.bio[0]}</p>
               </Reveal>
               <Reveal delay={0.28} className="mt-10 flex flex-wrap gap-x-12 gap-y-4">
-                <Cta href={`mailto:${agent.email}`}>Write to {agent.name.split(' ')[0]}</Cta>
+                <Cta onClick={() => openDesk('messages', p)}>
+                  Message {agent.name.split(' ')[0]}
+                </Cta>
                 <Cta href={agent.phoneHref} bare>
                   {agent.phone}
                 </Cta>

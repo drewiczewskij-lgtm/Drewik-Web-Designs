@@ -6,6 +6,8 @@ import { Grain } from '@/components/Grain';
 import { Loader } from '@/components/Loader';
 import { Navigation } from '@/components/Navigation';
 import { SmoothScrollProvider, useSmoothScroll } from '@/lib/smoothScroll';
+import { OfficeProvider } from '@/lib/office';
+import { Office } from '@/components/office/Office';
 import { EASE_IN_OUT_QUART } from '@/lib/motion';
 import Home from '@/pages/Home';
 
@@ -67,6 +69,7 @@ export default function App() {
 
   return (
     <SmoothScrollProvider>
+      <OfficeProvider>
       <ScrollReset />
       <Cursor />
       <Grain />
@@ -105,6 +108,9 @@ export default function App() {
           </Suspense>
         </RouteTransition>
       </main>
+
+      <Office />
+      </OfficeProvider>
     </SmoothScrollProvider>
   );
 }

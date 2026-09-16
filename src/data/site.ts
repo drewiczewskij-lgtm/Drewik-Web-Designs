@@ -21,6 +21,7 @@ export const NAV = [
   { label: 'Residences', href: '#residences' },
   { label: 'Neighborhoods', href: '#neighborhoods' },
   { label: 'About', href: '#about' },
+  { label: 'Book', href: '#office' },
 ] as const;
 
 export interface Neighborhood {

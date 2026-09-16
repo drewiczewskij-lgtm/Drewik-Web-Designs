@@ -26,6 +26,11 @@
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* Interface curves. The page moves cinematically; controls move crisply. */
+  --ease-ui: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-ui-inout: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 @layer base {
@@ -324,6 +329,76 @@
   .zoom-host:focus-visible img,
   .zoom-host:focus-visible .zoom-target {
     transform: scale(1.045);
+  }
+}
+
+/* ============================================================================
+   INTERFACE — the private office panels
+   Controls here answer faster than the page does: nothing over 260ms, every
+   pressable surface acknowledges the press.
+   ========================================================================= */
+
+@layer components {
+  /* Any pressable surface. The scale is small enough to feel, not to see. */
+  .press {
+    transition: transform 160ms var(--ease-ui);
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .press:active {
+      transform: none;
+    }
+  }
+
+  /* A row of choices — days, times, cards — that settles in sequence. */
+  .stagger > * {
+    opacity: 0;
+    transform: translateY(6px);
+    animation: settle 260ms var(--ease-ui) forwards;
+  }
+  @keyframes settle {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stagger > * {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+  }
+
+  /* Field styling shared by the enquiry form and the office panels. */
+  .field {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    padding-block: 0.7rem;
+    font-size: 1rem;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 200ms var(--ease-ui);
+  }
+  .field:focus-visible {
+    outline: none;
+    border-bottom-width: 2px;
+    border-bottom-color: var(--color-bronze-soft);
+  }
+  .field::placeholder {
+    color: color-mix(in srgb, currentColor 32%, transparent);
+  }
+
+  /* The scrim behind a panel. */
+  .scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 9, 7, 0.55);
+    backdrop-filter: blur(2px);
   }
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { IMAGES, imageSrcSet, imageUrl, type ImageAsset, type ImageKey } from '@/data/images';
-import { architecturalPlate, toneWash } from '@/lib/plate';
+import { toneWash } from '@/lib/plate';
+import { renderScene } from '@/lib/scenes';
 import { cn } from '@/lib/cn';
 
 interface FigureProps {
@@ -58,7 +59,7 @@ export function Figure({
   }, [image]);
 
   const src = failed
-    ? architecturalPlate(image, asset.tone)
+    ? renderScene(asset.scene, image)
     : imageUrl(asset.src, priority ? 1800 : 1280, quality);
 
   return (
