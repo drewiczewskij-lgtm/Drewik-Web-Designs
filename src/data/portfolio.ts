@@ -1,0 +1,406 @@
+import type { ImageKey } from '@/data/images';
+
+/* ============================================================================
+   THE PORTFOLIO
+   ----------------------------------------------------------------------------
+   ► ADDING YOUR OWN WORK
+
+   1. Add the picture to `src/data/images.ts` (one entry, with a `src`).
+   2. Add an item here pointing at that key.
+
+   Photographs need nothing else. For a film, add `video` — either a file you
+   host or a YouTube/Vimeo id — and the card opens a player instead of a viewer:
+
+       { kind: 'video', video: { provider: 'youtube', id: 'dQw4w9WgXcQ' } }
+       { kind: 'video', video: { provider: 'file', id: '/work/ridge-house.mp4' } }
+
+   Until a film has a source it opens a still frame and says so plainly rather
+   than pretending to play. `aspect` drives the masonry: 'tall' items take two
+   rows, 'wide' two columns. Mixing them is what stops the grid looking like a
+   spreadsheet.
+   ========================================================================= */
+
+export type PortfolioCategory =
+  | 'real-estate-photo'
+  | 'real-estate-video'
+  | 'drone'
+  | 'commercial'
+  | 'lifestyle';
+
+export const CATEGORIES: { id: PortfolioCategory | 'all'; label: string; blurb: string }[] = [
+  { id: 'all', label: 'All work', blurb: 'Everything, most recent first.' },
+  { id: 'real-estate-photo', label: 'Real estate photo', blurb: 'Interiors, exteriors and twilight sets.' },
+  { id: 'real-estate-video', label: 'Real estate video', blurb: 'Walkthroughs and property films.' },
+  { id: 'drone', label: 'Drone', blurb: 'Aerial stills and aerial video.' },
+  { id: 'commercial', label: 'Commercial', blurb: 'Brand and promotional work for local business.' },
+  { id: 'lifestyle', label: 'Lifestyle', blurb: 'People in the spaces, for brand and social.' },
+];
+
+export interface VideoSource {
+  provider: 'youtube' | 'vimeo' | 'file';
+  /** A YouTube/Vimeo id, or a path/URL for a file. */
+  id: string;
+}
+
+export interface PortfolioItem {
+  id: string;
+  title: string;
+  /** Where it was shot. Keep it to a town — never a full street address. */
+  location: string;
+  category: PortfolioCategory;
+  kind: 'photo' | 'video';
+  image: ImageKey;
+  aspect: 'square' | 'tall' | 'wide';
+  /** One line shown on hover and under the viewer. What the shot was for. */
+  caption: string;
+  /** The package it came from, so the grid doubles as proof of what you buy. */
+  service?: string;
+  video?: VideoSource;
+  /** Featured items lead the home page. Four is the right number. */
+  featured?: boolean;
+}
+
+export const PORTFOLIO: PortfolioItem[] = [
+  {
+    id: 'twilight-glass-house',
+    title: 'Twilight exterior',
+    location: 'Oxford, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reExteriorTwilight',
+    aspect: 'wide',
+    caption: 'The twenty-minute window after sunset where the sky and the windows balance.',
+    service: 'Premium package',
+    featured: true,
+  },
+  {
+    id: 'aerial-roofline',
+    title: 'Overhead, whole lot',
+    location: 'Tupelo, MS',
+    category: 'drone',
+    kind: 'photo',
+    image: 'aerialProperty',
+    aspect: 'tall',
+    caption: 'Straight down at 200 feet — the shot that shows what a listing photo cannot.',
+    service: 'Aerial photography',
+    featured: true,
+  },
+  {
+    id: 'living-room-flambient',
+    title: 'Living room',
+    location: 'Starkville, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reLiving',
+    aspect: 'square',
+    caption: 'Flambient blend: ambient for colour, flash for detail, window kept blue.',
+    service: 'Photo package',
+    featured: true,
+  },
+  {
+    // ► 277-north-place.mp4 — drop the file in public/work/ and run
+    //   `npm run link:work -- --write`; it matches this id by name.
+    id: '277-north-place',
+    title: '277 North Place',
+    location: 'Tupelo, MS',
+    category: 'real-estate-video',
+    kind: 'video',
+    image: 'filmFrameA',
+    aspect: 'wide',
+    caption: 'A full property film — approach, walkthrough and aerial, cut to one piece.',
+    service: 'Premium package',
+    featured: true,
+  },
+  {
+    // ► 1870-n-parc.mp4
+    id: '1870-n-parc',
+    title: '1870 N. Parc',
+    location: 'Oxford, MS',
+    category: 'real-estate-video',
+    kind: 'video',
+    image: 'reWalkthrough',
+    aspect: 'square',
+    caption: 'Interior-led walkthrough, paced so each room lands before the next.',
+    service: 'Photo + Video package',
+  },
+  {
+    id: 'property-film',
+    title: 'Property film',
+    location: 'Oxford, MS',
+    category: 'real-estate-video',
+    kind: 'video',
+    image: 'filmFrameA',
+    aspect: 'wide',
+    caption: 'Ninety seconds, graded, scored. Cut for the portal and again for Reels.',
+    service: 'Photo + Video package',
+  },
+  {
+    id: 'kitchen-island',
+    title: 'Kitchen',
+    location: 'Tupelo, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reKitchen',
+    aspect: 'square',
+    caption: 'Pendants balanced against daylight so nothing goes green under the cabinets.',
+    service: 'Photo package',
+  },
+  {
+    id: 'primary-suite',
+    title: 'Primary suite',
+    location: 'Columbus, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reBedroom',
+    aspect: 'tall',
+    caption: 'Bedside lamps on, ceiling light off. Rooms photograph better lit from low down.',
+    service: 'Photo package',
+  },
+  {
+    id: 'walkthrough-open',
+    title: 'Walkthrough, opening frame',
+    location: 'Southaven, MS',
+    category: 'real-estate-video',
+    kind: 'video',
+    image: 'reWalkthrough',
+    aspect: 'square',
+    caption: 'Gimbal move down the hall into the light. The first eight seconds decide the rest.',
+    service: 'Photo + Video package',
+  },
+  {
+    id: 'aerial-neighbourhood',
+    title: 'Neighbourhood at dusk',
+    location: 'Tupelo, MS',
+    category: 'drone',
+    kind: 'photo',
+    image: 'aerialNeighborhood',
+    aspect: 'wide',
+    caption: 'Context sells the house as much as the house does. Flown at civil twilight.',
+    service: 'Aerial photography',
+  },
+  {
+    id: 'pool-dusk',
+    title: 'Pool, blue hour',
+    location: 'Oxford, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'rePool',
+    aspect: 'square',
+    caption: 'Pool lights on, deck lights on, sky not yet black. Timing is the whole shot.',
+    service: 'Twilight add-on',
+  },
+  {
+    id: 'acreage',
+    title: 'Acreage and creek',
+    location: 'Pontotoc County, MS',
+    category: 'drone',
+    kind: 'photo',
+    image: 'aerialLand',
+    aspect: 'tall',
+    caption: 'Land listings live or die on the aerial. Boundaries legible, creek line visible.',
+    service: 'Aerial photography',
+  },
+  {
+    id: 'waterfront-dock',
+    title: 'Waterfront and dock',
+    location: 'Sardis Lake, MS',
+    category: 'drone',
+    kind: 'video',
+    image: 'aerialWater',
+    aspect: 'wide',
+    caption: 'A slow reveal out over the water, then back to the dock. One continuous move.',
+    service: 'Aerial video',
+  },
+  {
+    id: 'bath-detail',
+    title: 'Primary bath',
+    location: 'Starkville, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reBath',
+    aspect: 'square',
+    caption: 'Mirror lit separately so the room does not go flat. Tile kept straight.',
+    service: 'Photo package',
+  },
+  {
+    id: 'staircase',
+    title: 'Stair and balustrade',
+    location: 'Oxford, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reStair',
+    aspect: 'tall',
+    caption: 'Shot on a tilt-shift so the verticals stay vertical. They always should.',
+    service: 'Photo package',
+  },
+  {
+    id: 'dining',
+    title: 'Dining room',
+    location: 'Columbus, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reDining',
+    aspect: 'square',
+    caption: 'One point of view, one height, one horizon. Consistency is what makes a set.',
+    service: 'Photo package',
+  },
+  {
+    id: 'terrace-fire',
+    title: 'Covered terrace',
+    location: 'Tupelo, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reTerrace',
+    aspect: 'wide',
+    caption: 'Outdoor living photographs best when it is lit and the sky still has colour.',
+    service: 'Twilight add-on',
+  },
+  {
+    id: 'modern-cantilever',
+    title: 'Contemporary exterior',
+    location: 'Oxford, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reExteriorModern',
+    aspect: 'square',
+    caption: 'Two volumes, one shadow line. Lit to keep the cantilever reading as a cantilever.',
+    service: 'Premium package',
+  },
+  {
+    id: 'restaurant-bar',
+    title: 'Bar at service',
+    location: 'Oxford, MS',
+    category: 'commercial',
+    kind: 'photo',
+    image: 'commRestaurant',
+    aspect: 'tall',
+    caption: 'Shot during a real service. Staged hospitality photography never looks warm.',
+    service: 'Commercial',
+  },
+  {
+    id: 'gym-floor',
+    title: 'Training floor',
+    location: 'Tupelo, MS',
+    category: 'commercial',
+    kind: 'video',
+    image: 'commGym',
+    aspect: 'wide',
+    caption: 'Cool key, warm practical, one figure for scale. Cut to a 30-second spot.',
+    service: 'Commercial',
+  },
+  {
+    id: 'showroom',
+    title: 'Showroom floor',
+    location: 'Southaven, MS',
+    category: 'commercial',
+    kind: 'photo',
+    image: 'commAuto',
+    aspect: 'square',
+    caption: 'Overheads controlled, reflections managed. Cars are mirrors, which is the problem.',
+    service: 'Commercial',
+  },
+  {
+    id: 'hotel-portico',
+    title: 'Hotel at dusk',
+    location: 'Tupelo, MS',
+    category: 'commercial',
+    kind: 'photo',
+    image: 'commHotel',
+    aspect: 'tall',
+    caption: 'Every guest room light checked before the shot. It is worth the half hour.',
+    service: 'Commercial',
+  },
+  {
+    id: 'retail-interior',
+    title: 'Store interior',
+    location: 'Oxford, MS',
+    category: 'commercial',
+    kind: 'photo',
+    image: 'commRetail',
+    aspect: 'square',
+    caption: 'Track lighting balanced so the stock reads true. Colour accuracy is the job.',
+    service: 'Commercial',
+  },
+  {
+    id: 'event-stage',
+    title: 'Live event',
+    location: 'Starkville, MS',
+    category: 'commercial',
+    kind: 'video',
+    image: 'commEvent',
+    aspect: 'wide',
+    caption: 'Shot fast, graded warm, cut to music. Delivered the following morning.',
+    service: 'Commercial',
+  },
+  {
+    id: 'terrace-lifestyle',
+    title: 'Terrace, evening',
+    location: 'Oxford, MS',
+    category: 'lifestyle',
+    kind: 'photo',
+    image: 'lifestyleTerrace',
+    aspect: 'wide',
+    caption: 'People in the space, back-lit. Lifestyle frames outperform empty rooms on social.',
+    service: 'Commercial',
+  },
+  {
+    id: 'drone-in-flight',
+    title: 'On location',
+    location: 'North Mississippi',
+    category: 'lifestyle',
+    kind: 'photo',
+    image: 'droneInFlight',
+    aspect: 'square',
+    caption: 'The aircraft up at blue hour. Licensed, insured, and flown inside the rules.',
+    service: 'Aerial',
+  },
+  {
+    id: 'exterior-night',
+    title: 'After dark',
+    location: 'Columbus, MS',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reExteriorNight',
+    aspect: 'square',
+    caption: 'A true night exterior, lit from inside. Rare on a listing, and it shows.',
+    service: 'Twilight add-on',
+  },
+  {
+    id: 'commercial-frontage',
+    title: 'Commercial frontage',
+    location: 'Highway 45, MS',
+    category: 'drone',
+    kind: 'photo',
+    image: 'aerialHighway',
+    aspect: 'tall',
+    caption: 'Traffic counts are an argument. An aerial at dusk makes it for you.',
+    service: 'Aerial photography',
+  },
+];
+
+export const FEATURED_WORK = PORTFOLIO.filter((p) => p.featured);
+
+export function byCategory(category: PortfolioCategory | 'all'): PortfolioItem[] {
+  return category === 'all' ? PORTFOLIO : PORTFOLIO.filter((p) => p.category === category);
+}
+
+export function countFor(category: PortfolioCategory | 'all'): number {
+  return byCategory(category).length;
+}
+
+export function categoryLabel(id: PortfolioCategory): string {
+  return CATEGORIES.find((c) => c.id === id)?.label ?? id;
+}
+
+/** Playable means a source exists. Everything else opens as a still. */
+export function isPlayable(item: PortfolioItem): boolean {
+  return item.kind === 'video' && !!item.video && item.video.id.trim().length > 0;
+}
+
+export function videoEmbedUrl(v: VideoSource): string {
+  if (v.provider === 'youtube') {
+    return `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1`;
+  }
+  if (v.provider === 'vimeo') return `https://player.vimeo.com/video/${v.id}?autoplay=1&title=0&byline=0`;
+  return v.id;
+}

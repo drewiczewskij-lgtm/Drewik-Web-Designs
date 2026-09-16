@@ -28,7 +28,7 @@ import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
    ========================================================================= */
 
 export function BookingFlow() {
-  const { step, next, back, blocker, draft, set, pricing } = useBooking();
+  const { step, next, back, blocker, draft, set, pricing, restoreFromReference } = useBooking();
   const [params, setParams] = useSearchParams();
   const [summaryOpen, setSummaryOpen] = useState(false);
   const reduced = usePrefersReducedMotion();
@@ -56,6 +56,19 @@ export function BookingFlow() {
     setParams(params, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* Stripe returns the customer to /book/confirmed?ref=KM-XXXXXX. Reading it
+     here is what turns a successful payment into a receipt instead of an empty
+     step one — which is the single worst screen to show someone who has just
+     paid. Runs once; `restoreFromReference` owns everything after that. */
+  const restoredRef = useRef(false);
+  useEffect(() => {
+    if (restoredRef.current) return;
+    const ref = params.get('ref');
+    if (!ref) return;
+    restoredRef.current = true;
+    void restoreFromReference(ref);
+  }, [params, restoreFromReference]);
 
   const cancelled = params.get('cancelled');
 
@@ -170,8 +183,10 @@ export function BookingFlow() {
           )}
         </div>
 
-        {/* Desktop: the order, pinned. */}
-        <aside className="hidden lg:block">
+        {/* Desktop: the order, pinned. Not on the confirmation — the draft is
+            cleared by then, so it would sit beside a finished booking inviting
+            the customer to choose a package. The receipt itemises it anyway. */}
+        <aside className={isConfirmed ? 'hidden' : 'hidden lg:block'}>
           <div className="sticky top-28 flex flex-col gap-4">
             <OrderSummary />
             {draft.packageId && pricing?.ok && (

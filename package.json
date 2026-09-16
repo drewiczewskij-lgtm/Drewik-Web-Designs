@@ -16,7 +16,9 @@
     "build:single": "node scripts/build-variant.mjs single",
     "test:booking": "node scripts/test-booking.mjs",
     "link:work": "node scripts/link-work.mjs",
-    "use:stock": "node scripts/use-stock.mjs"
+    "use:stock": "node scripts/use-stock.mjs",
+    "make:og": "node scripts/make-og.mjs",
+    "make:seo": "node scripts/make-seo.mjs"
   },
   "dependencies": {
     "lenis": "^1.3.26",

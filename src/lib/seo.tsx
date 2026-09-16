@@ -59,6 +59,19 @@ export function Seo({ title, description, path, schema, noIndex }: SeoProps) {
     setMeta('meta[property="og:description"]', 'property', 'og:description', description);
     setMeta('meta[property="og:type"]', 'property', 'og:type', 'website');
     setMeta('meta[property="og:site_name"]', 'property', 'og:site_name', BRAND.name);
+    // The share card. Absolute, because a relative one is ignored by every
+    // scraper that matters.
+    const ogImage = `${BRAND.url.replace(/\/$/, '')}/og.png`;
+    setMeta('meta[property="og:image"]', 'property', 'og:image', ogImage);
+    setMeta('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
+    setMeta('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+    setMeta(
+      'meta[property="og:image:alt"]',
+      'property',
+      'og:image:alt',
+      `${BRAND.name} — ${BRAND.tagline}`,
+    );
+    setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', ogImage);
     setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', full);
     setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', description);
     setMeta(

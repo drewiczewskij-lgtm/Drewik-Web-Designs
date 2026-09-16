@@ -25,6 +25,8 @@ npm run test:booking     # 27 assertions on pricing and availability
 npm run check:images     # verify every photograph resolves
 npm run link:work        # wire files in public/work/ into the site
 npm run use:stock        # switch between stock photographs and drawn plates
+npm run make:og          # redraw the social share card (public/og.png)
+npm run make:seo         # rebuild sitemap.xml and robots.txt
 ```
 
 Node 20 or newer.
@@ -257,6 +259,35 @@ explaining why.
 A booking holds its slot from the moment it is written, *before* payment — the
 alternative is taking someone's money for a time that was sold while they typed
 their card number. An abandoned checkout expires after 30 minutes.
+
+---
+
+## Before you go live
+
+Four things, in this order. None takes more than a minute.
+
+1. **Set your real domain.** `url` in `src/data/site.ts`. Everything below reads
+   it, and until it is right they all point at a domain you do not own.
+
+2. **Rebuild the search files.**
+
+   ```bash
+   npm run make:seo     # sitemap.xml + robots.txt
+   npm run make:og      # the share card
+   ```
+
+   `robots.txt` keeps `/admin` and the confirmation page out of search — one is
+   an internal console, the other is somebody's private receipt.
+
+3. **Check the photographs resolve.** `npm run check:images`. See above.
+
+4. **Replace the remaining placeholders** — everything marked `// PLACEHOLDER`
+   in `src/data/site.ts`, and the testimonials once you have real ones.
+
+`public/og.png` is what a link to the site looks like when it is pasted into a
+text message, Slack or Facebook. Without it the link is a grey box. It is
+generated from your own business details, so re-run `make:og` after changing
+them. It uses the Playwright already installed for testing — nothing new.
 
 ---
 

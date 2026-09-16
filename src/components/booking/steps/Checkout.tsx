@@ -343,21 +343,50 @@ export function StepPayment() {
 
 /** Step 9. */
 export function StepConfirmed() {
-  const { lastBooking, reset, live } = useBooking();
+  const { confirmation, confirmationStatus, reset, live } = useBooking();
   const reduced = usePrefersReducedMotion();
 
-  if (!lastBooking) {
+  /* Reading a booking back after Stripe returns the customer. Showing a
+     spinner beats showing "no booking found" to somebody whose card has just
+     been charged and whose request is still in flight. */
+  if (confirmationStatus === 'loading' && !confirmation) {
     return (
-      <div className="flex flex-col gap-5">
-        <p className="text-muted">No booking to show. Start again from the first step.</p>
-        <Button onClick={reset} variant="ghost">
-          Start a new booking
-        </Button>
+      <div className="flex flex-col items-center gap-4 py-16 text-center">
+        <Spinner />
+        <p className="text-muted">Looking up your booking…</p>
       </div>
     );
   }
 
-  const pkg = getPackage(lastBooking.packageId);
+  if (confirmationStatus === 'missing' || !confirmation) {
+    return (
+      <div className="flex flex-col gap-6">
+        <Notice tone="warn" title="We could not find that booking">
+          The reference in the link did not match anything. If you have just paid,
+          your money is safe — the payment and the booking are recorded separately
+          and a receipt will have come from Stripe. Call{' '}
+          <a href={`tel:${CONTACT.phoneHref}`} className="link-rule font-mono">
+            {CONTACT.phone}
+          </a>{' '}
+          with that reference and it will be sorted in a minute.
+        </Notice>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={reset} variant="ghost">
+            Start a new booking
+          </Button>
+          <Button to="/contact" variant="quiet">
+            Contact us
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const b = confirmation;
+  // Paid is the server's word. Pending means Stripe has not confirmed yet,
+  // which is normal for a few seconds and must not be dressed up as done.
+  const settled = b.paid;
+  const pending = !settled && b.status === 'pending' && live;
 
   return (
     <div className="flex flex-col gap-8">
@@ -368,13 +397,19 @@ export function StepConfirmed() {
         className="flex flex-col items-center gap-5 py-4 text-center"
       >
         <span
-          className="relative grid h-20 w-20 place-items-center rounded-full border border-good/50 bg-good/10"
-          style={{ boxShadow: '0 0 60px -14px rgb(52 211 153 / 0.8)' }}
+          className={`relative grid h-20 w-20 place-items-center rounded-full border ${
+            settled ? 'border-good/50 bg-good/10' : 'border-amber/50 bg-amber/10'
+          }`}
+          style={{
+            boxShadow: settled
+              ? '0 0 60px -14px rgb(52 211 153 / 0.8)'
+              : '0 0 60px -14px rgb(255 184 97 / 0.7)',
+          }}
         >
           <svg width="30" height="23" viewBox="0 0 30 23" fill="none" aria-hidden="true">
             <motion.path
               d="M2 11.5L11 20.5L28 2.5"
-              stroke="rgb(52 211 153)"
+              stroke={settled ? 'rgb(52 211 153)' : 'rgb(255 184 97)'}
               strokeWidth="2.6"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -387,32 +422,37 @@ export function StepConfirmed() {
 
         <div className="flex flex-col gap-2">
           <h3 className="t-h2">
-            {live && lastBooking.paid ? 'You’re booked.' : 'Booking recorded.'}
+            {settled
+              ? b.firstName
+                ? `You’re booked, ${b.firstName}.`
+                : 'You’re booked.'
+              : pending
+                ? 'Payment is being confirmed.'
+                : 'Booking recorded.'}
           </h3>
           <p className="t-lead max-w-[46ch] text-muted">
-            {live && lastBooking.paid
-              ? `A confirmation is on its way to ${lastBooking.customer.email}, with a prep note for the property.`
-              : 'This run was a demonstration — no payment was taken and no appointment was reserved.'}
+            {settled
+              ? `A confirmation is on its way${b.email ? ` to ${b.email}` : ''}, with a prep note for the property.`
+              : pending
+                ? 'Your slot is held. This page updates as soon as the payment clears — it usually takes a few seconds. You will get a receipt either way.'
+                : 'This run was a demonstration — no payment was taken and no appointment was reserved.'}
           </p>
         </div>
 
         <div className="flex items-center gap-3 rounded-full border border-line px-5 py-2.5">
           <span className="t-label">Reference</span>
           <span className="font-mono text-[15px] tracking-[0.14em] text-bright">
-            {lastBooking.reference}
+            {b.reference}
           </span>
         </div>
       </motion.div>
 
       <div className="glass edge flex flex-col divide-y divide-line">
-        <Line label="Package" value={pkg?.name ?? lastBooking.packageId} />
-        <Line label="Date" value={formatDate(lastBooking.date)} />
-        <Line label="Time" value={formatTime(lastBooking.time)} />
-        <Line label="Property" value={lastBooking.customer.address} />
-        <Line
-          label={live && lastBooking.paid ? 'Paid' : 'Total'}
-          value={money(lastBooking.totalCents)}
-        />
+        <Line label="Package" value={b.packageName} />
+        {b.date && <Line label="Date" value={formatDate(b.date)} />}
+        {b.time && <Line label="Time" value={formatTime(b.time)} />}
+        {b.address && <Line label="Property" value={b.address} />}
+        <Line label={settled ? 'Paid' : 'Total'} value={money(b.totalCents)} />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -427,9 +467,7 @@ export function StepConfirmed() {
           </li>
           <li className="flex gap-3">
             <span className="font-mono text-neon">02</span>
-            <span>
-              You get a reminder the day before, with a rough arrival window.
-            </span>
+            <span>You get a reminder the day before, with a rough arrival window.</span>
           </li>
           <li className="flex gap-3">
             <span className="font-mono text-neon">03</span>
@@ -454,7 +492,7 @@ export function StepConfirmed() {
         <a href={`tel:${CONTACT.phoneHref}`} className="link-rule font-mono">
           {CONTACT.phone}
         </a>{' '}
-        with reference {lastBooking.reference}. Rescheduling is free up to 24 hours before.
+        with reference {b.reference}. Rescheduling is free up to 24 hours before.
       </p>
     </div>
   );

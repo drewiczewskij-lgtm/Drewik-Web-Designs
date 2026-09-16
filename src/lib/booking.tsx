@@ -8,11 +8,12 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { quote, SIZE_TIERS, type QuoteResult } from '@shared/catalog.mjs';
+import { getPackage, quote, SIZE_TIERS, type QuoteResult } from '@shared/catalog.mjs';
 import { bookingWindow, isoDate } from '@shared/schedule.mjs';
 import {
   createBooking,
   fetchAvailability,
+  fetchBooking,
   type BookingRequest,
   type CustomerDetails,
 } from '@/lib/api';
@@ -93,6 +94,31 @@ export interface CompletedBooking {
   paid: boolean;
 }
 
+/**
+ * What the confirmation screen renders.
+ *
+ * It comes from one of two places, and they do NOT carry the same fields. A
+ * booking made in this browser has everything. One read back from the server
+ * after Stripe returns the customer has only what a receipt needs — the server
+ * deliberately does not hand out the address or phone number for a six-character
+ * reference anybody could guess.
+ */
+export interface ConfirmedView {
+  reference: string;
+  date: string;
+  time: string;
+  packageName: string;
+  totalCents: number;
+  paid: boolean;
+  status?: string;
+  /** Present only when the booking was made in this browser. */
+  address?: string;
+  email?: string;
+  firstName?: string;
+}
+
+export type ConfirmationStatus = 'idle' | 'loading' | 'ready' | 'missing';
+
 interface BookingValue {
   draft: Draft;
   set: <K extends keyof Draft>(key: K, value: Draft[K]) => void;
@@ -122,6 +148,13 @@ interface BookingValue {
 
   history: CompletedBooking[];
   lastBooking: CompletedBooking | null;
+
+  /** What the confirmation step shows, whoever produced it. */
+  confirmation: ConfirmedView | null;
+  confirmationStatus: ConfirmationStatus;
+  /** Reads a booking back by reference — the path Stripe returns customers on. */
+  restoreFromReference: (reference: string) => Promise<void>;
+
   live: boolean;
 }
 
@@ -168,6 +201,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [lastBooking, setLastBooking] = useState<CompletedBooking | null>(null);
+  const [confirmation, setConfirmation] = useState<ConfirmedView | null>(null);
+  const [confirmationStatus, setConfirmationStatus] = useState<ConfirmationStatus>('idle');
 
   /* The newest draft, readable synchronously.
 
@@ -179,6 +214,11 @@ export function BookingProvider({ children }: { children: ReactNode }) {
      a ref makes both paths see the same thing. */
   const draftRef = useRef(draft);
   draftRef.current = draft;
+
+  /* Same reason as `draftRef`: `restoreFromReference` is called from an effect
+     and must see the newest history, not the copy from the render that made it. */
+  const historyRef = useRef(history);
+  historyRef.current = history;
 
   useEffect(() => write(DRAFT_KEY, draft), [draft]);
   useEffect(() => write(HISTORY_KEY, history), [history]);
@@ -233,6 +273,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     setDraft(EMPTY_DRAFT);
     setStep('type');
     setSubmitError(null);
+    setConfirmation(null);
+    setConfirmationStatus('idle');
   }, []);
 
   const pricing = useMemo<QuoteResult | null>(() => {
@@ -359,6 +401,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 
     setHistory((h) => [completed, ...h]);
     setLastBooking(completed);
+    setConfirmation(toView(completed));
+    setConfirmationStatus('ready');
 
     if (result.checkoutUrl) {
       // Live: the customer leaves for Stripe's hosted checkout. The booking is
@@ -372,6 +416,84 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     setSubmitting(false);
     setStep('confirmed');
   }, [draft, pricing]);
+
+  /**
+   * Shows the confirmation for a reference in the URL.
+   *
+   * This is what Stripe returns the customer to after paying, and getting it
+   * wrong is expensive: without it they come back from a successful payment to
+   * an empty step one, with no receipt and no reason to believe it worked.
+   *
+   * The local record shows instantly when this is the same browser. The server
+   * is asked either way, because only it knows whether the payment actually
+   * cleared — a local record is written before the customer ever reaches
+   * Stripe, so on its own it cannot tell paid from abandoned.
+   */
+  const restoreFromReference = useCallback(
+    async (reference: string) => {
+      const ref = reference.trim().toUpperCase();
+      if (!ref) return;
+
+      setStep('confirmed');
+      setConfirmationStatus('loading');
+
+      const local = historyRef.current.find((b) => b.reference === ref);
+      if (local) setConfirmation(toView(local));
+
+      const result = await fetchBooking(ref);
+
+      /* Demonstration mode answers every reference with "ok" because there is
+         no server to disagree with. Without a local record to back it that is
+         an empty receipt, so treat it as not found rather than render blanks. */
+      if (result.demo && !local) {
+        setConfirmationStatus('missing');
+        return;
+      }
+
+      if (result.ok && result.reference && !result.demo) {
+        const remote = result as unknown as {
+          reference: string;
+          status?: string;
+          date?: string;
+          time?: string;
+          packageName?: string;
+          totalCents?: number;
+          paid?: boolean;
+          customerFirstName?: string;
+        };
+        setConfirmation({
+          reference: remote.reference,
+          // The server is the authority on everything it returns; the local
+          // record only fills the gaps it deliberately withholds.
+          date: remote.date ?? local?.date ?? '',
+          time: remote.time ?? local?.time ?? '',
+          packageName:
+            remote.packageName ??
+            (local ? getPackage(local.packageId)?.name ?? local.packageId : ''),
+          totalCents: remote.totalCents ?? local?.totalCents ?? 0,
+          paid: remote.paid ?? local?.paid ?? false,
+          status: remote.status,
+          firstName: remote.customerFirstName || local?.customer.name.split(' ')[0],
+          address: local?.customer.address,
+          email: local?.customer.email,
+        });
+        setConfirmationStatus('ready');
+        // The booking is done, so the part-finished draft behind it is stale.
+        setDraft(EMPTY_DRAFT);
+        return;
+      }
+
+      // Demonstration mode, with the local record to show.
+      if (local) {
+        setConfirmationStatus('ready');
+        setDraft(EMPTY_DRAFT);
+        return;
+      }
+
+      setConfirmationStatus('missing');
+    },
+    [],
+  );
 
   const value = useMemo<BookingValue>(
     () => ({
@@ -394,12 +516,15 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       submitError,
       history,
       lastBooking,
+      confirmation,
+      confirmationStatus,
+      restoreFromReference,
       live: isLive(),
     }),
     [
       draft, set, setCustomer, toggleAddon, reset, step, goTo, next, back, blocker,
       furthest, pricing, booked, availabilityError, submit, submitting, submitError,
-      history, lastBooking,
+      history, lastBooking, confirmation, confirmationStatus, restoreFromReference,
     ],
   );
 
@@ -410,6 +535,21 @@ export function useBooking(): BookingValue {
   const ctx = useContext(BookingContext);
   if (!ctx) throw new Error('useBooking must be used inside BookingProvider');
   return ctx;
+}
+
+/** A booking made in this browser, as the confirmation screen wants it. */
+function toView(b: CompletedBooking): ConfirmedView {
+  return {
+    reference: b.reference,
+    date: b.date,
+    time: b.time,
+    packageName: getPackage(b.packageId)?.name ?? b.packageId,
+    totalCents: b.totalCents,
+    paid: b.paid,
+    address: b.customer.address,
+    email: b.customer.email,
+    firstName: b.customer.name.split(' ')[0],
+  };
 }
 
 /** Today, for the calendar's initial month. */
