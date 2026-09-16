@@ -52,6 +52,53 @@
   --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+/* ============================================================================
+   THE PAGE GROUND — DELIBERATELY OUTSIDE @layer
+   ----------------------------------------------------------------------------
+   Everything else in this file sits inside `@layer base`, which is correct:
+   layered rules are easy to override from a component.
+
+   These are not, and must not be. An UNLAYERED rule beats a LAYERED one no
+   matter what order they appear in or how specific either is — that is the
+   whole point of the cascade layers spec. So when this site is embedded in a
+   host that paints its own ground with plain unlayered CSS (a preview frame, a
+   CMS shell, an email client's reader), a `body { background }` inside
+   `@layer base` silently loses, and the host's light ground shows through
+   underneath this site's near-white type. White text on a white page.
+
+   That is not hypothetical: it is exactly what happened the first time this
+   was embedded. These few declarations are the site's floor, so they are
+   written where nothing can quietly outrank them.
+
+   Keep the font here too. A host that sets `font: 14px system-ui` on body in
+   the same unlayered way would otherwise beat the typeface as well.
+   ========================================================================= */
+
+/* `:root`, not `html`, and deliberately. A host that declares
+   `:root { color-scheme: light }` outranks a plain `html` selector — `:root` is
+   a pseudo-class (0,1,0) and `html` a type selector (0,0,1) — so matching it
+   selector-for-selector is what actually wins, given this rule comes later.
+   It decides how native controls, scrollbars and the caret are drawn. */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: var(--color-void);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-void);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: -0.006em;
+}
+
 @layer base {
   :root {
     --gutter: clamp(1.15rem, 4.5vw, 5rem);
@@ -69,9 +116,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Background and text-size-adjust are set above, outside any layer. */
   html {
-    background-color: var(--color-void);
-    -webkit-text-size-adjust: 100%;
     scrollbar-color: var(--color-line) transparent;
   }
 
@@ -87,14 +133,9 @@
     overflow: hidden;
   }
 
+  /* Background, colour and font for `body` are set above, outside any layer.
+     Only the properties no host is likely to fight over are left here. */
   body {
-    margin: 0;
-    background-color: var(--color-void);
-    color: var(--color-body);
-    font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.65;
-    letter-spacing: -0.006em;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
