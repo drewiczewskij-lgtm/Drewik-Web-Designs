@@ -88,6 +88,58 @@ home section, which shows what you have booked, reserved and asked.
 
 ---
 
+## Going live: real bookings and real payments
+
+Out of the box the diary and the deposit are demonstrations. Both become real
+when you fill in `src/config/integrations.ts`, or the matching variables in a
+`.env.local` copied from `.env.example`. Neither needs a server, a database, or
+an API key in the browser.
+
+**Bookings.** Create an event type in Cal.com or Calendly, then set:
+
+```
+VITE_BOOKING_PROVIDER=cal          # or: calendly
+VITE_BOOKING_LINK=elena/viewing    # the path only, not the full address
+```
+
+The panel then embeds the scheduler's own page instead of the built-in
+calendar. It is a plain iframe, so no third-party script runs on your site and
+nothing the scheduler ships can read the rest of the page. A frame can always be
+refused by a browser setting or a blocker, and a refused frame still fires
+`load`, so there is no way to detect it from here — the same booking is
+therefore always one click away in a new tab, underneath the frame.
+
+**Payments.** In the Stripe dashboard go to Payment links, create one per
+residence (each deposit is a different amount), and paste the addresses:
+
+```
+VITE_PAYMENT_PROVIDER=stripe
+VITE_STRIPE_LINK_CASA_AURELIA=https://buy.stripe.com/...
+VITE_STRIPE_LINK_RIDGE_HOUSE=https://buy.stripe.com/...
+VITE_STRIPE_LINK_VILLA_17=https://buy.stripe.com/...
+VITE_STRIPE_LINK_GLASS_HOUSE=https://buy.stripe.com/...
+```
+
+The card form disappears entirely and becomes a summary plus one button to
+Stripe's hosted checkout. **No card number ever touches this code**, which is
+the whole point: it keeps you out of PCI scope. The link carries
+`client_reference_id` set to the residence slug, so your Stripe webhook can tell
+which property a payment belongs to, and prefills the buyer's email.
+
+Work in Stripe test mode first. A test-mode link only ever accepts test cards,
+so you can click the entire flow without moving money.
+
+Two things worth knowing:
+
+- These values are compiled into the JavaScript, which is correct — a scheduler
+  link and a payment link are public by design. A Stripe **secret** key
+  (`sk_...`) must never appear here.
+- The embedded scheduler needs a real host. It cannot load inside the published
+  artifact, whose sandbox blocks third-party frames, so that copy stays in
+  demonstration mode.
+
+---
+
 ## Stack
 
 - **React 19** + **TypeScript** + **Vite 8**

@@ -11,7 +11,9 @@ import {
 } from '@/lib/office';
 import { cn } from '@/lib/cn';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
+import { bookingIsLive } from '@/config/integrations';
 import { Figure } from '../Figure';
+import { LiveBooking } from './LiveBooking';
 import { Panel, Solid, Chip } from './Panel';
 
 /* ==========================================================================
@@ -62,6 +64,7 @@ export function BookViewing() {
   const [ref, setRef] = useState<string | null>(null);
 
   const agent = agentFor(property);
+  const live = bookingIsLive();
 
   // The month grid, padded so the first of the month lands on its weekday.
   const grid = useMemo(() => {
@@ -112,6 +115,14 @@ export function BookViewing() {
       setStep('done');
     }, 700);
   };
+
+  if (live) {
+    return (
+      <Panel open={open} onClose={close} eyebrow="Private Viewing" title="Book a viewing">
+        <LiveBooking property={property} />
+      </Panel>
+    );
+  }
 
   return (
     <Panel

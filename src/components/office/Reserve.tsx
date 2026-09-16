@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { agentFor, depositFor, money, useOffice } from '@/lib/office';
+import { checkoutUrl, paymentIsLive } from '@/config/integrations';
 import { cn } from '@/lib/cn';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { Figure } from '../Figure';
@@ -72,6 +73,10 @@ export function Reserve() {
   const open = desk === 'reserve';
   const agent = agentFor(property);
   const deposit = depositFor(property);
+  // With a payment link configured, no card field is ever rendered here: the
+  // buyer goes to the provider's own hosted checkout instead.
+  const live = paymentIsLive(property.slug);
+  const [email, setEmail] = useState('');
 
   const [card, setCard] = useState('');
   const [exp, setExp] = useState('');
@@ -125,6 +130,73 @@ export function Reserve() {
     setZip('');
     setErrors({});
   };
+
+  if (live) {
+    const href = checkoutUrl(property.slug, email.trim() || undefined);
+    return (
+      <Panel
+        open={open}
+        onClose={close}
+        eyebrow="Reservation"
+        title="Reserve this residence"
+        footer={
+          <>
+            <a
+              href={href ?? '#'}
+              className="press focus-bare bg-ink text-paper flex w-full items-center justify-center gap-3 px-7 py-4"
+            >
+              <span className="t-label">Continue to secure checkout</span>
+              <svg width="18" height="8" viewBox="0 0 22 8" fill="none" aria-hidden="true">
+                <path d="M0 4h20M16.4 0.6 20 4l-3.6 3.4" stroke="currentColor" strokeWidth="1.2" />
+              </svg>
+            </a>
+            <p className="text-stone-deep mt-3 text-center text-[0.78rem] leading-relaxed">
+              Payment is taken by Stripe. Your card details never reach this site.
+            </p>
+          </>
+        }
+      >
+        <div className="border-ink/12 mb-7 flex items-center gap-4 border-b pb-6">
+          <Figure image={property.cover} className="h-16 w-24 shrink-0" sizes="96px" quality={50} />
+          <div className="min-w-0 flex-1">
+            <p className="t-h3 truncate">{property.name}</p>
+            <p className="t-label text-stone-deep mt-1.5">{property.locationLine}</p>
+          </div>
+        </div>
+
+        <dl className="border-ink/12 mb-8 border-b pb-5">
+          <Row k="Guide price" v={property.priceDisplay} />
+          <Row k="Reservation deposit" v={`1% · ${money(deposit)}`} />
+          <Row k="Exclusivity" v="14 days" />
+          <Row k="Refundable" v="In full, within 14 days" />
+          <div className="border-ink/14 mt-3 flex items-baseline justify-between gap-6 border-t pt-4">
+            <dt className="t-label">Due now</dt>
+            <dd className="font-display t-num text-2xl leading-none font-light">
+              {money(deposit)}
+            </dd>
+          </div>
+        </dl>
+
+        <label htmlFor="rs-email" className="t-label text-stone-deep mb-2 block">
+          Email for the receipt
+        </label>
+        <input
+          id="rs-email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="field text-ink"
+        />
+
+        <p className="t-body text-stone-deep mt-7 text-[0.88rem] leading-relaxed">
+          You will be handed to Stripe to pay. {agent.name} is notified the moment
+          it clears, and the pack goes to your solicitor the same day.
+        </p>
+      </Panel>
+    );
+  }
 
   return (
     <Panel
