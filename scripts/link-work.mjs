@@ -46,6 +46,13 @@ const VIDEO_EXT = new Set(['.mp4', '.webm', '.mov', '.m4v']);
  * side is the normalised filename, the right side is the key in images.ts.
  */
 const ALIASES = {
+  // The five shots the image library already names in its comments.
+  frontelevation: 'reExteriorDay',
+  poolterrace: 'rePool',
+  entrystair: 'entryStair',
+  diningroom: 'reDining',
+  aerialfarmhouse: 'aerialProperty',
+
   founder: 'founderPortrait',
   portrait: 'founderPortrait',
   bryan: 'founderPortrait',
@@ -65,6 +72,12 @@ const ALIASES = {
   drone: 'aerialProperty',
   exterior: 'reExteriorDay',
   gear: 'gearStill',
+  foyer: 'entryStair',
+  entry: 'entryStair',
+  staircase: 'entryStair',
+  dining: 'reDining',
+  front: 'reExteriorDay',
+  exteriorfront: 'reExteriorDay',
 };
 
 /** 'Hero Twilight-01.JPG' → 'herotwilight01' */

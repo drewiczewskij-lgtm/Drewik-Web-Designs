@@ -22,8 +22,9 @@ npm run build            # typecheck + production build to dist/
 npm run preview          # serve the production build
 
 npm run test:booking     # 27 assertions on pricing and availability
-npm run check:images     # report which frames are drawn and which are real
+npm run check:images     # verify every photograph resolves
 npm run link:work        # wire files in public/work/ into the site
+npm run use:stock        # switch between stock photographs and drawn plates
 ```
 
 Node 20 or newer.
@@ -117,13 +118,36 @@ right in the browser and wrong on the invoice.
 
 ---
 
-## Putting your own photographs on it
+## Photographs
 
-**Right now every image on this site is drawn, not photographed.** Each frame
-renders a composed, blue-hour illustration of its subject from
-`src/lib/scenes.ts`. That is deliberate: nothing is requested from a network, so
-nothing can ever 404, and the site looks finished on day one. The portfolio page
-says so plainly rather than passing illustrations off as work.
+The site ships pointing at a set of **real stock photographs** (Unsplash, free
+for commercial use without attribution). Behind every one of them sits a drawn
+plate from `src/lib/scenes.ts` — a composed illustration of that exact subject —
+which appears automatically if the photograph does not load. So a dead link, a
+blocked CDN or an offline laptop degrades into art direction instead of a broken
+image. Verified: 85 frames across five pages with every photograph unreachable,
+zero broken images.
+
+```bash
+npm run check:images          # verify every photograph actually resolves
+npm run use:stock -- --revert # go back to drawn plates only
+npm run use:stock -- --write  # and back to photographs again
+```
+
+**Run `check:images` once on your own machine.** The stock ids were chosen
+without network access and have never been tested against the live CDN. The
+script requests every one and names the failures; delete those lines from
+`src/data/stock.ts` and that frame keeps its drawing. Nothing breaks either way.
+
+The founder's portrait is deliberately excluded from the stock set and stays a
+drawn stand-in. A photograph of a stranger presented as the founder of the
+business would be a lie told to every visitor.
+
+### Putting your own work on it
+
+Stock is a staging step, not the destination — the point of the site is to show
+*your* photographs. Your own files always win: `use:stock` will not overwrite an
+entry that already points at something in `public/work/`.
 
 To replace them:
 
@@ -357,8 +381,12 @@ This matters, so it is listed rather than buried.
   show the section. They carry an "Example" label and the section carries a
   notice. Delete `placeholder: true` from an entry once the words are genuinely
   someone else's, and the labelling disappears on its own.
-- **Photographs and films.** All drawn. See above.
-- **The founder's portrait.** A drawn stand-in, labelled on the About page.
+- **Photographs.** Stock, of other people's houses, with drawn plates behind
+  them. Replace with your own work — see above.
+- **Films.** No sources yet. A film with no source opens its still frame and
+  says so rather than showing a play button that does nothing.
+- **The founder's portrait.** A drawn stand-in, labelled on the About page, and
+  excluded from the stock set on purpose.
 
 **Placeholder facts to replace** — marked `// PLACEHOLDER` in `src/data/site.ts`:
 the domain, the founding year, the service area, the city, and the social links.
