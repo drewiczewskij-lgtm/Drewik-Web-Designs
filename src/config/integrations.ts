@@ -1,139 +1,74 @@
 /* ============================================================================
-   INTEGRATIONS — THE ONLY FILE YOU EDIT TO GO LIVE
+   INTEGRATIONS — WHAT YOU EDIT TO GO LIVE
    ----------------------------------------------------------------------------
-   Out of the box both the diary and the deposit are demonstrations: nothing is
-   booked and no money moves. Fill in the two values below (or set the matching
-   environment variables) and the site switches to the real thing on its own.
+   Out of the box the site runs in DEMONSTRATION MODE: the calendar works, the
+   totals are real, the forms validate — but no money moves and no booking
+   leaves the browser. Every screen that is pretending says so, out loud, where
+   the customer can read it. Nothing here fakes a payment.
 
-   Neither integration needs a server, a database, or an API key in the browser.
-   A booking is an embedded page from your scheduler; a payment is a redirect to
-   a link your payment provider hosts. No card number ever touches this code.
+   To make it real you need the small server in `api/`. It exists because a
+   payment cannot be done safely from a browser: the price has to be
+   recalculated somewhere the customer cannot edit, and the Stripe secret key
+   has to live somewhere they cannot read. See `api/README.md`.
 
-   ── BOOKING ───────────────────────────────────────────────────────────────
-   Cal.com    Create an event type, then take the part of its public address
-              after cal.com — for example `elena/viewing`.
-   Calendly   Same idea: from calendly.com/elena/viewing, take `elena/viewing`.
+   ── THE ONE VARIABLE THAT SWITCHES IT ON ──────────────────────────────────
 
-   ── PAYMENTS ──────────────────────────────────────────────────────────────
-   Stripe     Dashboard → Payment links → New. Set the amount, switch on
-              "Collect customer address" if you want it, and copy the
-              https://buy.stripe.com/... address. One link per residence is
-              tidiest, because each deposit is a different amount.
+     VITE_API_BASE=/api           same origin as the site (the usual case)
+     VITE_API_BASE=https://…/api  a server hosted somewhere else
 
-   Test it with Stripe in test mode first. A link created in test mode only
-   ever accepts test cards, so you can click the whole flow safely.
+   That is all the browser ever needs to know. The Stripe keys live on the
+   server, in ITS environment, and never appear in this file, in the bundle,
+   or in anything shipped to a visitor.
+
+   ⚠ Anything named VITE_* IS COMPILED INTO THE JAVASCRIPT AND IS PUBLIC.
+     A Stripe secret key (sk_live_…) must never be given that prefix, or any
+     other route into this directory.
    ========================================================================= */
-
-export type BookingProvider = 'demo' | 'cal' | 'calendly';
-export type PaymentProvider = 'demo' | 'stripe';
 
 const env = import.meta.env;
 
-export interface BookingConfig {
-  provider: BookingProvider;
-  /** `user/event` — never the full https:// address. */
-  link: string;
-}
+/** Where the booking and payment endpoints live. Empty = demonstration mode. */
+export const API_BASE: string = (env.VITE_API_BASE ?? '').replace(/\/$/, '');
 
-export interface PaymentConfig {
-  provider: PaymentProvider;
-  /** A payment link per residence slug. Most specific wins. */
-  links: Record<string, string>;
-  /** Used for any residence without its own link. */
-  fallbackLink: string;
-}
-
-export const BOOKING: BookingConfig = {
-  provider: (env.VITE_BOOKING_PROVIDER as BookingProvider) || 'demo',
-  link: env.VITE_BOOKING_LINK || '',
-};
-
-export const PAYMENTS: PaymentConfig = {
-  provider: (env.VITE_PAYMENT_PROVIDER as PaymentProvider) || 'demo',
-  links: {
-    'casa-aurelia': env.VITE_STRIPE_LINK_CASA_AURELIA || '',
-    'the-ridge-house': env.VITE_STRIPE_LINK_RIDGE_HOUSE || '',
-    'villa-no-17': env.VITE_STRIPE_LINK_VILLA_17 || '',
-    'the-glass-house': env.VITE_STRIPE_LINK_GLASS_HOUSE || '',
-  },
-  fallbackLink: env.VITE_STRIPE_LINK_DEFAULT || '',
-};
-
-/* ---------------------------------------------------------------------------
-   Resolution
-   ------------------------------------------------------------------------ */
-
-export function bookingIsLive(): boolean {
-  return BOOKING.provider !== 'demo' && BOOKING.link.trim().length > 0;
-}
-
-/** The address the scheduler is embedded from, with our own styling applied. */
-export function bookingEmbedUrl(opts: {
-  name?: string;
-  email?: string;
-  notes?: string;
-}): string | null {
-  if (!bookingIsLive()) return null;
-  const path = BOOKING.link.replace(/^https?:\/\/[^/]+\//, '').replace(/^\/+|\/+$/g, '');
-
-  if (BOOKING.provider === 'cal') {
-    const q = new URLSearchParams({
-      embed: 'inline',
-      // Cal reads these as its own theme tokens; they are hex without the hash.
-      'theme': 'light',
-      'brandColor': '9B7C4E',
-      'layout': 'month_view',
-    });
-    if (opts.name) q.set('name', opts.name);
-    if (opts.email) q.set('email', opts.email);
-    if (opts.notes) q.set('notes', opts.notes);
-    return `https://cal.com/${path}?${q.toString()}`;
-  }
-
-  const q = new URLSearchParams({
-    embed_type: 'Inline',
-    embed_domain: typeof window === 'undefined' ? 'localhost' : window.location.hostname,
-    hide_gdpr_banner: '1',
-    background_color: 'f4f1ea',
-    text_color: '1c1b17',
-    primary_color: '9b7c4e',
-  });
-  if (opts.name) q.set('name', opts.name);
-  if (opts.email) q.set('email', opts.email);
-  if (opts.notes) q.set('a1', opts.notes);
-  return `https://calendly.com/${path}?${q.toString()}`;
-}
-
-/** The same booking page, for opening in a tab when the frame is refused. */
-export function bookingDirectUrl(): string | null {
-  if (!bookingIsLive()) return null;
-  const path = BOOKING.link.replace(/^https?:\/\/[^/]+\//, '').replace(/^\/+|\/+$/g, '');
-  return BOOKING.provider === 'cal'
-    ? `https://cal.com/${path}`
-    : `https://calendly.com/${path}`;
-}
-
-export function paymentIsLive(slug: string): boolean {
-  return PAYMENTS.provider === 'stripe' && paymentLinkFor(slug) !== null;
-}
-
-export function paymentLinkFor(slug: string): string | null {
-  const own = PAYMENTS.links[slug]?.trim();
-  if (own) return own;
-  const fallback = PAYMENTS.fallbackLink.trim();
-  return fallback || null;
-}
+/** True once a server is configured. Drives every "this is a demonstration"
+    notice on the site — there is exactly one switch, so they cannot disagree. */
+export const isLive = (): boolean => API_BASE.length > 0;
 
 /**
- * Hands the buyer to the provider's own checkout, carrying what we already
- * know so they do not retype it. `client_reference_id` comes back on the
- * webhook, which is how a payment gets matched to a residence.
+ * Publishable key, optional. Only needed if you later move from Stripe's
+ * hosted Checkout to an embedded card element. It is publishable by design —
+ * safe in the bundle — and the site works without it.
  */
-export function checkoutUrl(slug: string, email?: string): string | null {
-  const base = paymentLinkFor(slug);
-  if (!base) return null;
-  const url = new URL(base);
-  url.searchParams.set('client_reference_id', slug);
-  if (email) url.searchParams.set('prefilled_email', email);
-  return url.toString();
+export const STRIPE_PUBLISHABLE_KEY: string = env.VITE_STRIPE_PUBLISHABLE_KEY ?? '';
+
+/** Where Stripe returns the customer. Must be a full, absolute URL. */
+export function checkoutReturnUrls(origin: string) {
+  return {
+    success: `${origin}/book/confirmed?ref={BOOKING_REF}`,
+    cancel: `${origin}/book?cancelled=1`,
+  };
 }
+
+/* ---------------------------------------------------------------------------
+   FORMS
+   The contact and commercial-quote forms post to whatever you put here. Any
+   service that accepts a plain POST works — Formspree, Basin, a Netlify
+   function, your own inbox handler.
+
+   Leave it blank and the forms validate, compose, and show a success state,
+   but tell the reader plainly that the message was not sent and give them the
+   phone number and email address instead. A form that silently swallows an
+   enquiry is worse than no form.
+   ------------------------------------------------------------------------ */
+
+export const FORM_ENDPOINT: string = env.VITE_FORM_ENDPOINT ?? '';
+export const formsAreLive = (): boolean => FORM_ENDPOINT.trim().length > 0;
+
+/* ---------------------------------------------------------------------------
+   ANALYTICS — off unless you ask for it. No third-party script is loaded by
+   this site otherwise, which is why it has no cookie banner.
+   ------------------------------------------------------------------------ */
+
+export const ANALYTICS = {
+  plausibleDomain: env.VITE_PLAUSIBLE_DOMAIN ?? '',
+};

@@ -1,42 +1,69 @@
 import type { SceneKind } from '@/lib/scenes';
 
 /* ============================================================================
-   IMAGE CONFIGURATION — THE ONLY PLACE IMAGE SOURCES LIVE
+   THE IMAGE LIBRARY — THE ONLY PLACE PICTURES ARE DEFINED
    ----------------------------------------------------------------------------
-   Every photograph in the site resolves through this file. To move Arcadia onto
-   a real photo library, replace `IMAGE_BASE` and the `src` of each entry; the
-   rest of the application needs no change.
+   ► HOW TO PUT YOUR OWN WORK ON THIS SITE
 
-   Each entry carries:
-     src   — the remote identifier (an Unsplash photo id, or an absolute URL)
-     alt   — real alternative text, written for a screen reader
-     scene — the drawn plate used if the photograph never arrives
-     tone  — the wash held behind the frame while it decodes
-     focus — object-position, so crops stay composed at every aspect ratio
+   Every frame on the site resolves through this file. To replace one, set its
+   `src`. That is the whole job — no component needs touching.
+
+       heroExterior: {
+         src: '/work/hero-exterior.jpg',   ←  add this line
+         alt: '...',
+         ...
+       }
+
+   Three kinds of `src` work:
+
+     '/work/twilight-01.jpg'      a file in `public/work/` — the simplest option
+     'https://cdn.example/a.jpg'  any absolute URL
+     'photo-1600596542815-…'      an Unsplash photo id, resized through their CDN
+
+   ► WHAT HAPPENS UNTIL THEN
+
+   `src` is empty on every entry below, and that is deliberate. An empty source
+   means the frame draws its plate from `src/lib/scenes.ts` instead — a composed,
+   blue-hour illustration of that exact subject. Nothing is ever requested, so
+   nothing can ever 404, and the site looks finished offline and on day one.
+
+   Replace them a few at a time. A mixed page of your photographs and drawn
+   plates still holds together, because the plates were art-directed to match.
+
+   ► THE OTHER FIELDS
+
+     alt    real alternative text, written for someone who cannot see the image.
+            REWRITE THIS when you swap the picture — it must describe YOUR photo.
+     scene  which plate stands in until then
+     tone   the wash held behind the frame while a real photo decodes
+     focus  object-position, so crops stay composed at every aspect ratio
    ========================================================================= */
 
-export type Tone = 'dusk' | 'stone' | 'sand' | 'pine' | 'marine' | 'ember' | 'graphite';
+export type Tone = 'twilight' | 'interior' | 'aerial' | 'night' | 'water' | 'neon' | 'studio' | 'daylight';
 
 export interface ImageAsset {
+  /** Empty means "draw the plate". See the note above. */
   src: string;
   alt: string;
   tone: Tone;
   focus?: string;
-  /** The plate drawn for this frame when its photograph does not arrive. */
   scene: SceneKind;
 }
 
-/** Swap this for any CDN that accepts width/quality query parameters. */
+/** Prefixed to bare Unsplash-style ids. Swap for any CDN taking w/q parameters. */
 export const IMAGE_BASE = 'https://images.unsplash.com/';
 
-/** Widths generated for `srcset`. Kept small in number to limit cache churn. */
+/** Widths generated for `srcset`. Few on purpose, to limit cache churn. */
 export const IMAGE_WIDTHS = [640, 960, 1280, 1800, 2400] as const;
 
-/**
- * Build a single source URL at a given width.
- * Absolute URLs are returned untouched, so a self-hosted library drops straight in.
- */
+/** True when this entry has no photograph yet and should draw its plate. */
+export function isDrawn(src: string): boolean {
+  return src.trim().length === 0;
+}
+
+/** One source URL at a given width. Absolute and rooted paths pass through. */
 export function imageUrl(src: string, width: number, quality = 72): string {
+  if (isDrawn(src)) return '';
   if (/^https?:\/\//.test(src) || src.startsWith('/')) return src;
   const params = new URLSearchParams({
     auto: 'format',
@@ -48,6 +75,7 @@ export function imageUrl(src: string, width: number, quality = 72): string {
 }
 
 export function imageSrcSet(src: string, quality = 72): string | undefined {
+  if (isDrawn(src)) return undefined;
   if (/^https?:\/\//.test(src) || src.startsWith('/')) return undefined;
   return IMAGE_WIDTHS.map((w) => `${imageUrl(src, w, quality)} ${w}w`).join(', ');
 }
@@ -57,182 +85,235 @@ export function imageSrcSet(src: string, quality = 72): string | undefined {
    ------------------------------------------------------------------------ */
 
 export const IMAGES = {
-  /* — Casa Aurelia, Malibu — */
-  aureliaHero: {
-    src: 'photo-1600596542815-ffad4c1539a9',
-    alt: 'Casa Aurelia at dusk: a low, horizontal residence of pale stone and glass set above the Pacific.',
-    tone: 'dusk',
-    scene: 'coast-dusk',
+  /* — Hero and home — */
+  heroTwilight: {
+    src: '',
+    alt: 'A low modern house photographed at blue hour, its glazed living wall lit warm against a deep indigo sky.',
+    tone: 'twilight',
+    scene: 'exterior-twilight',
     focus: '50% 58%',
   },
-  aureliaExterior: {
-    src: 'photo-1580587771525-78b9dba3b914',
-    alt: 'The western elevation of Casa Aurelia, its glazed volume cantilevered over the bluff.',
-    tone: 'dusk',
-    scene: 'coast-day',
+  homeAerial: {
+    src: '',
+    alt: 'An aerial photograph looking straight down on a property, showing the roofline, pool and wooded lot.',
+    tone: 'aerial',
+    scene: 'aerial-property',
   },
-  aureliaLiving: {
-    src: 'photo-1600607687939-ce8a6c25118c',
-    alt: 'The living room at Casa Aurelia, framed in white oak with a full-height wall of glass.',
-    tone: 'sand',
+  homeInterior: {
+    src: '',
+    alt: 'A living room lit for photography, warm lamplight balanced against the blue of the windows.',
+    tone: 'interior',
     scene: 'interior-living',
   },
-  aureliaKitchen: {
-    src: 'photo-1600489000022-c2086d79f9d4',
-    alt: 'The kitchen at Casa Aurelia: a single slab island in honed limestone beneath a clerestory.',
-    tone: 'stone',
+  homeFilm: {
+    src: '',
+    alt: 'A frame from a property film: the house in soft focus behind an anamorphic flare.',
+    tone: 'twilight',
+    scene: 'video-frame',
+  },
+
+  /* — Real estate: stills — */
+  reExteriorTwilight: {
+    src: '',
+    alt: 'Twilight exterior of a single-storey house, path lights on and the interior glowing through the glass.',
+    tone: 'twilight',
+    scene: 'exterior-twilight',
+  },
+  reExteriorDay: {
+    src: '',
+    alt: 'A traditional two-storey home photographed in clear afternoon light from the front lawn.',
+    tone: 'daylight',
+    scene: 'exterior-day',
+  },
+  reExteriorModern: {
+    src: '',
+    alt: 'A contemporary house of two offset volumes, the upper floor cantilevered over the lower.',
+    tone: 'twilight',
+    scene: 'exterior-modern',
+  },
+  reExteriorNight: {
+    src: '',
+    alt: 'The same house after dark, windows lit across the facade and the entry door open to the light.',
+    tone: 'night',
+    scene: 'exterior-night',
+  },
+  reLiving: {
+    src: '',
+    alt: 'A living room with a low sofa, floor lamp and framed art, windows holding evening blue.',
+    tone: 'interior',
+    scene: 'interior-living',
+  },
+  reKitchen: {
+    src: '',
+    alt: 'A kitchen island under three pendant lights, with a run of cabinetry and lit splashback behind.',
+    tone: 'interior',
     scene: 'interior-kitchen',
   },
-  aureliaSuite: {
-    src: 'photo-1600566753086-00f18fb6b3ea',
-    alt: 'The primary suite, opening on two sides to a private terrace above the water.',
-    tone: 'sand',
+  reBedroom: {
+    src: '',
+    alt: 'A primary bedroom with an upholstered headboard, bedside lamps lit and the window cool behind.',
+    tone: 'interior',
     scene: 'interior-bedroom',
   },
-  aureliaTerrace: {
-    src: 'photo-1600585154340-be6161a56a0c',
-    alt: 'The terrace at Casa Aurelia, a shaded stone deck running the length of the house.',
-    tone: 'dusk',
-    scene: 'terrace',
-  },
-  aureliaPool: {
-    src: 'photo-1519821172144-4f87d85de2a1',
-    alt: 'The infinity pool at Casa Aurelia reading level with the horizon line of the Pacific.',
-    tone: 'marine',
-    scene: 'pool',
-  },
-  aureliaBath: {
-    src: 'photo-1600210492486-724fe5c67fb0',
-    alt: 'The primary bath, finished in a single run of travertine with a freestanding tub.',
-    tone: 'stone',
+  reBath: {
+    src: '',
+    alt: 'A bathroom with a freestanding tub, large-format tile and a backlit mirror.',
+    tone: 'interior',
     scene: 'interior-bath',
   },
-  aureliaDetail: {
-    src: 'photo-1600607687644-c7171b42498b',
-    alt: 'A detail of the oak joinery and bronze hardware in the gallery hallway.',
-    tone: 'sand',
-    scene: 'joinery',
-  },
-  aureliaDusk: {
-    src: 'photo-1523217582562-09d0def993a6',
-    alt: 'Casa Aurelia after sunset, its interiors lit and legible through the glass.',
-    tone: 'dusk',
-    scene: 'coast-night',
-  },
-  aureliaStair: {
-    src: 'photo-1600607688969-a5bfcd646154',
-    alt: 'The floating stair at Casa Aurelia, treads of solid oak cantilevered from a plaster wall.',
-    tone: 'sand',
-    scene: 'stair',
-  },
-  aureliaDining: {
-    src: 'photo-1600121848594-d8644e57abab',
-    alt: 'The dining room, with a long walnut table set beneath a run of clerestory glazing.',
-    tone: 'sand',
+  reDining: {
+    src: '',
+    alt: 'A dining room with a timber table, four chairs and three pendants above it.',
+    tone: 'interior',
     scene: 'interior-dining',
   },
-
-  /* — The Ridge House, Aspen — */
-  ridgeHero: {
-    src: 'photo-1610641818989-c2051b5e2cfd',
-    alt: 'The Ridge House in Aspen: blackened timber and glass set into a snow-covered slope.',
-    tone: 'pine',
-    scene: 'alpine-house',
+  reStair: {
+    src: '',
+    alt: 'A timber staircase with a fine steel balustrade, raking light across the treads.',
+    tone: 'interior',
+    scene: 'staircase',
   },
-  ridgeInterior: {
-    src: 'photo-1600585154526-990dced4db0d',
-    alt: 'The great room at The Ridge House, a double-height volume facing the Elk Mountains.',
-    tone: 'graphite',
-    scene: 'alpine-interior',
+  reDetail: {
+    src: '',
+    alt: 'A close detail of oak joinery with a bronze reveal, lit from the side.',
+    tone: 'interior',
+    scene: 'detail',
   },
-  ridgeDetail: {
-    src: 'photo-1551524164-687a55dd1126',
-    alt: 'A detail of the charred cedar cladding and steel window surrounds at The Ridge House.',
-    tone: 'pine',
-    scene: 'timber-detail',
+  rePool: {
+    src: '',
+    alt: 'A swimming pool lit from within at dusk, treeline dark against the last of the sky.',
+    tone: 'water',
+    scene: 'pool',
   },
-
-  /* — Villa No. 17, Miami Beach — */
-  villaHero: {
-    src: 'photo-1613490493576-7fde63acd811',
-    alt: 'Villa No. 17 on Miami Beach, a white stucco composition wrapped in deep loggias.',
-    tone: 'marine',
-    scene: 'villa',
+  reTerrace: {
+    src: '',
+    alt: 'A covered terrace with downlights and a lit fire table, looking out to the treeline.',
+    tone: 'twilight',
+    scene: 'terrace',
   },
-  villaInterior: {
-    src: 'photo-1600566753190-17f0baa2a6c3',
-    alt: 'A bedroom at Villa No. 17 opening to the waterway through full-height sliding glass.',
-    tone: 'sand',
-    scene: 'interior-bedroom',
-  },
-  villaWater: {
-    src: 'photo-1571003123894-1f0594d2b5d9',
-    alt: 'The pool terrace at Villa No. 17, with a private dock on the Intracoastal beyond.',
-    tone: 'marine',
-    scene: 'villa-water',
+  reWalkthrough: {
+    src: '',
+    alt: 'The opening frame of a walkthrough: a hallway in one-point perspective toward a lit room.',
+    tone: 'interior',
+    scene: 'walkthrough',
   },
 
-  /* — The Glass House, Austin — */
-  glassHero: {
-    src: 'photo-1600585154084-4e5fe7c39198',
-    alt: 'The Glass House outside Austin: a steel-framed pavilion floating above live oaks.',
-    tone: 'graphite',
-    scene: 'pavilion',
+  /* — Aerial — */
+  aerialProperty: {
+    src: '',
+    alt: 'A property from directly overhead: roof, driveway, pool and the shape of the whole lot.',
+    tone: 'aerial',
+    scene: 'aerial-property',
   },
-  glassInterior: {
-    src: 'photo-1502672260266-1c1ef2d93688',
-    alt: 'The interior of The Glass House, a single uninterrupted room beneath an exposed steel deck.',
-    tone: 'stone',
-    scene: 'pavilion-interior',
+  aerialNeighborhood: {
+    src: '',
+    alt: 'A neighbourhood at dusk from a few hundred feet, streetlights on and windows lit.',
+    tone: 'aerial',
+    scene: 'aerial-neighborhood',
   },
-
-  /* — Places — */
-  malibu: {
-    src: 'photo-1505118380757-91f5f5632de0',
-    alt: 'The Malibu coastline at late afternoon, bluffs falling to a pale beach.',
-    tone: 'dusk',
-    scene: 'coastline',
+  aerialLand: {
+    src: '',
+    alt: 'Aerial view of acreage at golden hour, field boundaries and a creek running through.',
+    tone: 'aerial',
+    scene: 'aerial-land',
   },
-  aspen: {
-    src: 'photo-1478827387698-1527781a4887',
-    alt: 'The Elk Mountains above Aspen under early snow.',
-    tone: 'pine',
-    scene: 'alpine-land',
+  aerialWater: {
+    src: '',
+    alt: 'A waterfront shoreline from the air, a private dock reaching into lit water.',
+    tone: 'water',
+    scene: 'aerial-water',
   },
-  miami: {
-    src: 'photo-1506929562872-bb421503ef21',
-    alt: 'Miami Beach from the water, its low modern skyline against the Atlantic.',
-    tone: 'marine',
-    scene: 'bay',
+  aerialHighway: {
+    src: '',
+    alt: 'A commercial frontage from the air at dusk, traffic drawing light trails along the road.',
+    tone: 'aerial',
+    scene: 'aerial-highway',
   },
-  austin: {
-    src: 'photo-1531218150217-54595bc2b934',
-    alt: 'The hill country west of Austin at dusk.',
-    tone: 'ember',
-    scene: 'hills',
-  },
-  newYork: {
-    src: 'photo-1496442226666-8d4d0e62e6e9',
-    alt: 'Lower Manhattan seen from the east at first light.',
-    tone: 'graphite',
-    scene: 'city',
+  droneInFlight: {
+    src: '',
+    alt: 'The drone in flight against a blue-hour sky, navigation lights showing red and green.',
+    tone: 'night',
+    scene: 'drone-flight',
   },
 
-  /* — People — */
-  agentPortrait: {
-    src: 'photo-1573496359142-b8d87734a5a2',
-    alt: 'Elena Marlowe, Principal Broker at Arcadia Estates, photographed in natural light.',
-    tone: 'stone',
+  /* — Video — */
+  filmFrameA: {
+    src: '',
+    alt: 'A graded frame from a property film, letterboxed, with a horizontal flare across the glass.',
+    tone: 'twilight',
+    scene: 'video-frame',
+  },
+  filmFrameB: {
+    src: '',
+    alt: 'A second film frame: the hallway, moving toward a lit room at the end.',
+    tone: 'interior',
+    scene: 'walkthrough',
+  },
+
+  /* — Commercial — */
+  commRestaurant: {
+    src: '',
+    alt: 'A restaurant bar at service, bottles lit on the back shelves and two guests in silhouette.',
+    tone: 'interior',
+    scene: 'commercial-restaurant',
+  },
+  commGym: {
+    src: '',
+    alt: 'A gym floor lit in cool blue, weight rack and rig behind a loaded barbell.',
+    tone: 'neon',
+    scene: 'commercial-gym',
+  },
+  commAuto: {
+    src: '',
+    alt: 'A car on a polished showroom floor under a run of overhead strip lights.',
+    tone: 'studio',
+    scene: 'commercial-auto',
+  },
+  commHotel: {
+    src: '',
+    alt: 'A hotel at dusk, windows lit across the tower and the portico glowing at the base.',
+    tone: 'twilight',
+    scene: 'commercial-hotel',
+  },
+  commRetail: {
+    src: '',
+    alt: 'A retail interior with rails of stock either side and track lighting down the centre.',
+    tone: 'interior',
+    scene: 'commercial-retail',
+  },
+  commEvent: {
+    src: '',
+    alt: 'An event at night: beams from the lighting rig over a stage and a crowd below.',
+    tone: 'neon',
+    scene: 'commercial-event',
+  },
+
+  /* — Lifestyle — */
+  lifestyleTerrace: {
+    src: '',
+    alt: 'Two people on a terrace at dusk, back-lit, the house glowing behind them.',
+    tone: 'twilight',
+    scene: 'lifestyle',
+  },
+
+  /* — The company — */
+  founderPortrait: {
+    // ► DROP THE FOUNDER'S PHOTOGRAPH HERE. Put the file in `public/work/`
+    //   and write the path, e.g. '/work/founder.jpg'. Then rewrite `alt` below
+    //   to describe the actual photograph.
+    src: '',
+    alt: 'Portrait of the founder of KM Productions. A drawn stand-in until the photograph is added.',
+    tone: 'studio',
     scene: 'portrait',
-    focus: '50% 30%',
+    focus: '50% 32%',
   },
-  agentSecondary: {
-    src: 'photo-1487412720507-e7ab37603c6f',
-    alt: 'Thomas Reyes, Director of Architecture Sales, photographed against a plaster wall.',
-    tone: 'graphite',
-    scene: 'portrait',
-    focus: '50% 28%',
+  gearStill: {
+    src: '',
+    alt: 'A full-frame camera body with a fast prime lens, lit from two sides against a dark background.',
+    tone: 'studio',
+    scene: 'gear',
   },
 } as const satisfies Record<string, ImageAsset>;
 
 export type ImageKey = keyof typeof IMAGES;
+export const IMAGE_KEYS = Object.keys(IMAGES) as ImageKey[];

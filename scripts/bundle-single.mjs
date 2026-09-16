@@ -61,7 +61,7 @@ try {
   /* No favicon is not a failure. */
 }
 
-const out = join(root, 'arcadia-estates.html');
+const out = join(root, 'km-productions.html');
 await writeFile(out, html);
 
 const leftover = html.match(/(src|href)="\.\/assets\//g);
@@ -70,4 +70,4 @@ if (leftover) {
   process.exit(1);
 }
 
-console.log(`arcadia-estates.html — ${(html.length / 1024 / 1024).toFixed(2)} MB, one file, no dependencies.`);
+console.log(`km-productions.html — ${(html.length / 1024 / 1024).toFixed(2)} MB, one file, no dependencies.`);

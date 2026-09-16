@@ -9,5 +9,9 @@ dist-ssr
 .env.*
 !.env.example
 dist-single
-arcadia-estates.html
-arcadia-estates-site.zip
+km-productions.html
+
+# The booking server's data file. It holds real customer names, addresses and
+# phone numbers, and it must never end up in version control.
+data/
+*.bookings.json

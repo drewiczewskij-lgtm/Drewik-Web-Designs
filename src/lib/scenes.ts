@@ -1,51 +1,62 @@
 /* ============================================================================
    SCENE PLATES
    ----------------------------------------------------------------------------
-   Drawn imagery for every frame in the site, generated as SVG.
+   Drawn imagery, generated as SVG, for every frame in the site.
 
-   These are what a frame shows when its photograph does not arrive — offline,
-   a blocked CDN, a sandbox that refuses third-party images. They are not
-   placeholders: each one is composed for its subject, in the brand's light, so
-   a frame that never loads still reads as part of the same art direction.
+   This is what a frame shows when its photograph does not arrive: offline, a
+   blocked CDN, a sandbox that refuses third-party images, a source you have not
+   replaced yet. They are not grey boxes. Each one is composed for its subject,
+   in the same light, so a frame that never loads still reads as part of the
+   portfolio rather than as a fault.
 
-   Everything is drawn to a 1600 x 1100 field with the horizon near three-fifths
-   and the subject on the centre line, so the composition survives being cropped
-   to a tall portrait or a wide letterbox alike.
+   ART DIRECTION. Everything is shot at blue hour — the twenty minutes after
+   sunset when the sky still holds colour and the windows have come on. It is
+   the hour real estate photography is actually sold on, and it is the reason
+   this site's dark interface and its imagery belong to each other.
+
+   Drawn to a 1600 x 1100 field with the horizon near three-fifths and the
+   subject on the centre line, so a plate survives being cropped to a tall
+   portrait or a wide letterbox alike.
    ========================================================================= */
 
 const W = 1600;
 const H = 1100;
 
 export type SceneKind =
-  | 'coast-dusk'
-  | 'coast-day'
-  | 'coast-night'
-  | 'coastline'
-  | 'terrace'
-  | 'pool'
+  | 'exterior-twilight'
+  | 'exterior-day'
+  | 'exterior-modern'
+  | 'exterior-night'
   | 'interior-living'
-  | 'interior-dining'
   | 'interior-kitchen'
   | 'interior-bedroom'
   | 'interior-bath'
-  | 'stair'
-  | 'joinery'
-  | 'alpine-house'
-  | 'alpine-interior'
-  | 'alpine-land'
-  | 'timber-detail'
-  | 'villa'
-  | 'villa-water'
-  | 'bay'
-  | 'pavilion'
-  | 'pavilion-interior'
-  | 'hills'
-  | 'city'
+  | 'interior-dining'
+  | 'staircase'
+  | 'detail'
+  | 'pool'
+  | 'terrace'
+  | 'aerial-property'
+  | 'aerial-neighborhood'
+  | 'aerial-land'
+  | 'aerial-water'
+  | 'aerial-highway'
+  | 'drone-flight'
+  | 'video-frame'
+  | 'walkthrough'
+  | 'commercial-restaurant'
+  | 'commercial-gym'
+  | 'commercial-auto'
+  | 'commercial-hotel'
+  | 'commercial-retail'
+  | 'commercial-event'
+  | 'lifestyle'
+  | 'gear'
   | 'portrait';
 
 /* -------------------------------------------------------------------------
-   Deterministic jitter, so a plate is identical on every reload but no two
-   frames share a sun position or a skyline.
+   Deterministic jitter. A plate is identical on every reload, but no two
+   frames share a moon position, a skyline or a scatter of lit windows.
    ---------------------------------------------------------------------- */
 function rng(seed: string) {
   let h = 2166136261;
@@ -87,33 +98,36 @@ const radial = (id: string, stops: Stop[], cx: number, cy: number, r: number) =>
     .join('') +
   '</radialGradient>';
 
+const n = (v: number) => v.toFixed(1);
+
 const rect = (x: number, y: number, w: number, h: number, fill: string, extra = '') =>
-  `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${fill}" ${extra}/>`;
+  `<rect x="${n(x)}" y="${n(y)}" width="${n(Math.max(0, w))}" height="${n(Math.max(0, h))}" fill="${fill}" ${extra}/>`;
 
 const poly = (points: string, fill: string, extra = '') =>
   `<polygon points="${points}" fill="${fill}" ${extra}/>`;
 
-/** A lit face and a shaded return — the whole vocabulary of these buildings. */
-function volume(
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  lit: string,
-  shade: string,
-  depth = 0,
-) {
-  const side =
-    depth > 0
-      ? poly(
-          `${x + w},${y} ${x + w + depth},${y + depth * 0.5} ${x + w + depth},${y + h + depth * 0.5} ${x + w},${y + h}`,
-          shade,
-        )
-      : '';
-  return side + rect(x, y, w, h, lit);
+const circ = (cx: number, cy: number, r: number, fill: string, extra = '') =>
+  `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}" fill="${fill}" ${extra}/>`;
+
+const ell = (cx: number, cy: number, rx: number, ry: number, fill: string, extra = '') =>
+  `<ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(rx)}" ry="${n(ry)}" fill="${fill}" ${extra}/>`;
+
+/* -------------------------------------------------------------------------
+   Shared furniture
+   ---------------------------------------------------------------------- */
+
+/** The blue-hour sky every exterior is shot against. */
+function twilightSky(id: string, warm = 0.55) {
+  return grad(id, [
+    [0, '#050A14'],
+    [0.32, '#0C1D33'],
+    [0.62, '#1B3E5C'],
+    [0.84, warm > 0.4 ? '#4A6E85' : '#2A506E'],
+    [1, warm > 0.4 ? '#C98A56' : '#5D7E92'],
+  ]);
 }
 
-/** Warm interior light read through glazing. */
+/** Warm interior light read through a run of glazing. */
 function glazing(
   x: number,
   y: number,
@@ -121,469 +135,1048 @@ function glazing(
   h: number,
   fill: string,
   mullions = 4,
-  mullionColor = '#00000022',
+  mullionColor = '#0A121C',
 ) {
   let out = rect(x, y, w, h, fill);
   for (let i = 1; i < mullions; i++) {
-    out += rect(x + (w / mullions) * i - 1.6, y, 3.2, h, mullionColor);
+    out += rect(x + (w / mullions) * i - 1.8, y, 3.6, h, mullionColor);
   }
   return out;
 }
 
-const pine = (x: number, y: number, s: number, c: string) =>
+/** Scattered lit windows across a facade. */
+function litWindows(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  cols: number,
+  rows: number,
+  r: () => number,
+  lit = '#FFC57C',
+  dark = '#16222F',
+) {
+  let out = '';
+  const cw = w / cols;
+  const ch = h / rows;
+  for (let c = 0; c < cols; c++) {
+    for (let rw = 0; rw < rows; rw++) {
+      const on = r() > 0.42;
+      out += rect(
+        x + c * cw + cw * 0.18,
+        y + rw * ch + ch * 0.2,
+        cw * 0.64,
+        ch * 0.6,
+        on ? lit : dark,
+        on ? `opacity="${(0.72 + r() * 0.28).toFixed(2)}"` : 'opacity="0.85"',
+      );
+    }
+  }
+  return out;
+}
+
+/** A soft halo. Used for lamps, the moon, and light spilling from a door. */
+function halo(id: string, cx: number, cy: number, r: number, color: string, alpha = 0.55) {
+  return {
+    def: radial(id, [[0, color, alpha], [0.55, color, alpha * 0.28], [1, color, 0]], cx, cy, r),
+    body: rect(0, 0, W, H, `url(#${id})`),
+  };
+}
+
+const conifer = (x: number, y: number, s: number, c: string) =>
   poly(
-    `${x},${y} ${x - 13 * s},${y + 46 * s} ${x - 5 * s},${y + 44 * s} ${x - 16 * s},${y + 84 * s} ${x + 16 * s},${y + 84 * s} ${x + 5 * s},${y + 44 * s} ${x + 13 * s},${y + 46 * s}`,
+    `${n(x)},${n(y)} ${n(x - 13 * s)},${n(y + 46 * s)} ${n(x - 5 * s)},${n(y + 44 * s)} ${n(x - 16 * s)},${n(y + 84 * s)} ${n(x + 16 * s)},${n(y + 84 * s)} ${n(x + 5 * s)},${n(y + 44 * s)} ${n(x + 13 * s)},${n(y + 46 * s)}`,
     c,
   );
 
-const oak = (x: number, y: number, s: number, c: string) =>
-  `<ellipse cx="${x}" cy="${y}" rx="${44 * s}" ry="${30 * s}" fill="${c}"/>` +
-  `<ellipse cx="${x - 26 * s}" cy="${y + 12 * s}" rx="${26 * s}" ry="${19 * s}" fill="${c}"/>` +
-  `<ellipse cx="${x + 28 * s}" cy="${y + 10 * s}" rx="${24 * s}" ry="${17 * s}" fill="${c}"/>` +
-  rect(x - 3 * s, y + 18 * s, 6 * s, 40 * s, c);
+const broadleaf = (x: number, y: number, s: number, c: string) =>
+  ell(x, y, 44 * s, 32 * s, c) +
+  ell(x - 30 * s, y + 10 * s, 28 * s, 20 * s, c) +
+  ell(x + 28 * s, y + 12 * s, 26 * s, 19 * s, c) +
+  rect(x - 3 * s, y + 20 * s, 6 * s, 34 * s, c);
 
-const palm = (x: number, y: number, s: number, c: string) => {
-  let out = `<path d="M${x},${y} q${5 * s},${40 * s} ${2 * s},${86 * s} l${7 * s},0 q${3 * s},${-46 * s} ${-2 * s},${-86 * s} Z" fill="${c}"/>`;
-  for (let i = 0; i < 6; i++) {
-    const a = -160 + i * 44;
-    const r = (a * Math.PI) / 180;
-    const ex = x + Math.cos(r) * 62 * s;
-    const ey = y + Math.sin(r) * 40 * s;
-    out += `<path d="M${x},${y} Q${(x + ex) / 2},${(y + ey) / 2 - 22 * s} ${ex},${ey} Q${(x + ex) / 2},${(y + ey) / 2 - 8 * s} ${x},${y + 5 * s} Z" fill="${c}"/>`;
-  }
-  return out;
-};
-
-/** Reflected light on water: broken glints, widest nearest the viewer. */
-function specular(cx: number, top: number, bottom: number, color: string, r: () => number) {
+/** Vertical light on water. */
+function specular(cx: number, top: number, height: number, color: string, r: () => number) {
   let out = '';
-  const rows = 40;
-  for (let i = 0; i < rows; i++) {
-    const t = i / rows;
-    const y = top + (bottom - top) * t;
-    const span = 26 + t * 250;
-    const w = span * (0.3 + r() * 0.7);
-    const jitter = (r() - 0.5) * span * 0.55;
-    const o = 0.34 * (1 - t * 0.55) * (0.35 + r() * 0.65);
-    out += rect(cx - w / 2 + jitter, y, w, 1.6 + t * 3, color, `opacity="${o.toFixed(2)}"`);
+  const bands = 16;
+  for (let i = 0; i < bands; i++) {
+    const t = i / bands;
+    const y = top + t * height;
+    const w = 26 + t * 190 + r() * 40;
+    out += rect(cx - w / 2, y, w, 3 + r() * 4, color, `opacity="${(0.34 * (1 - t * 0.6)).toFixed(2)}"`);
   }
   return out;
 }
 
-function wrap(defs: string, body: string, seed: number) {
+/** A parked car, seen from the side. Small enough to be a silhouette. */
+function car(x: number, y: number, s: number, body: string, glass: string, lamp?: string) {
+  let out = poly(
+    `${n(x)},${n(y)} ${n(x + 30 * s)},${n(y - 16 * s)} ${n(x + 78 * s)},${n(y - 17 * s)} ${n(x + 104 * s)},${n(y)}`,
+    glass,
+  );
+  out += rect(x - 14 * s, y, 132 * s, 20 * s, body);
+  out += circ(x + 16 * s, y + 20 * s, 9 * s, '#0A0F16');
+  out += circ(x + 90 * s, y + 20 * s, 9 * s, '#0A0F16');
+  if (lamp) out += rect(x + 112 * s, y + 4 * s, 8 * s, 6 * s, lamp);
+  return out;
+}
+
+/** A standing figure, back-lit. Never a face — these are silhouettes. */
+function figure(x: number, groundY: number, s: number, c: string) {
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice">` +
-    `<defs>${defs}` +
-    `<filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="${seed}"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.07"/></feComponentTransfer></filter>` +
-    radial('vg', [[0.55, '#000', 0], [1, '#0B0906', 0.44]], W / 2, H * 0.46, W * 0.72) +
-    `</defs>` +
-    body +
-    rect(0, 0, W, H, 'url(#vg)') +
-    rect(0, 0, W, H, '#000', 'filter="url(#g)"') +
-    `</svg>`
+    circ(x, groundY - 74 * s, 11 * s, c) +
+    poly(
+      `${n(x - 13 * s)},${n(groundY - 62 * s)} ${n(x + 13 * s)},${n(groundY - 62 * s)} ${n(x + 10 * s)},${n(groundY - 20 * s)} ${n(x - 10 * s)},${n(groundY - 20 * s)}`,
+      c,
+    ) +
+    rect(x - 10 * s, groundY - 22 * s, 8 * s, 22 * s, c) +
+    rect(x + 2 * s, groundY - 22 * s, 8 * s, 22 * s, c)
   );
 }
 
-/* -------------------------------------------------------------------------
-   Families
-   ---------------------------------------------------------------------- */
+/* =========================================================================
+   EXTERIORS
+   ====================================================================== */
 
-interface Light {
-  sky: [string, string, string];
-  sun: string;
-  sea: [string, string];
-  wall: [string, string];
-  glass: string;
-  sunY: number;
-}
-
-const DUSK: Light = {
-  sky: ['#1C150E', '#8A5028', '#EDBE7C'],
-  sun: '#FFD99C',
-  sea: ['#242F35', '#6C8087'],
-  wall: ['#E7D9C0', '#6B5E50'],
-  glass: '#F2C177',
-  sunY: 0.5,
-};
-
-const DAY: Light = {
-  sky: ['#4E7488', '#96B2BB', '#D6DCD3'],
-  sun: '#FCF4E2',
-  sea: ['#2F5460', '#7A9AA3'],
-  wall: ['#EFE8DC', '#83786A'],
-  glass: '#9FB6BE',
-  sunY: 0.26,
-};
-
-const NIGHT: Light = {
-  sky: ['#080A0E', '#161A21', '#33313A'],
-  sun: '#54525C',
-  sea: ['#0E1216', '#2C333B'],
-  wall: ['#25221E', '#141210'],
-  glass: '#F6C97E',
-  sunY: 0.18,
-};
-
-function coast(l: Light, r: () => number, withHouse: boolean) {
-  const horizon = H * 0.54;
-  const bluffY = horizon + 168;
-  // The house sits left of centre; the sun is thrown to the opposite side so
-  // the two never fight for the same part of the frame.
-  const sunX = W * (0.66 + r() * 0.2);
-  const sunY = horizon - H * l.sunY * 0.52;
-  const sunR = 48 + r() * 24;
-
-  const defs =
-    grad('sky', [[0, l.sky[0]], [0.62, l.sky[1]], [1, l.sky[2]]]) +
-    grad('sea', [[0, l.sea[1]], [1, l.sea[0]]]) +
-    grad('haze', [[0, l.sky[2], 0.55], [1, l.sky[2], 0]]) +
-    radial('glow', [[0, l.sun, 0.7], [1, l.sun, 0]], sunX, sunY, sunR * 8) +
-    `<clipPath id="seaclip"><rect x="0" y="${horizon}" width="${W}" height="${bluffY - horizon + 40}"/></clipPath>`;
-
-  let body = rect(0, 0, W, horizon, 'url(#sky)');
-  body += rect(0, 0, W, horizon, 'url(#glow)');
-  body += `<circle cx="${sunX}" cy="${sunY}" r="${sunR}" fill="${l.sun}" opacity="0.94"/>`;
-  body += rect(0, horizon, W, bluffY - horizon + 60, 'url(#sea)');
-  // Reflected light stays on the water, never over the land in front of it.
-  body += `<g clip-path="url(#seaclip)">${specular(sunX, horizon, bluffY + 40, l.sun, r)}</g>`;
-  body += rect(0, horizon - 3, W, 4, l.sun, 'opacity="0.4"');
-  body += rect(0, horizon - 90, W, 90, 'url(#haze)');
-
-  // Bluff: a long shelf falling away to the right.
-  body += poly(
-    `0,${bluffY + 30} 340,${bluffY - 6} 1020,${bluffY - 26} ${W},${bluffY + 52} ${W},${H} 0,${H}`,
-    '#000',
-    'opacity="0.58"',
-  );
-
-  if (withHouse) {
-    const hx = W * 0.1;
-    const hw = W * 0.54;
-    const hh = 128;
-    const hy = bluffY - 62 - hh;
-
-    // The terrace slab, running past the house to the right.
-    body += rect(hx - 30, hy + hh, hw + 250, 18, l.wall[0], 'opacity="0.85"');
-    body += rect(hx - 30, hy + hh + 18, hw + 250, 44, l.wall[1]);
-    body += rect(hx - 30, hy + hh + 60, hw + 250, 10, '#000', 'opacity="0.35"');
-
-    // Principal volume: deep soffit, then a run of glass in uneven bays.
-    body += rect(hx, hy, hw, hh, l.wall[0]);
-    body += rect(hx, hy, hw, 30, l.wall[1], 'opacity="0.6"');
-    let gx = hx + 26;
-    const gEnd = hx + hw - 26;
-    while (gx < gEnd - 20) {
-      const bw = Math.min(58 + r() * 74, gEnd - gx);
-      body += rect(gx, hy + 40, bw, hh - 58, l.glass, 'opacity="0.92"');
-      gx += bw + 7;
-    }
-    body += rect(hx, hy + hh - 6, hw, 6, l.wall[1]);
-
-    // Upper volume, set back and pushed to the far end.
-    const ux = hx + hw * 0.58;
-    const uw = hw * 0.46;
-    body += rect(ux, hy - 92, uw, 92, l.wall[0]);
-    body += rect(ux, hy - 92, uw, 18, l.wall[1], 'opacity="0.6"');
-    body += rect(ux + 22, hy - 62, uw - 44, 44, l.glass, 'opacity="0.9"');
-
-    // A chimney mass anchoring the left end, and the shadow the house casts.
-    body += rect(hx + 12, hy - 58, 46, 58, l.wall[1]);
-    body += rect(hx - 60, bluffY - 54, hw + 300, 12, '#000', 'opacity="0.3"');
-  }
-
-  const tree = l === NIGHT ? '#100E0C' : l === DAY ? '#2A3A33' : '#1E2621';
-  body += oak(W * 0.055, bluffY - 44, 1.35, tree);
-  body += pine(W * 0.9, bluffY - 172, 1.25, tree);
-  body += pine(W * 0.955, bluffY - 138, 0.95, tree);
-  body += oak(W * 0.82, bluffY - 34, 0.95, tree);
-  return { defs, body };
-}
-
-function coastline(r: () => number) {
-  const l = DUSK;
-  const horizon = H * 0.5;
-  const sunX = W * (0.3 + r() * 0.4);
-  const defs =
-    grad('sky', [[0, '#2A1F16'], [0.56, '#9A6234'], [1, '#EFC489']]) +
-    grad('sea', [[0, '#4C646C'], [1, '#26313A']]) +
-    radial('glow', [[0, '#FFD9A0', 0.8], [1, '#FFD9A0', 0]], sunX, horizon - 90, W * 0.55);
-  let body = rect(0, 0, W, horizon, 'url(#sky)');
-  body += rect(0, 0, W, horizon, 'url(#glow)');
-  body += `<circle cx="${sunX}" cy="${horizon - 82}" r="66" fill="#FFE1AE"/>`;
-  body += rect(0, horizon, W, H - horizon, 'url(#sea)');
-  body += specular(sunX, horizon, H, '#FFD9A0', r);
-  // Headlands stepping back into haze.
-  body += poly(`0,${horizon + 6} 300,${horizon - 66} 520,${horizon + 10} 0,${horizon + 120}`, '#1E2A2E', 'opacity="0.55"');
-  body += poly(`${W},${horizon + 14} 1240,${horizon - 44} 1080,${horizon + 18} ${W},${horizon + 96}`, '#1E2A2E', 'opacity="0.42"');
-  // Near bluff and the wet sand catching the sky.
-  body += poly(`0,${H * 0.78} 250,${H * 0.72} 470,${H * 0.83} 300,${H} 0,${H}`, '#15181A', 'opacity="0.88"');
-  body += poly(`${W},${H * 0.74} 1290,${H * 0.7} 1140,${H * 0.86} ${W},${H}`, '#15181A', 'opacity="0.82"');
-  body += rect(300, H * 0.9, 1000, H * 0.1, l.sun, 'opacity="0.1"');
-  return { defs, body };
-}
-
-function room(o: {
-  wall: string;
-  wallShade: string;
-  floor: string;
-  floorHi: string;
-  ceiling: string;
-  view: [string, string];
-  light: string;
-  furniture: { x: number; y: number; w: number; h: number; c: string }[];
-  windowX?: number;
-  windowW?: number;
-  pendant?: boolean;
-}) {
+function exteriorTwilight(r: () => number) {
   const horizon = H * 0.6;
-  const wx = o.windowX ?? W * 0.3;
-  const ww = o.windowW ?? W * 0.62;
-  const wy = H * 0.16;
-  const wh = horizon + 74 - wy;
-
+  const moon = halo('moonglow', W * 0.76, H * 0.16, W * 0.42, '#9FD4FF', 0.3);
+  const spill = halo('spill', W * 0.45, H * 0.72, W * 0.5, '#FFB861', 0.28);
   const defs =
-    grad('wall', [[0, o.wall], [1, o.wallShade]]) +
-    grad('floor', [[0, o.floorHi], [1, o.floor]]) +
-    grad('view', [[0, o.view[0]], [1, o.view[1]]]) +
-    radial('pool', [[0, o.light, 0.5], [1, o.light, 0]], wx + ww / 2, horizon + 150, W * 0.46);
+    twilightSky('sky') +
+    grad('lawn', [[0, '#16301F'], [1, '#08150F']]) +
+    grad('drive', [[0, '#252C38'], [1, '#131820']]) +
+    moon.def +
+    spill.def;
 
-  let body = rect(0, 0, W, horizon + 74, 'url(#wall)');
-  body += rect(0, 0, W, H * 0.13, o.ceiling);
-  body += rect(0, H * 0.13, W, 5, '#00000022');
-  body += rect(0, horizon + 74, W, H - horizon - 74, 'url(#floor)');
-
-  // The opening, its view, and the light it throws onto the floor.
-  body += rect(wx - 16, wy - 16, ww + 32, wh + 20, o.wallShade);
-  body += rect(wx, wy, ww, wh, 'url(#view)');
-  body += rect(wx, wy + wh * 0.62, ww, 4, '#FFFFFF', 'opacity="0.35"');
-  for (let i = 1; i < 5; i++) body += rect(wx + (ww / 5) * i - 3, wy, 6, wh, o.wallShade);
-  body += rect(0, horizon + 74, W, H - horizon - 74, 'url(#pool)');
-  body += poly(
-    `${wx},${horizon + 74} ${wx + ww},${horizon + 74} ${wx + ww + 150},${H} ${wx - 150},${H}`,
-    o.light,
-    'opacity="0.16"',
-  );
-
-  for (const f of o.furniture) body += rect(f.x, f.y, f.w, f.h, f.c);
-  if (o.pendant) {
-    body += rect(W * 0.5 - 2, H * 0.13, 4, 120, '#00000055');
-    body += poly(`${W * 0.5 - 62},${H * 0.13 + 190} ${W * 0.5 + 62},${H * 0.13 + 190} ${W * 0.5 + 40},${H * 0.13 + 120} ${W * 0.5 - 40},${H * 0.13 + 120}`, '#2E2A24');
-    body += `<ellipse cx="${W * 0.5}" cy="${H * 0.13 + 192}" rx="60" ry="9" fill="${o.light}" opacity="0.85"/>`;
-  }
-  return { defs, body };
-}
-
-function detail(o: { base: string; slat: string; gap: string; hardware: string; light: string }) {
-  const defs =
-    grad('d', [[0, o.base], [1, o.slat]]) +
-    radial('dl', [[0, o.light, 0.5], [1, o.light, 0]], W * 0.28, H * 0.22, W * 0.72);
-  let body = rect(0, 0, W, H, 'url(#d)');
-  // A run of vertical boards, raking across the frame.
-  for (let x = -60; x < W + 60; x += 58) {
-    body += rect(x, 0, 42, H, o.slat);
-    body += rect(x + 42, 0, 16, H, o.gap);
-    body += rect(x, 0, 6, H, '#FFFFFF', 'opacity="0.07"');
-  }
-  // A single horizontal reveal, and the bronze pull that justifies the frame.
-  body += rect(0, H * 0.52, W, 16, o.gap);
-  body += rect(0, H * 0.52, W, 4, '#FFFFFF', 'opacity="0.1"');
-  body += rect(W * 0.5 - 132, H * 0.45, 264, 12, o.hardware);
-  body += rect(W * 0.5 - 132, H * 0.45, 264, 4, '#FFFFFF', 'opacity="0.3"');
-  body += rect(0, 0, W, H, 'url(#dl)');
-  return { defs, body };
-}
-
-function alpine(r: () => number, withHouse: boolean) {
-  const horizon = H * 0.66;
-  const defs =
-    grad('sky', [[0, '#9FB0BC'], [0.55, '#CDD8DE'], [1, '#EFF2F3']]) +
-    grad('snow', [[0, '#F2F5F6'], [1, '#D3DADE']]) +
-    radial('hz', [[0, '#FFFFFF', 0.55], [1, '#FFFFFF', 0]], W * 0.52, horizon - 40, W * 0.6);
-  let body = rect(0, 0, W, H, 'url(#sky)');
-  // Three ranges, each paler than the one in front of it.
-  body += poly(`0,${horizon} 210,${H * 0.3} 420,${horizon} `, '#A8B4BD', 'opacity="0.55"');
-  body += poly(`300,${horizon} 640,${H * 0.21} 980,${horizon}`, '#93A2AD', 'opacity="0.7"');
-  body += poly(`640,${horizon} 980,${H * 0.14} 1180,${H * 0.34} 1360,${H * 0.2} ${W},${horizon}`, '#7D8C98');
-  body += poly(`920,${H * 0.26} 980,${H * 0.14} 1042,${H * 0.26} 1000,${H * 0.3} 960,${H * 0.28}`, '#F0F4F6');
-  body += poly(`1300,${H * 0.3} 1360,${H * 0.2} 1420,${H * 0.3} 1380,${H * 0.33} 1340,${H * 0.32}`, '#F0F4F6');
-  body += rect(0, 0, W, horizon, 'url(#hz)');
-  body += rect(0, horizon, W, H - horizon, 'url(#snow)');
-
-  const treeline = horizon + 10;
-  for (let i = 0; i < 26; i++) {
-    const x = (i / 25) * W + (r() - 0.5) * 34;
-    body += pine(x, treeline - 96 - r() * 40, 0.72 + r() * 0.5, '#28352E');
-  }
-
-  if (withHouse) {
-    const hx = W * 0.22;
-    const hw = W * 0.56;
-    const hy = horizon + 60;
-    body += rect(hx - 20, hy + 140, hw + 40, 22, '#CBD3D7');
-    body += volume(hx, hy, hw, 140, '#241F1C', '#151210', 0);
-    body += rect(hx, hy, hw, 16, '#3A322C');
-    body += glazing(hx + 40, hy + 34, hw - 80, 86, '#F5CC8B', 6, '#00000044');
-    body += rect(hx + 40, hy + 120, hw - 80, 90, '#F5CC8B', 'opacity="0.12"');
-  }
-  return { defs, body };
-}
-
-function villa(r: () => number) {
-  const horizon = H * 0.62;
-  const defs =
-    grad('sky', [[0, '#8FB6C8'], [0.6, '#CFDCE0'], [1, '#F2E8D8']]) +
-    grad('wall', [[0, '#FBF7F0'], [1, '#D8CCB8']]) +
-    grad('ground', [[0, '#9FA98C'], [1, '#6E7864']]);
   let body = rect(0, 0, W, horizon, 'url(#sky)');
-  body += `<circle cx="${W * 0.78}" cy="${H * 0.18}" r="74" fill="#FDF6E6" opacity="0.65"/>`;
+  body += circ(W * 0.76, H * 0.16, 30, '#EAF4FF', 'opacity="0.9"');
+  body += moon.body;
+  // A distant treeline holding the horizon.
+  for (let i = 0; i < 26; i++) {
+    const x = (i / 25) * W + (r() - 0.5) * 50;
+    body += conifer(x, horizon - 78 - r() * 46, 0.78 + r() * 0.5, '#0A1A16');
+  }
+  body += rect(0, horizon, W, H - horizon, 'url(#lawn)');
+
+  // The house: a low horizontal volume with a projecting glazed wing.
+  const hy = H * 0.31;
+  const hh = H * 0.29;
+  body += rect(W * 0.1, hy, W * 0.56, hh, '#1A222D');
+  body += rect(W * 0.1, hy - 12, W * 0.58, 16, '#232C38'); // roof fascia
+  body += poly(
+    `${n(W * 0.66)},${n(hy)} ${n(W * 0.78)},${n(hy + 26)} ${n(W * 0.78)},${n(hy + hh)} ${n(W * 0.66)},${n(hy + hh)}`,
+    '#121922',
+  );
+  // The glazed wall — the whole reason to shoot at this hour.
+  body += glazing(W * 0.14, hy + hh * 0.2, W * 0.32, hh * 0.56, '#FFC275', 7);
+  body += glazing(W * 0.5, hy + hh * 0.26, W * 0.13, hh * 0.44, '#FFB861', 3);
+  // Clerestory above.
+  body += rect(W * 0.14, hy + 26, W * 0.48, 22, '#FFD9A3', 'opacity="0.72"');
+  // Stone base and entry.
+  body += rect(W * 0.1, hy + hh - 26, W * 0.56, 26, '#2B3440');
+  body += rect(W * 0.47, hy + hh * 0.45, 46, hh * 0.55, '#FFE0B0', 'opacity="0.85"');
+  body += spill.body;
+
+  // Driveway running to the lower edge, and planting.
+  body += poly(
+    `${n(W * 0.34)},${n(hy + hh)} ${n(W * 0.52)},${n(hy + hh)} ${n(W * 0.74)},${n(H)} ${n(W * 0.16)},${n(H)}`,
+    'url(#drive)',
+  );
+  for (let i = 0; i < 7; i++) {
+    const x = W * (0.06 + i * 0.03);
+    body += ell(x, hy + hh + 16, 26, 14, '#0D2018');
+  }
+  body += broadleaf(W * 0.84, hy + hh * 0.5, 1.5, '#0B1B15');
+  body += broadleaf(W * 0.05, hy + hh * 0.72, 1.1, '#0C1D16');
+  // Path lights, the detail that says someone lit this.
+  for (let i = 0; i < 6; i++) {
+    const x = W * (0.3 - i * 0.02) + i * 6;
+    const y = hy + hh + 40 + i * 78;
+    body += circ(x, y, 5, '#FFD08A');
+    body += ell(x, y + 6, 26, 8, '#FFC275', 'opacity="0.14"');
+  }
+  return { defs, body };
+}
+
+function exteriorDay(r: () => number) {
+  const horizon = H * 0.58;
+  const defs =
+    grad('sky', [[0, '#2E6C9E'], [0.55, '#6FA8CC'], [1, '#C6DDE9']]) +
+    grad('lawn', [[0, '#2F5A38'], [1, '#1B3A24']]) +
+    grad('drive', [[0, '#5A6270'], [1, '#3A4250']]) +
+    radial('sun', [[0, '#FFF3D6', 0.45], [1, '#FFF3D6', 0]], W * 0.2, H * 0.1, W * 0.5);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  // Cloud banks, flat and wide.
+  for (let i = 0; i < 5; i++) {
+    const x = r() * W;
+    const y = H * (0.08 + r() * 0.24);
+    const s = 0.7 + r() * 0.9;
+    body += ell(x, y, 150 * s, 26 * s, '#FFFFFF', 'opacity="0.5"');
+    body += ell(x + 70 * s, y + 10 * s, 110 * s, 20 * s, '#FFFFFF', 'opacity="0.38"');
+  }
+  body += rect(0, 0, W, horizon, 'url(#sun)');
+  for (let i = 0; i < 22; i++) {
+    body += broadleaf((i / 21) * W + (r() - 0.5) * 40, horizon - 40 - r() * 30, 0.7 + r() * 0.4, '#24492C');
+  }
+  body += rect(0, horizon, W, H - horizon, 'url(#lawn)');
+  const hy = H * 0.28;
+  const hh = H * 0.32;
+  body += rect(W * 0.12, hy, W * 0.5, hh, '#E4E1D8');
+  body += poly(`${n(W * 0.08)},${n(hy)} ${n(W * 0.37)},${n(H * 0.16)} ${n(W * 0.66)},${n(hy)}`, '#3E4650');
+  body += rect(W * 0.62, hy + hh * 0.2, W * 0.16, hh * 0.8, '#D6D2C7');
+  body += poly(`${n(W * 0.6)},${n(hy + hh * 0.2)} ${n(W * 0.7)},${n(H * 0.24)} ${n(W * 0.8)},${n(hy + hh * 0.2)}`, '#39414A');
+  for (let i = 0; i < 4; i++) {
+    body += rect(W * (0.16 + i * 0.1), hy + hh * 0.22, W * 0.06, hh * 0.3, '#2C3C4A');
+    body += rect(W * (0.16 + i * 0.1), hy + hh * 0.6, W * 0.06, hh * 0.26, '#2C3C4A');
+  }
+  body += rect(W * 0.35, hy + hh * 0.52, 52, hh * 0.48, '#6A4A32');
+  body += poly(`${n(W * 0.3)},${n(hy + hh)} ${n(W * 0.48)},${n(hy + hh)} ${n(W * 0.66)},${n(H)} ${n(W * 0.2)},${n(H)}`, 'url(#drive)');
+  return { defs, body };
+}
+
+function exteriorModern(r: () => number) {
+  const horizon = H * 0.66;
+  const spill = halo('spill', W * 0.5, H * 0.56, W * 0.6, '#FFB861', 0.24);
+  const defs =
+    twilightSky('sky', 0.3) +
+    grad('deck', [[0, '#2A313C'], [1, '#141920']]) +
+    grad('conc', [[0, '#39414D'], [1, '#232A34']]) +
+    spill.def;
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  for (let i = 0; i < 40; i++) {
+    body += circ(r() * W, r() * horizon * 0.62, r() * 1.5 + 0.5, '#DCEBFF', `opacity="${(0.3 + r() * 0.5).toFixed(2)}"`);
+  }
+  // Two stacked cantilevered boxes, offset. The whole language of the house.
+  const upperY = H * 0.24;
+  const lowerY = H * 0.44;
+  body += rect(W * 0.2, lowerY, W * 0.62, H * 0.22, 'url(#conc)');
+  body += glazing(W * 0.24, lowerY + 24, W * 0.5, H * 0.13, '#FFC275', 8);
+  body += rect(W * 0.08, upperY, W * 0.56, H * 0.18, '#1D242E');
+  body += glazing(W * 0.11, upperY + 20, W * 0.46, H * 0.11, '#FFD49A', 6);
+  body += rect(W * 0.08, upperY - 10, W * 0.58, 12, '#2B3340');
+  // The shadow line under the cantilever — what makes it read as floating.
+  body += rect(W * 0.08, upperY + H * 0.18, W * 0.56, 14, '#080C12', 'opacity="0.8"');
+  body += spill.body;
+  body += rect(0, horizon, W, H - horizon, 'url(#deck)');
+  for (let i = 0; i < 12; i++) body += rect(0, horizon + i * 40, W, 2, '#0A0E14', 'opacity="0.6"');
+  body += conifer(W * 0.9, H * 0.3, 2.4, '#0A1A16');
+  body += conifer(W * 0.96, H * 0.36, 1.8, '#091712');
+  return { defs, body };
+}
+
+function exteriorNight(r: () => number) {
+  const horizon = H * 0.68;
+  const g = halo('g', W * 0.42, H * 0.54, W * 0.55, '#FFB861', 0.3);
+  const defs =
+    grad('sky', [[0, '#03060C'], [0.6, '#07101C'], [1, '#0E1E2E']]) +
+    grad('ground', [[0, '#11161E'], [1, '#070A0F']]) +
+    g.def;
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  for (let i = 0; i < 90; i++) {
+    body += circ(r() * W, r() * horizon, r() * 1.6 + 0.4, '#CFE4FF', `opacity="${(0.25 + r() * 0.6).toFixed(2)}"`);
+  }
+  const hy = H * 0.36;
+  const hh = H * 0.3;
+  body += rect(W * 0.14, hy, W * 0.6, hh, '#0D131B');
+  body += rect(W * 0.14, hy - 10, W * 0.62, 14, '#131A24');
+  body += litWindows(W * 0.17, hy + 22, W * 0.54, hh * 0.6, 7, 2, r);
+  body += rect(W * 0.42, hy + hh * 0.5, 50, hh * 0.5, '#FFDCA8', 'opacity="0.8"');
+  body += g.body;
+  body += rect(0, horizon, W, H - horizon, 'url(#ground)');
+  body += ell(W * 0.44, horizon + 30, W * 0.3, 40, '#FFC275', 'opacity="0.08"');
+  return { defs, body };
+}
+
+/* =========================================================================
+   INTERIORS
+   All shot the same way: a warm room against a blue window. That contrast
+   is the entire craft of interior real estate photography.
+   ====================================================================== */
+
+function room(
+  r: () => number,
+  opts: {
+    wall: [string, string];
+    floor: [string, string];
+    windowAt: number;
+    warm: string;
+  },
+) {
+  const defs =
+    grad('wall', [[0, opts.wall[0]], [1, opts.wall[1]]]) +
+    grad('floor', [[0, opts.floor[0]], [1, opts.floor[1]]]) +
+    grad('win', [[0, '#1E4A6B'], [0.6, '#2F6A90'], [1, '#6E9AB4']]) +
+    radial('lamp', [[0, opts.warm, 0.5], [1, opts.warm, 0]], W * 0.28, H * 0.42, W * 0.6);
+  const floorY = H * 0.68;
+  let body = rect(0, 0, W, floorY, 'url(#wall)');
+  body += rect(0, floorY, W, H - floorY, 'url(#floor)');
+  // Floorboards running to the vanishing point.
+  for (let i = 0; i < 10; i++) {
+    const t = i / 9;
+    body += rect(0, floorY + t * t * (H - floorY), W, 2, '#00000033');
+  }
+  // The window, and the cool light it throws on the floor.
+  const wx = W * opts.windowAt;
+  body += rect(wx, H * 0.16, W * 0.26, H * 0.44, '#0C141C');
+  body += glazing(wx + 10, H * 0.17, W * 0.26 - 20, H * 0.42, 'url(#win)', 3, '#0C141C');
+  body += poly(
+    `${n(wx)},${n(floorY)} ${n(wx + W * 0.26)},${n(floorY)} ${n(wx + W * 0.34)},${n(H)} ${n(wx - W * 0.1)},${n(H)}`,
+    '#9FC6DC',
+    'opacity="0.1"',
+  );
+  void r;
+  return { defs, body, floorY };
+}
+
+function interiorLiving(r: () => number) {
+  const base = room(r, { wall: ['#2A2A2C', '#17181B'], floor: ['#4A3A2C', '#241C15'], windowAt: 0.6, warm: '#FFB861' });
+  let body = base.body;
+  const fy = base.floorY;
+  // Sofa, low and wide, parallel to the frame.
+  body += rect(W * 0.08, fy - 108, W * 0.36, 78, '#3B3F46');
+  body += rect(W * 0.08, fy - 132, W * 0.36, 30, '#464B53');
+  body += rect(W * 0.08, fy - 30, W * 0.36, 16, '#2A2E34');
+  for (let i = 0; i < 3; i++) body += rect(W * (0.11 + i * 0.11), fy - 126, 58, 44, '#565C66');
+  // Coffee table and rug.
+  body += ell(W * 0.3, fy + 34, W * 0.3, 50, '#1E1A16');
+  body += rect(W * 0.2, fy - 34, W * 0.2, 12, '#7A5636');
+  body += rect(W * 0.22, fy - 22, 8, 34, '#4E3722');
+  body += rect(W * 0.37, fy - 22, 8, 34, '#4E3722');
+  // A floor lamp, which is where the warm light comes from.
+  body += rect(W * 0.5, fy - 250, 5, 250, '#2C2F35');
+  body += poly(`${n(W * 0.47)},${n(fy - 250)} ${n(W * 0.54)},${n(fy - 250)} ${n(W * 0.555)},${n(fy - 300)} ${n(W * 0.455)},${n(fy - 300)}`, '#FFD9A5');
+  body += rect(0, 0, W, H, 'url(#lamp)');
+  // Art on the left wall, lit.
+  body += rect(W * 0.12, H * 0.18, W * 0.14, H * 0.2, '#1A1C20');
+  body += rect(W * 0.13, H * 0.19, W * 0.12, H * 0.18, '#3E4A58');
+  return { defs: base.defs, body };
+}
+
+function interiorKitchen(r: () => number) {
+  const base = room(r, { wall: ['#2E2F31', '#1A1B1E'], floor: ['#3E3B36', '#1F1D1B'], windowAt: 0.66, warm: '#FFC27A' });
+  let body = base.body;
+  const fy = base.floorY;
+  // Run of cabinetry, worktop, splashback.
+  body += rect(0, fy - 190, W * 0.62, 24, '#D8D2C6'); // worktop
+  body += rect(0, fy - 166, W * 0.62, 166, '#22262C');
+  for (let i = 0; i < 6; i++) body += rect(W * 0.02 + i * W * 0.1, fy - 158, W * 0.086, 150, '#2B3037');
+  for (let i = 0; i < 6; i++) body += rect(W * 0.055 + i * W * 0.1, fy - 96, W * 0.02, 5, '#C8A465');
+  body += rect(0, H * 0.24, W * 0.62, 12, '#171A1F');
+  // Upper cabinets with a light strip under them.
+  body += rect(0, H * 0.12, W * 0.4, H * 0.12, '#262B31');
+  body += rect(0, H * 0.24 + 12, W * 0.4, 6, '#FFD9A5', 'opacity="0.75"');
+  // Island with three pendants.
+  body += rect(W * 0.16, fy - 24, W * 0.42, 22, '#E3DDD0');
+  body += rect(W * 0.18, fy - 2, W * 0.38, 92, '#1B2026');
+  for (let i = 0; i < 3; i++) {
+    const x = W * (0.24 + i * 0.12);
+    body += rect(x - 2, H * 0.12, 4, H * 0.26, '#2E333A');
+    body += poly(`${n(x - 26)},${n(H * 0.38)} ${n(x + 26)},${n(H * 0.38)} ${n(x + 16)},${n(H * 0.32)} ${n(x - 16)},${n(H * 0.32)}`, '#C8A465');
+    body += ell(x, H * 0.385, 24, 7, '#FFE0B0');
+  }
+  body += rect(0, 0, W, H, 'url(#lamp)');
+  return { defs: base.defs, body };
+}
+
+function interiorBedroom(r: () => number) {
+  const base = room(r, { wall: ['#2B2A2E', '#18171B'], floor: ['#453626', '#221A12'], windowAt: 0.62, warm: '#FFB870' });
+  let body = base.body;
+  const fy = base.floorY;
+  body += rect(W * 0.1, fy - 96, W * 0.4, 96, '#EDE6D9'); // bed
+  body += rect(W * 0.1, fy - 96, W * 0.4, 26, '#D8CFC0');
+  body += rect(W * 0.08, fy - 230, W * 0.44, 140, '#2F343B'); // headboard
+  for (let i = 0; i < 2; i++) body += rect(W * (0.14 + i * 0.16), fy - 132, W * 0.12, 42, '#FBF6EC');
+  body += rect(W * 0.1, fy - 40, W * 0.4, 22, '#8A6A46'); // throw
+  for (let i = 0; i < 2; i++) {
+    const x = W * (0.055 + i * 0.44);
+    body += rect(x, fy - 74, 66, 74, '#2A2F36');
+    body += circ(x + 33, fy - 104, 18, '#FFD9A5');
+  }
+  body += rect(0, 0, W, H, 'url(#lamp)');
+  return { defs: base.defs, body };
+}
+
+function interiorBath(r: () => number) {
+  const base = room(r, { wall: ['#33343A', '#1D1E23'], floor: ['#3A3B41', '#1E1F24'], windowAt: 0.64, warm: '#FFCC8A' });
+  let body = base.body;
+  const fy = base.floorY;
+  // Large-format tile, drawn as a grid rather than a texture.
+  for (let i = 0; i < 6; i++) body += rect(W * 0.16 * i, 0, 2, fy, '#00000026');
+  for (let i = 0; i < 5; i++) body += rect(0, H * 0.14 * i, W, 2, '#00000026');
+  body += ell(W * 0.3, fy - 40, W * 0.15, 52, '#F2EEE6'); // freestanding tub
+  body += rect(W * 0.15, fy - 42, W * 0.3, 44, '#F2EEE6');
+  body += ell(W * 0.3, fy + 4, W * 0.15, 20, '#D9D3C8');
+  body += rect(W * 0.2, fy - 130, 5, 92, '#C0C4CA'); // filler
+  body += rect(W * 0.2, fy - 130, 44, 5, '#C0C4CA');
+  body += rect(W * 0.58, H * 0.22, W * 0.3, H * 0.26, '#1A2028'); // mirror
+  body += rect(W * 0.59, H * 0.23, W * 0.28, H * 0.24, '#33404E');
+  body += rect(W * 0.58, H * 0.48, W * 0.3, 8, '#FFE3B5', 'opacity="0.8"');
+  body += rect(0, 0, W, H, 'url(#lamp)');
+  return { defs: base.defs, body };
+}
+
+function interiorDining(r: () => number) {
+  const base = room(r, { wall: ['#2C2B2D', '#19181B'], floor: ['#4A3928', '#241B12'], windowAt: 0.58, warm: '#FFBE74' });
+  let body = base.body;
+  const fy = base.floorY;
+  body += rect(W * 0.1, fy - 64, W * 0.46, 18, '#6B4A2E'); // table
+  body += rect(W * 0.13, fy - 46, 12, 62, '#4A331F');
+  body += rect(W * 0.51, fy - 46, 12, 62, '#4A331F');
+  for (let i = 0; i < 4; i++) {
+    const x = W * (0.13 + i * 0.12);
+    body += rect(x, fy - 52, 46, 8, '#2F343B');
+    body += rect(x + 2, fy - 122, 42, 72, '#353A42');
+    body += rect(x + 4, fy - 44, 6, 44, '#262A31');
+    body += rect(x + 36, fy - 44, 6, 44, '#262A31');
+  }
+  for (let i = 0; i < 3; i++) {
+    const x = W * (0.18 + i * 0.14);
+    body += rect(x - 2, H * 0.1, 4, H * 0.26, '#2E333A');
+    body += circ(x, H * 0.37, 15, '#FFE0B0');
+  }
+  body += rect(0, 0, W, H, 'url(#lamp)');
+  return { defs: base.defs, body };
+}
+
+function staircase(r: () => number) {
+  const defs =
+    grad('wall', [[0, '#2B2C30'], [1, '#141519']]) +
+    radial('sl', [[0, '#FFE6BC', 0.42], [1, '#FFE6BC', 0]], W * 0.72, H * 0.14, W * 0.7);
+  let body = rect(0, 0, W, H, 'url(#wall)');
+  body += rect(0, 0, W, H, 'url(#sl)');
+  const n2 = 9;
+  for (let i = 0; i < n2; i++) {
+    const y = H * 0.14 + i * (H * 0.082);
+    const x = W * 0.18 + i * (W * 0.058);
+    const w = W * 0.3;
+    body += rect(x + 12, y + 28, w, 22, '#000', 'opacity="0.34"');
+    body += rect(x, y, w, 26, '#6B4A2E');
+    body += rect(x, y, w, 7, '#8E653E');
+    body += poly(`${n(x)},${n(y + 26)} ${n(x + w)},${n(y + 26)} ${n(x + w - 14)},${n(y + 40)} ${n(x - 14)},${n(y + 40)}`, '#4A3320');
+  }
+  // A thin steel balustrade, which is what the shot is actually about.
+  body += poly(`${n(W * 0.16)},${n(H * 0.08)} ${n(W * 0.18)},${n(H * 0.08)} ${n(W * 0.72)},${n(H * 0.82)} ${n(W * 0.7)},${n(H * 0.82)}`, '#8C919A');
+  for (let i = 0; i < 14; i++) {
+    const t = i / 13;
+    body += rect(W * (0.17 + t * 0.54), H * (0.09 + t * 0.73), 2.4, H * 0.1, '#5A6068');
+  }
+  body += rect(0, H * 0.9, W, H * 0.1, '#5A4128');
+  void r;
+  return { defs, body };
+}
+
+function detail(r: () => number) {
+  const defs =
+    grad('bg', [[0, '#26282C'], [1, '#111316']]) +
+    radial('gl', [[0, '#FFD9A5', 0.4], [1, '#FFD9A5', 0]], W * 0.68, H * 0.3, W * 0.55);
+  let body = rect(0, 0, W, H, 'url(#bg)');
+  // A run of oak joinery, raking light across it.
+  for (let i = 0; i < 16; i++) {
+    const x = (i / 16) * W;
+    body += rect(x, 0, W / 16 - 4, H, i % 2 ? '#4E3A25' : '#5A4429');
+    body += rect(x, 0, 3, H, '#2A1E12');
+  }
+  body += rect(0, H * 0.46, W, 10, '#1C140C');
+  body += rect(0, H * 0.46, W, 3, '#C8A465'); // a bronze reveal
+  body += rect(W * 0.3, H * 0.52, W * 0.12, 5, '#C8A465');
+  body += rect(0, 0, W, H, 'url(#gl)');
+  void r;
+  return { defs, body };
+}
+
+function pool(r: () => number) {
+  const horizon = H * 0.44;
+  const defs =
+    twilightSky('sky') +
+    grad('pw', [[0, '#1C6E86'], [1, '#0B3244']]) +
+    grad('deck', [[0, '#3A4049'], [1, '#1E2229']]) +
+    radial('gl', [[0, '#7FE9FF', 0.28], [1, '#7FE9FF', 0]], W * 0.5, H * 0.62, W * 0.55);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  body += circ(W * (0.2 + r() * 0.2), horizon - 90, 26, '#EAF4FF', 'opacity="0.85"');
+  for (let i = 0; i < 18; i++) body += conifer((i / 17) * W, horizon - 52 - r() * 30, 0.7, '#0A1A16');
+  body += rect(0, horizon, W, H * 0.06, '#0F1A22');
+  // Coping, then the water, lit from beneath.
+  body += rect(0, horizon + H * 0.06, W, 10, '#4A5158');
+  body += rect(0, horizon + H * 0.06 + 10, W, H * 0.32, 'url(#pw)');
+  for (let i = 0; i < 16; i++) {
+    const y = horizon + H * 0.1 + i * 22;
+    body += rect((r() - 0.5) * 240 + W * 0.3, y, 200 + r() * 460, 3, '#BFF2FF', 'opacity="0.12"');
+  }
+  body += specular(W * 0.36, horizon + H * 0.1, H * 0.3, '#EAF4FF', r);
+  body += rect(0, 0, W, H, 'url(#gl)');
+  body += rect(0, H * 0.84, W, H * 0.16, 'url(#deck)');
+  for (let i = 0; i < 2; i++) {
+    const x = W * (0.12 + i * 0.6);
+    body += rect(x, H * 0.86, 190, 14, '#3F464F');
+    body += poly(`${n(x)},${n(H * 0.86)} ${n(x + 64)},${n(H * 0.86)} ${n(x + 38)},${n(H * 0.8)} ${n(x - 8)},${n(H * 0.8)}`, '#474E58');
+  }
+  return { defs, body };
+}
+
+function terrace(r: () => number) {
+  const horizon = H * 0.56;
+  const defs =
+    twilightSky('sky') +
+    grad('stone', [[0, '#3B414A'], [1, '#1D2127']]) +
+    radial('fire', [[0, '#FF9A4D', 0.55], [1, '#FF9A4D', 0]], W * 0.5, H * 0.72, W * 0.42);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  for (let i = 0; i < 40; i++) body += circ(r() * W, r() * horizon * 0.6, r() * 1.4 + 0.4, '#DCEBFF', `opacity="${(0.3 + r() * 0.5).toFixed(2)}"`);
+  for (let i = 0; i < 20; i++) body += conifer((i / 19) * W, horizon - 46 - r() * 26, 0.62, '#0A1A16');
+  body += rect(0, horizon, W, H - horizon, 'url(#stone)');
+  for (let i = 0; i < 8; i++) body += rect(0, horizon + i * 62, W, 2, '#00000038');
+  // The soffit overhead — this is a covered terrace, and the frame says so.
+  body += rect(0, 0, W, H * 0.14, '#12161C');
+  body += rect(0, H * 0.14, W, 7, '#00000055');
+  body += rect(W * 0.1, H * 0.14, 26, H * 0.44, '#232931');
+  body += rect(W * 0.86, H * 0.14, 26, H * 0.44, '#232931');
+  for (let i = 0; i < 4; i++) body += circ(W * (0.2 + i * 0.2), H * 0.14 + 16, 9, '#FFDCA8');
+  // A low fire table.
+  body += rect(W * 0.38, H * 0.72, W * 0.24, 66, '#2B3138');
+  body += rect(W * 0.42, H * 0.69, W * 0.16, 34, '#FF9A4D', 'opacity="0.92"');
+  body += rect(0, 0, W, H, 'url(#fire)');
+  return { defs, body };
+}
+
+/* =========================================================================
+   AERIAL — the drone work
+   ====================================================================== */
+
+function aerialProperty(r: () => number) {
+  const defs =
+    grad('land', [[0, '#1B3A24'], [1, '#0C1C12']]) +
+    grad('roofg', [[0, '#3E454F'], [1, '#262C34']]) +
+    radial('vig', [[0, '#000000', 0], [1, '#000000', 0.5]], W * 0.5, H * 0.5, W * 0.72);
+  let body = rect(0, 0, W, H, 'url(#land)');
+  // Ground texture: mown bands, which is what a lawn looks like from 200 feet.
+  for (let i = 0; i < 22; i++) {
+    body += rect(0, i * 52, W, 26, '#FFFFFF', `opacity="${(0.012 + r() * 0.016).toFixed(3)}"`);
+  }
+  // Tree canopies, seen from directly above, each with a shadow offset.
+  for (let i = 0; i < 26; i++) {
+    const x = r() * W;
+    const y = r() * H;
+    const s = 22 + r() * 34;
+    body += ell(x + s * 0.3, y + s * 0.34, s, s * 0.9, '#050C08', 'opacity="0.55"');
+    body += ell(x, y, s, s * 0.92, r() > 0.5 ? '#1E4229' : '#173420');
+  }
+  // The house: a roof plan, shot square. Shadow first.
+  const rx = W * 0.3;
+  const ry = H * 0.32;
+  const rw = W * 0.4;
+  const rh = H * 0.3;
+  body += rect(rx + 26, ry + 30, rw, rh, '#050C08', 'opacity="0.55"');
+  body += rect(rx, ry, rw, rh, 'url(#roofg)');
+  body += rect(rx + rw * 0.55, ry - rh * 0.3, rw * 0.45, rh * 0.62, '#333A43');
+  // Ridge lines and valleys.
+  body += rect(rx, ry + rh * 0.5 - 3, rw, 6, '#1B2028');
+  body += rect(rx + rw * 0.5 - 3, ry, 6, rh, '#1B2028');
+  body += rect(rx + rw * 0.76, ry - rh * 0.3, 6, rh * 0.62, '#1B2028');
+  body += rect(rx + rw * 0.2, ry + rh * 0.18, 26, 30, '#525A64'); // chimney
+  // Pool, drive, and the parked car that gives it scale.
+  body += rect(W * 0.14, H * 0.66, W * 0.16, H * 0.12, '#14607A');
+  body += rect(W * 0.14, H * 0.66, W * 0.16, H * 0.12, '#7FE9FF', 'opacity="0.18"');
+  body += rect(W * 0.13, H * 0.645, W * 0.18, H * 0.015, '#4A5158');
+  body += poly(`${n(W * 0.44)},${n(ry + rh)} ${n(W * 0.58)},${n(ry + rh)} ${n(W * 0.66)},${n(H)} ${n(W * 0.38)},${n(H)}`, '#2E343C');
+  body += rect(W * 0.47, H * 0.84, 46, 90, '#454C55');
+  body += rect(0, 0, W, H, 'url(#vig)');
+  return { defs, body };
+}
+
+function aerialNeighborhood(r: () => number) {
+  const horizon = H * 0.22;
+  const defs =
+    twilightSky('sky', 0.6) +
+    grad('land', [[0, '#16241C'], [1, '#0A120E']]) +
+    radial('vig', [[0, '#000000', 0], [1, '#000000', 0.45]], W * 0.5, H * 0.56, W * 0.75);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  body += rect(0, horizon, W, H - horizon, 'url(#land)');
+  // Streets in perspective, converging toward the horizon.
+  for (let i = 0; i < 6; i++) {
+    const t = i / 5;
+    const y = horizon + Math.pow(t, 1.7) * (H - horizon);
+    body += rect(0, y, W, 6 + t * 16, '#2A3038');
+  }
+  for (let i = 0; i < 9; i++) {
+    const x = (i / 8) * W;
+    body += poly(`${n(W * 0.5 + (x - W * 0.5) * 0.28)},${n(horizon)} ${n(W * 0.5 + (x - W * 0.5) * 0.3)},${n(horizon)} ${n(x + 14)},${n(H)} ${n(x - 14)},${n(H)}`, '#252B33');
+  }
+  // Rooftops on both sides of each street, lit windows facing the camera.
+  for (let i = 0; i < 46; i++) {
+    const t = 0.1 + r() * 0.9;
+    const y = horizon + Math.pow(t, 1.6) * (H - horizon);
+    const s = 0.25 + t * 1.2;
+    const x = r() * W;
+    body += rect(x, y - 30 * s, 92 * s, 34 * s, '#050A08', 'opacity="0.5"');
+    body += rect(x - 6 * s, y - 40 * s, 92 * s, 34 * s, r() > 0.5 ? '#39404A' : '#2F363F');
+    if (r() > 0.4) body += rect(x + 8 * s, y - 30 * s, 20 * s, 12 * s, '#FFC275', 'opacity="0.7"');
+  }
+  // Streetlights.
+  for (let i = 0; i < 24; i++) {
+    const t = 0.15 + r() * 0.85;
+    const y = horizon + Math.pow(t, 1.6) * (H - horizon);
+    const x = r() * W;
+    body += circ(x, y, 2 + t * 3, '#FFD08A', 'opacity="0.9"');
+    body += circ(x, y, 10 + t * 20, '#FFC275', 'opacity="0.07"');
+  }
+  body += rect(0, 0, W, H, 'url(#vig)');
+  return { defs, body };
+}
+
+function aerialLand(r: () => number) {
+  const horizon = H * 0.2;
+  const defs =
+    twilightSky('sky', 0.7) +
+    grad('field', [[0, '#26401F'], [1, '#0E1A11']]) +
+    radial('vig', [[0, '#000000', 0], [1, '#000000', 0.42]], W * 0.5, H * 0.5, W * 0.76);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  body += rect(0, horizon, W, H - horizon, 'url(#field)');
+  // Field boundaries as an irregular quilt.
+  for (let i = 0; i < 9; i++) {
+    const y = horizon + Math.pow(i / 8, 1.5) * (H - horizon);
+    const hh2 = (H - horizon) * 0.14;
+    body += rect(0, y, W, hh2, i % 2 ? '#22381D' : '#1A2E18', `opacity="${(0.5 + r() * 0.4).toFixed(2)}"`);
+    body += rect(0, y, W, 2, '#0A120C');
+  }
+  for (let i = 0; i < 5; i++) {
+    const x = r() * W;
+    body += poly(`${n(x)},${n(horizon)} ${n(x + 30)},${n(horizon)} ${n(x + 120)},${n(H)} ${n(x - 60)},${n(H)}`, '#1E3320', 'opacity="0.5"');
+  }
+  // A treeline and a creek cutting diagonally.
+  body += poly(`0,${n(H * 0.62)} ${n(W * 0.4)},${n(H * 0.52)} ${n(W)},${n(H * 0.74)} ${n(W)},${n(H * 0.8)} ${n(W * 0.4)},${n(H * 0.6)} 0,${n(H * 0.7)}`, '#2E5A6E', 'opacity="0.75"');
+  for (let i = 0; i < 30; i++) {
+    const x = r() * W;
+    const y = H * (0.5 + r() * 0.48);
+    body += ell(x, y, 16 + r() * 22, 14 + r() * 18, '#12240F');
+  }
+  body += rect(0, 0, W, H, 'url(#vig)');
+  return { defs, body };
+}
+
+function aerialWater(r: () => number) {
+  const horizon = H * 0.3;
+  const defs =
+    twilightSky('sky', 0.8) +
+    grad('water', [[0, '#1B4F66'], [1, '#08202C']]) +
+    grad('sand', [[0, '#C0A882'], [1, '#8A7658']]) +
+    radial('vig', [[0, '#000000', 0], [1, '#000000', 0.44]], W * 0.5, H * 0.5, W * 0.78);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  body += circ(W * (0.3 + r() * 0.4), horizon - 60, 34, '#FFE4B6', 'opacity="0.9"');
+  body += rect(0, horizon, W, H - horizon, 'url(#water)');
+  body += specular(W * (0.3 + r() * 0.4), horizon, H * 0.7, '#FFE4B6', r);
+  for (let i = 0; i < 40; i++) {
+    body += rect(r() * W, horizon + r() * (H - horizon), 60 + r() * 220, 2.4, '#BFF2FF', `opacity="${(0.05 + r() * 0.1).toFixed(2)}"`);
+  }
+  // A shoreline sweeping in from the left, with a dock.
+  body += poly(`0,${n(H * 0.52)} ${n(W * 0.44)},${n(H * 0.66)} ${n(W * 0.3)},${n(H)} 0,${n(H)}`, 'url(#sand)');
+  body += poly(`0,${n(H * 0.5)} ${n(W * 0.42)},${n(H * 0.64)} ${n(W * 0.4)},${n(H * 0.6)} 0,${n(H * 0.46)}`, '#1C3A22');
+  body += rect(W * 0.3, H * 0.72, W * 0.2, 14, '#5E4A33');
+  for (let i = 0; i < 6; i++) body += rect(W * (0.32 + i * 0.032), H * 0.72, 7, 40, '#4A3A28');
+  body += rect(0, 0, W, H, 'url(#vig)');
+  return { defs, body };
+}
+
+function aerialHighway(r: () => number) {
+  const horizon = H * 0.26;
+  const defs =
+    twilightSky('sky', 0.5) +
+    grad('ground', [[0, '#1A2028'], [1, '#0A0E13']]) +
+    radial('vig', [[0, '#000000', 0], [1, '#000000', 0.46]], W * 0.5, H * 0.5, W * 0.76);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  body += rect(0, horizon, W, H - horizon, 'url(#ground)');
+  // A wide road sweeping through, with light trails on it.
+  body += poly(`${n(W * 0.42)},${n(horizon)} ${n(W * 0.56)},${n(horizon)} ${n(W * 1.1)},${n(H)} ${n(W * 0.02)},${n(H)}`, '#242A33');
+  body += poly(`${n(W * 0.48)},${n(horizon)} ${n(W * 0.5)},${n(horizon)} ${n(W * 0.62)},${n(H)} ${n(W * 0.48)},${n(H)}`, '#3A424C');
+  for (let i = 0; i < 9; i++) {
+    const t = i / 8;
+    const y = horizon + Math.pow(t, 1.7) * (H - horizon);
+    const w = 6 + t * 26;
+    body += rect(W * 0.49 + (t * t * W * 0.06), y, w, 10 + t * 30, '#C9D3DE', 'opacity="0.34"');
+  }
+  // Head and tail light streaks.
+  for (let i = 0; i < 12; i++) {
+    const t = 0.1 + r() * 0.9;
+    const y = horizon + Math.pow(t, 1.7) * (H - horizon);
+    const lane = r() > 0.5;
+    body += rect(W * (lane ? 0.4 : 0.56) + (t * t * (lane ? -W * 0.3 : W * 0.34)), y, 60 + t * 200, 4 + t * 8, lane ? '#FFE7C2' : '#FF6B5A', `opacity="${(0.5 + r() * 0.4).toFixed(2)}"`);
+  }
+  for (let i = 0; i < 30; i++) {
+    const x = r() * W;
+    const y = H * (0.3 + r() * 0.7);
+    body += ell(x, y, 18 + r() * 24, 16 + r() * 20, '#101E14');
+  }
+  body += rect(0, 0, W, H, 'url(#vig)');
+  return { defs, body };
+}
+
+function droneFlight(r: () => number) {
+  const horizon = H * 0.72;
+  const defs =
+    twilightSky('sky', 0.65) +
+    grad('ground', [[0, '#132019'], [1, '#070C0A']]) +
+    radial('nav', [[0, '#7FE9FF', 0.4], [1, '#7FE9FF', 0]], W * 0.46, H * 0.36, W * 0.34);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  for (let i = 0; i < 50; i++) body += circ(r() * W, r() * horizon * 0.6, r() * 1.4 + 0.4, '#DCEBFF', `opacity="${(0.25 + r() * 0.5).toFixed(2)}"`);
+  for (let i = 0; i < 22; i++) body += conifer((i / 21) * W, horizon - 60 - r() * 40, 0.85 + r() * 0.4, '#081511');
   body += rect(0, horizon, W, H - horizon, 'url(#ground)');
 
-  const hx = W * 0.14;
-  const hw = W * 0.72;
-  const hy = horizon - 300;
-  body += volume(hx, hy, hw, 300, 'url(#wall)', '#BFB29C', 0);
-  body += rect(hx, hy, hw, 26, '#EFE6D6');
-  // The deep loggia: piers with shade behind them.
-  const bays = 6;
-  body += rect(hx + 28, hy + 128, hw - 56, 172, '#6F6352');
-  for (let i = 0; i <= bays; i++) {
-    const px = hx + 28 + ((hw - 56) / bays) * i - 14;
-    body += rect(px, hy + 120, 28, 180, '#F6F1E7');
+  // The aircraft, in silhouette against the sky, seen slightly from below.
+  const cx = W * 0.46;
+  const cy = H * 0.36;
+  body += rect(0, 0, W, H, 'url(#nav)');
+  // Arms and rotors.
+  for (const [dx, dy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]] as const) {
+    const ax = cx + dx * 150;
+    const ay = cy + dy * 52;
+    body += poly(`${n(cx)},${n(cy)} ${n(ax)},${n(ay - 8)} ${n(ax)},${n(ay + 8)}`, '#0E141B');
+    body += rect(ax - 12, ay - 12, 24, 24, '#161D26');
+    body += ell(ax, ay - 14, 92, 9, '#9FD4FF', 'opacity="0.2"'); // blade blur
+    body += ell(ax, ay - 14, 92, 3, '#CFE9FF', 'opacity="0.35"');
   }
-  body += rect(hx + 28, hy + 120, hw - 56, 14, '#EFE6D6');
-  body += glazing(hx + 74, hy + 46, hw - 148, 62, '#B9C9CB', 5, '#00000022');
-  for (let i = 0; i < 4; i++) {
-    body += palm(hx - 70 + i * 22, hy + 40 + r() * 30, 1.5 + r() * 0.5, '#33402F');
-  }
-  body += palm(W * 0.94, hy + 30, 1.7, '#33402F');
-  body += rect(0, H * 0.93, W, H * 0.07, '#2F4C55');
+  // Body and gimbal.
+  body += ell(cx, cy, 96, 42, '#141B24');
+  body += ell(cx, cy - 8, 84, 30, '#1C242F');
+  body += circ(cx - 6, cy + 34, 26, '#0B1016');
+  body += circ(cx - 6, cy + 34, 15, '#2B3B4A');
+  body += circ(cx - 10, cy + 30, 5, '#BFF2FF', 'opacity="0.8"');
+  // Navigation lights: one red, one green. Anyone who flies will notice.
+  body += circ(cx - 148, cy + 52, 7, '#FF4D4D');
+  body += circ(cx - 148, cy + 52, 18, '#FF4D4D', 'opacity="0.18"');
+  body += circ(cx + 148, cy + 52, 7, '#4DFF9A');
+  body += circ(cx + 148, cy + 52, 18, '#4DFF9A', 'opacity="0.18"');
   return { defs, body };
 }
 
-function water(r: () => number, dock: boolean) {
-  const horizon = H * 0.42;
+/* =========================================================================
+   VIDEO
+   ====================================================================== */
+
+function videoFrame(r: () => number) {
+  const horizon = H * 0.62;
   const defs =
-    grad('sky', [[0, '#7FA6BE'], [0.6, '#C8D9DF'], [1, '#F1E6D4']]) +
-    grad('water', [[0, '#5C93A6'], [1, '#2C5464']]);
+    twilightSky('sky', 0.45) +
+    grad('ground', [[0, '#1A2028'], [1, '#0A0E13']]) +
+    radial('gl', [[0, '#FFB861', 0.3], [1, '#FFB861', 0]], W * 0.38, H * 0.5, W * 0.5);
   let body = rect(0, 0, W, horizon, 'url(#sky)');
-  body += `<circle cx="${W * 0.72}" cy="${horizon - 130}" r="60" fill="#FCF3E1" opacity="0.8"/>`;
-  // A low skyline on the far shore.
-  for (let i = 0; i < 16; i++) {
-    const x = i * 108 + (r() - 0.5) * 30;
-    const h = 22 + r() * 76;
-    body += rect(x, horizon - h, 78, h, '#9FB2BB', 'opacity="0.75"');
-  }
-  body += rect(0, horizon, W, H - horizon, 'url(#water)');
-  body += specular(W * 0.72, horizon, H, '#F6E3C2', r);
-  for (let i = 0; i < 26; i++) {
-    const y = horizon + 24 + i * 26;
-    body += rect((r() - 0.5) * 300 + W * 0.3, y, 220 + r() * 420, 3, '#FFFFFF', 'opacity="0.09"');
-  }
-  if (dock) {
-    const dy = H * 0.62;
-    body += rect(W * 0.26, dy, W * 0.52, 26, '#C9B893');
-    for (let i = 0; i < 7; i++) body += rect(W * 0.27 + i * (W * 0.5) / 6, dy + 26, 12, 150, '#5C503F');
-    // A hull moored alongside.
-    body += poly(`${W * 0.6},${dy - 54} ${W * 0.86},${dy - 54} ${W * 0.82},${dy - 6} ${W * 0.62},${dy - 6}`, '#F2EEE6');
-    body += rect(W * 0.64, dy - 88, W * 0.14, 36, '#E4DED2');
-    body += rect(W * 0.6, dy - 60, W * 0.26, 8, '#3C4A50');
-    body += palm(W * 0.1, dy - 90, 1.8, '#2E3B2C');
-    body += palm(W * 0.92, dy - 70, 1.6, '#2E3B2C');
-  }
+  for (let i = 0; i < 30; i++) body += circ(r() * W, r() * horizon * 0.5, r() * 1.3 + 0.4, '#DCEBFF', `opacity="${(0.3 + r() * 0.4).toFixed(2)}"`);
+  // A house read as a shape, deliberately soft — this is a frame from a film.
+  body += rect(W * 0.18, H * 0.34, W * 0.5, H * 0.28, '#151C25');
+  body += glazing(W * 0.22, H * 0.4, W * 0.34, H * 0.16, '#FFC275', 6);
+  body += rect(W * 0.18, H * 0.32, W * 0.52, 14, '#1E2631');
+  body += rect(0, 0, W, H, 'url(#gl)');
+  body += rect(0, horizon, W, H - horizon, 'url(#ground)');
+  for (let i = 0; i < 14; i++) body += rect(0, horizon + i * 34, W, 2, '#00000033');
+  // Anamorphic letterbox and a flare. It should read as a frame, not a photo.
+  body += rect(0, 0, W, H * 0.085, '#000');
+  body += rect(0, H * 0.915, W, H * 0.085, '#000');
+  body += rect(W * 0.1, H * 0.44, W * 0.7, 3, '#7FD4FF', 'opacity="0.42"');
+  body += ell(W * 0.44, H * 0.445, 190, 22, '#7FD4FF', 'opacity="0.12"');
   return { defs, body };
 }
 
-function pavilion(r: () => number) {
-  const horizon = H * 0.66;
+function walkthrough(r: () => number) {
   const defs =
-    grad('sky', [[0, '#A9BDB4'], [0.6, '#D9DFCD'], [1, '#F2EFE0']]) +
-    grad('meadow', [[0, '#B4A576'], [1, '#7E7350']]);
-  let body = rect(0, 0, W, horizon, 'url(#sky)');
-  body += rect(0, horizon, W, H - horizon, 'url(#meadow)');
-  for (let i = 0; i < 7; i++) body += oak(120 + i * 250 + (r() - 0.5) * 70, horizon - 120 - r() * 60, 1.5 + r() * 0.6, '#3F4A36');
-
-  const hx = W * 0.12;
-  const hw = W * 0.76;
-  const hy = horizon - 210;
-  const hh = 158;
-  // Eight piers, the floor plate, the glass, the deck above it.
-  for (let i = 0; i <= 7; i++) body += rect(hx + 16 + (hw / 7) * i - 7, hy + hh, 14, 120, '#2A2A27');
-  body += rect(hx - 18, hy + hh - 16, hw + 36, 22, '#23231F');
-  body += rect(hx, hy + 18, hw, hh - 34, '#DCE5DE', 'opacity="0.86"');
-  for (let i = 1; i < 8; i++) body += rect(hx + (hw / 8) * i - 3, hy + 18, 6, hh - 34, '#2A2A27');
-  body += rect(hx + hw * 0.62, hy + 18, hw * 0.2, hh - 34, '#23231F');
-  body += rect(hx - 28, hy - 14, hw + 56, 34, '#23231F');
-  body += rect(hx - 28, hy + 18, hw + 56, 6, '#000', 'opacity="0.3"');
-  body += oak(W * 0.94, horizon - 80, 1.9, '#3A4532');
+    grad('wall', [[0, '#2A2B2F'], [1, '#141519']]) +
+    grad('floor', [[0, '#4A3928'], [1, '#221A12']]) +
+    radial('far', [[0, '#FFD9A5', 0.44], [1, '#FFD9A5', 0]], W * 0.5, H * 0.44, W * 0.4);
+  const floorY = H * 0.74;
+  let body = rect(0, 0, W, floorY, 'url(#wall)');
+  body += rect(0, floorY, W, H - floorY, 'url(#floor)');
+  // A one-point-perspective hallway: the classic walkthrough opening frame.
+  const vx = W * 0.5;
+  const vy = H * 0.5;
+  body += poly(`0,0 ${n(W * 0.28)},${n(H * 0.3)} ${n(W * 0.28)},${n(H * 0.7)} 0,${n(H)}`, '#1B1D21');
+  body += poly(`${n(W)},0 ${n(W * 0.72)},${n(H * 0.3)} ${n(W * 0.72)},${n(H * 0.7)} ${n(W)},${n(H)}`, '#1B1D21');
+  body += poly(`0,0 ${n(W)},0 ${n(W * 0.72)},${n(H * 0.3)} ${n(W * 0.28)},${n(H * 0.3)}`, '#101215');
+  body += poly(`0,${n(H)} ${n(W)},${n(H)} ${n(W * 0.72)},${n(H * 0.7)} ${n(W * 0.28)},${n(H * 0.7)}`, '#2E2318');
+  // Doorways down the left wall.
+  for (let i = 0; i < 3; i++) {
+    const t = 0.18 + i * 0.22;
+    const x1 = vx - (vx - 0) * (1 - t);
+    const w = (vx - x1) * 0.3;
+    body += rect(x1, vy - (vy - H * 0.3) * (1 - t) * 0.9, w, H * 0.3 * (1 - t) + H * 0.1, '#0C0E11');
+  }
+  // The lit room at the end, which is what pulls the eye through.
+  body += rect(W * 0.4, H * 0.38, W * 0.2, H * 0.28, '#FFC275', 'opacity="0.85"');
+  body += rect(0, 0, W, H, 'url(#far)');
+  void r;
   return { defs, body };
 }
 
-function hills(r: () => number) {
-  const defs =
-    grad('sky', [[0, '#39281E'], [0.5, '#A96B3B'], [1, '#EFC78E']]) +
-    radial('sun', [[0, '#FFE2B0', 0.9], [1, '#FFE2B0', 0]], W * 0.62, H * 0.54, W * 0.5);
-  let body = rect(0, 0, W, H, 'url(#sky)');
-  body += rect(0, 0, W, H, 'url(#sun)');
-  body += `<circle cx="${W * 0.62}" cy="${H * 0.54}" r="58" fill="#FFEEC8"/>`;
-  const bands = [
-    [H * 0.56, '#7A5C42', 0.6],
-    [H * 0.64, '#5A4633', 0.75],
-    [H * 0.73, '#3C2F24', 0.9],
-    [H * 0.84, '#241C16', 1],
-  ] as const;
-  bands.forEach(([y, c, o], i) => {
-    let d = `M0,${y + 40} `;
-    for (let x = 0; x <= W; x += 200) d += `Q${x + 100},${y - 30 - r() * 60 + i * 10} ${x + 200},${y + (r() - 0.5) * 30} `;
-    d += `L${W},${H} L0,${H} Z`;
-    body += `<path d="${d}" fill="${c}" opacity="${o}"/>`;
-  });
-  for (let i = 0; i < 5; i++) body += oak(160 + i * 330 + (r() - 0.5) * 80, H * 0.82 - r() * 30, 1.4 + r() * 0.5, '#171210');
-  return { defs, body };
-}
+/* =========================================================================
+   COMMERCIAL
+   ====================================================================== */
 
-function city(r: () => number) {
-  const horizon = H * 0.82;
+function commercialRestaurant(r: () => number) {
   const defs =
-    grad('sky', [[0, '#1B2532'], [0.56, '#6A5768'], [1, '#E8C79C']]) +
-    grad('river', [[0, '#3A3A40'], [1, '#1A1B20']]);
-  let body = rect(0, 0, W, horizon, 'url(#sky)');
-  body += `<circle cx="${W * 0.2}" cy="${horizon - 120}" r="46" fill="#FFE6BC" opacity="0.9"/>`;
-  // Two ranks of towers, the back one hazed out.
-  for (const [alpha, base, spread] of [[0.45, horizon - 30, 150], [1, horizon, 0]] as const) {
-    let x = -40;
-    while (x < W + 40) {
-      const w = 48 + r() * 88;
-      const h = 120 + r() * (spread ? 300 : 460);
-      const c = spread ? '#4B5663' : '#171C24';
-      body += rect(x, base - h, w, h, c, `opacity="${alpha}"`);
-      if (!spread) {
-        for (let wy = base - h + 24; wy < base - 30; wy += 30) {
-          for (let wx = x + 10; wx < x + w - 12; wx += 20) {
-            if (r() > 0.55) body += rect(wx, wy, 8, 12, '#F3D59B', 'opacity="0.8"');
-          }
-        }
-      }
-      x += w + 8 + r() * 14;
+    grad('bg', [[0, '#221A16'], [1, '#0E0A08']]) +
+    radial('warm', [[0, '#FFB05A', 0.5], [1, '#FFB05A', 0]], W * 0.5, H * 0.46, W * 0.6);
+  let body = rect(0, 0, W, H, 'url(#bg)');
+  // Bar back: bottles on lit shelves.
+  body += rect(0, H * 0.1, W, H * 0.44, '#1A1310');
+  for (let s = 0; s < 3; s++) {
+    const y = H * (0.16 + s * 0.13);
+    body += rect(W * 0.06, y + 54, W * 0.88, 7, '#3A2A1E');
+    body += rect(W * 0.06, y + 50, W * 0.88, 4, '#FFC98A', 'opacity="0.55"');
+    for (let i = 0; i < 22; i++) {
+      const x = W * 0.08 + i * W * 0.04 + r() * 8;
+      const hgt = 30 + r() * 24;
+      body += rect(x, y + 54 - hgt, 13, hgt, ['#6B4A2E', '#2E4A3A', '#4A2E3A', '#3A3A2E'][Math.floor(r() * 4)]);
+      body += rect(x + 4, y + 54 - hgt - 12, 5, 12, '#2A2018');
     }
   }
-  body += rect(0, horizon, W, H - horizon, 'url(#river)');
-  body += specular(W * 0.2, horizon, H, '#F3D59B', r);
+  // Counter, glassware, and two guests in silhouette.
+  body += rect(0, H * 0.62, W, 26, '#5A3E28');
+  body += rect(0, H * 0.62, W, 7, '#8A6440');
+  body += rect(0, H * 0.648, W, H * 0.352, '#140E0A');
+  for (let i = 0; i < 5; i++) {
+    const x = W * (0.12 + i * 0.19);
+    body += poly(`${n(x - 15)},${n(H * 0.62)} ${n(x + 15)},${n(H * 0.62)} ${n(x + 8)},${n(H * 0.55)} ${n(x - 8)},${n(H * 0.55)}`, '#C8D8E0', 'opacity="0.42"');
+    body += rect(x - 2, H * 0.55, 4, -26, '#C8D8E0', 'opacity="0.3"');
+  }
+  body += rect(0, 0, W, H, 'url(#warm)');
+  body += figure(W * 0.2, H * 0.62, 1.5, '#0A0706');
+  body += figure(W * 0.78, H * 0.62, 1.4, '#0A0706');
+  return { defs, body };
+}
+
+function commercialGym(r: () => number) {
+  const defs =
+    grad('bg', [[0, '#12161C'], [1, '#05070A']]) +
+    grad('floor', [[0, '#1E242C'], [1, '#0A0D11']]) +
+    radial('rim', [[0, '#3EC8FF', 0.3], [1, '#3EC8FF', 0]], W * 0.7, H * 0.3, W * 0.5);
+  const floorY = H * 0.72;
+  let body = rect(0, 0, W, floorY, 'url(#bg)');
+  body += rect(0, floorY, W, H - floorY, 'url(#floor)');
+  for (let i = 0; i < 10; i++) body += rect(0, floorY + i * 34, W, 2, '#00000044');
+  // A rack of weights along the back wall.
+  body += rect(W * 0.04, H * 0.3, W * 0.42, 14, '#262E38');
+  body += rect(W * 0.04, H * 0.5, W * 0.42, 14, '#262E38');
+  for (let i = 0; i < 7; i++) {
+    const x = W * (0.07 + i * 0.056);
+    body += circ(x, H * 0.27, 20 - i * 1.2, '#1A2028');
+    body += circ(x, H * 0.27, 13 - i, '#3EC8FF', 'opacity="0.28"');
+    body += circ(x, H * 0.47, 20 - i * 1.2, '#1A2028');
+  }
+  // Uprights of a rig, and a barbell on the floor.
+  for (let i = 0; i < 3; i++) body += rect(W * (0.54 + i * 0.16), H * 0.1, 22, floorY - H * 0.1, '#1C242D');
+  body += rect(W * 0.54, H * 0.2, W * 0.34, 10, '#2A333E');
+  body += rect(W * 0.3, floorY - 16, W * 0.4, 9, '#8B939D');
+  for (const x of [W * 0.34, W * 0.66]) {
+    body += circ(x, floorY - 12, 40, '#141A21');
+    body += circ(x, floorY - 12, 40, '#3EC8FF', 'opacity="0.12"');
+  }
+  body += rect(0, 0, W, H, 'url(#rim)');
+  body += figure(W * 0.72, floorY, 2.4, '#070A0E');
+  void r;
+  return { defs, body };
+}
+
+function commercialAuto(r: () => number) {
+  const defs =
+    grad('bg', [[0, '#0B0F15'], [1, '#04070A']]) +
+    grad('floor', [[0, '#181E26'], [1, '#080B0F']]) +
+    radial('spot', [[0, '#DCEBFF', 0.28], [1, '#DCEBFF', 0]], W * 0.5, H * 0.3, W * 0.55);
+  const floorY = H * 0.66;
+  let body = rect(0, 0, W, floorY, 'url(#bg)');
+  body += rect(0, floorY, W, H - floorY, 'url(#floor)');
+  // Polished-floor reflection under the car.
+  body += ell(W * 0.5, floorY + 90, W * 0.34, 60, '#BFD8F0', 'opacity="0.07"');
+  body += rect(0, 0, W, H, 'url(#spot)');
+  // Overhead strip lights, receding.
+  for (let i = 0; i < 4; i++) {
+    const y = H * (0.06 + i * 0.05);
+    const inset = i * W * 0.06;
+    body += rect(inset, y, W - inset * 2, 7, '#CFE4FF', `opacity="${(0.5 - i * 0.1).toFixed(2)}"`);
+  }
+  body += car(W * 0.26, floorY - 4, 4.4, '#1C2630', '#2E4256', '#FFE7C2');
+  body += rect(0, 0, W, H, 'url(#spot)');
+  void r;
+  return { defs, body };
+}
+
+function commercialHotel(r: () => number) {
+  const horizon = H * 0.64;
+  const g = halo('g', W * 0.5, H * 0.56, W * 0.5, '#FFB861', 0.3);
+  const defs = twilightSky('sky', 0.4) + grad('ground', [[0, '#1A2028'], [1, '#0A0E13']]) + g.def;
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  for (let i = 0; i < 40; i++) body += circ(r() * W, r() * horizon * 0.5, r() * 1.4 + 0.4, '#DCEBFF', `opacity="${(0.3 + r() * 0.4).toFixed(2)}"`);
+  // A tower, softly lit, with a lit portico across the base.
+  body += rect(W * 0.28, H * 0.08, W * 0.44, horizon - H * 0.08, '#141B24');
+  body += litWindows(W * 0.3, H * 0.12, W * 0.4, horizon - H * 0.2, 8, 9, r);
+  body += rect(W * 0.26, H * 0.06, W * 0.48, 16, '#1E2631');
+  body += rect(W * 0.2, horizon - H * 0.1, W * 0.6, H * 0.1, '#1A222C');
+  body += rect(W * 0.2, horizon - H * 0.1, W * 0.6, 8, '#FFD9A5', 'opacity="0.65"');
+  for (let i = 0; i < 6; i++) body += rect(W * (0.23 + i * 0.1), horizon - H * 0.09, 18, H * 0.09, '#232B36');
+  body += g.body;
+  body += rect(0, horizon, W, H - horizon, 'url(#ground)');
+  body += car(W * 0.56, horizon + 70, 2.8, '#1A222C', '#2E4256', '#FFE7C2');
+  body += figure(W * 0.36, horizon + 66, 1.6, '#080C10');
+  return { defs, body };
+}
+
+function commercialRetail(r: () => number) {
+  const defs =
+    grad('bg', [[0, '#1A1E24'], [1, '#0A0D11']]) +
+    grad('floor', [[0, '#252B33'], [1, '#101419']]) +
+    radial('warm', [[0, '#FFD9A5', 0.32], [1, '#FFD9A5', 0]], W * 0.5, H * 0.34, W * 0.6);
+  const floorY = H * 0.74;
+  let body = rect(0, 0, W, floorY, 'url(#bg)');
+  body += rect(0, floorY, W, H - floorY, 'url(#floor)');
+  // Rails of stock along both walls, lit from a track above.
+  for (const side of [0, 1]) {
+    const x = side ? W * 0.62 : W * 0.06;
+    body += rect(x, H * 0.3, W * 0.32, 8, '#3A424C');
+    for (let i = 0; i < 12; i++) {
+      const gx = x + 10 + i * (W * 0.32 / 12);
+      body += rect(gx, H * 0.3, 18, H * 0.26, ['#3E4A58', '#4A4038', '#38443E', '#4A3A44'][Math.floor(r() * 4)]);
+      body += rect(gx + 6, H * 0.29, 6, 14, '#5A626C');
+    }
+  }
+  body += rect(0, H * 0.06, W, 10, '#1E242C');
+  for (let i = 0; i < 7; i++) {
+    const x = W * (0.08 + i * 0.14);
+    body += rect(x - 6, H * 0.07, 12, 16, '#39414B');
+    body += ell(x, H * 0.09, 14, 5, '#FFE3B5');
+    body += poly(`${n(x - 14)},${n(H * 0.09)} ${n(x + 14)},${n(H * 0.09)} ${n(x + 70)},${n(floorY)} ${n(x - 70)},${n(floorY)}`, '#FFD9A5', 'opacity="0.05"');
+  }
+  // A central table with folded stock.
+  body += rect(W * 0.38, H * 0.6, W * 0.24, 12, '#6B4A2E');
+  body += rect(W * 0.4, H * 0.612, 12, H * 0.13, '#4A3320');
+  body += rect(W * 0.58, H * 0.612, 12, H * 0.13, '#4A3320');
+  for (let i = 0; i < 3; i++) body += rect(W * (0.4 + i * 0.07), H * 0.56, W * 0.06, H * 0.04, '#59626E');
+  body += rect(0, 0, W, H, 'url(#warm)');
+  return { defs, body };
+}
+
+function commercialEvent(r: () => number) {
+  const defs =
+    grad('bg', [[0, '#0A0D14'], [1, '#04060A']]) +
+    radial('stage', [[0, '#3EC8FF', 0.34], [1, '#3EC8FF', 0]], W * 0.5, H * 0.42, W * 0.5) +
+    radial('warm', [[0, '#B06BFF', 0.24], [1, '#B06BFF', 0]], W * 0.2, H * 0.3, W * 0.45);
+  const floorY = H * 0.78;
+  let body = rect(0, 0, W, H, 'url(#bg)');
+  // Beams from a lighting rig, which is the whole look of an event frame.
+  for (let i = 0; i < 7; i++) {
+    const x = W * (0.1 + i * 0.13);
+    body += poly(`${n(x - 10)},${n(H * 0.04)} ${n(x + 10)},${n(H * 0.04)} ${n(x + 130)},${n(floorY)} ${n(x - 130)},${n(floorY)}`, i % 2 ? '#3EC8FF' : '#B06BFF', 'opacity="0.09"');
+    body += rect(x - 14, H * 0.02, 28, 20, '#1A212B');
+  }
+  body += rect(0, 0, W, H, 'url(#warm)');
+  body += rect(0, 0, W, H, 'url(#stage)');
+  // The stage, and a crowd in front of it.
+  body += rect(W * 0.2, H * 0.52, W * 0.6, H * 0.2, '#0E1420');
+  body += rect(W * 0.2, H * 0.52, W * 0.6, 8, '#3EC8FF', 'opacity="0.5"');
+  body += figure(W * 0.5, H * 0.72, 2.2, '#050810');
+  body += rect(0, floorY, W, H - floorY, '#05070C');
+  for (let i = 0; i < 30; i++) {
+    body += figure(r() * W, floorY + 40 + r() * 60, 1 + r() * 0.7, '#070B12');
+  }
+  // Phone screens in the crowd. Nobody draws these, and everybody has seen them.
+  for (let i = 0; i < 7; i++) body += rect(r() * W, floorY + 10 + r() * 40, 7, 12, '#9FD4FF', 'opacity="0.55"');
+  return { defs, body };
+}
+
+/* =========================================================================
+   PEOPLE AND KIT
+   ====================================================================== */
+
+function lifestyle(r: () => number) {
+  const horizon = H * 0.66;
+  const defs =
+    twilightSky('sky', 0.7) +
+    grad('ground', [[0, '#1C2620'], [1, '#0A0F0C']]) +
+    radial('rim', [[0, '#FFC275', 0.34], [1, '#FFC275', 0]], W * 0.66, H * 0.42, W * 0.44);
+  let body = rect(0, 0, W, horizon, 'url(#sky)');
+  for (let i = 0; i < 18; i++) body += broadleaf((i / 17) * W, horizon - 50 - r() * 40, 0.8 + r() * 0.5, '#0C1B13');
+  body += rect(0, horizon, W, H - horizon, 'url(#ground)');
+  body += rect(0, 0, W, H, 'url(#rim)');
+  // Two figures on a terrace, back-lit. A lifestyle frame, not a portrait.
+  body += rect(W * 0.06, horizon - 10, W * 0.88, 16, '#2A3139');
+  body += figure(W * 0.42, horizon, 3.2, '#0A0F14');
+  body += figure(W * 0.58, horizon, 3.0, '#0A0F14');
+  body += ell(W * 0.5, horizon + 26, W * 0.2, 22, '#000', 'opacity="0.4"');
+  return { defs, body };
+}
+
+function gear(r: () => number) {
+  const defs =
+    grad('bg', [[0, '#181C22'], [1, '#080A0E']]) +
+    radial('key', [[0, '#9FD4FF', 0.26], [1, '#9FD4FF', 0]], W * 0.34, H * 0.28, W * 0.5) +
+    radial('fill', [[0, '#FFB861', 0.18], [1, '#FFB861', 0]], W * 0.78, H * 0.7, W * 0.44);
+  let body = rect(0, 0, W, H, 'url(#bg)');
+  body += rect(0, 0, W, H, 'url(#key)');
+  body += rect(0, 0, W, H, 'url(#fill)');
+  const cy = H * 0.52;
+  // A camera body in three-quarter view, with a fast prime on the front.
+  body += ell(W * 0.5, cy + 150, W * 0.3, 36, '#000', 'opacity="0.45"');
+  body += rect(W * 0.3, cy - 90, W * 0.26, 170, '#14191F');
+  body += rect(W * 0.3, cy - 112, W * 0.14, 24, '#1B222A'); // prism
+  body += rect(W * 0.32, cy - 74, W * 0.09, 44, '#222A33'); // grip
+  body += circ(W * 0.62, cy - 6, 104, '#101519'); // lens barrel
+  body += circ(W * 0.62, cy - 6, 104, '#3A444F', 'opacity="0.5"');
+  body += circ(W * 0.62, cy - 6, 84, '#0A0D11');
+  body += circ(W * 0.62, cy - 6, 62, '#141C26');
+  body += circ(W * 0.615, cy - 14, 40, '#2E5C7A', 'opacity="0.75"'); // coating
+  body += circ(W * 0.6, cy - 24, 16, '#BFF2FF', 'opacity="0.5"'); // specular
+  for (let i = 0; i < 3; i++) body += circ(W * 0.62, cy - 6, 104 - i * 14, '#000', 'opacity="0.0"') + rect(W * 0.52 + i * 24, cy - 112, 5, 22, '#39424D');
+  // Focus and aperture rings, knurled.
+  for (let i = 0; i < 26; i++) {
+    const a = (i / 26) * Math.PI * 2;
+    body += circ(W * 0.62 + Math.cos(a) * 96, cy - 6 + Math.sin(a) * 96, 3.4, '#4A555F');
+  }
+  body += rect(W * 0.31, cy - 118, W * 0.08, 6, '#C8A465'); // a hot-shoe detail
+  void r;
   return { defs, body };
 }
 
 function portrait(r: () => number) {
   const defs =
-    grad('wall', [[0, '#D9CEBC'], [1, '#7E7364']]) +
-    radial('key', [[0, '#FBF0DA', 0.85], [1, '#FBF0DA', 0]], W * 0.3, H * 0.24, W * 0.62);
-  let body = rect(0, 0, W, H, 'url(#wall)');
+    grad('bg', [[0, '#212833'], [1, '#080B10']]) +
+    radial('key', [[0, '#FFD9A5', 0.26], [1, '#FFD9A5', 0]], W * 0.3, H * 0.18, W * 0.56) +
+    radial('rim', [[0, '#7FD4FF', 0.3], [1, '#7FD4FF', 0]], W * 0.78, H * 0.42, W * 0.34);
+  let body = rect(0, 0, W, H, 'url(#bg)');
   body += rect(0, 0, W, H, 'url(#key)');
-  // Head and shoulders, unlit, with a rim of key light down one side.
-  const cx = W * 0.5 + (r() - 0.5) * 60;
-  const headY = H * 0.36;
-  body += `<ellipse cx="${cx}" cy="${headY}" rx="132" ry="158" fill="#3B342B"/>`;
-  body += `<path d="M${cx - 300},${H} Q${cx - 250},${H * 0.62} ${cx - 96},${H * 0.54} L${cx + 96},${H * 0.54} Q${cx + 250},${H * 0.62} ${cx + 300},${H} Z" fill="#332D26"/>`;
-  body += `<ellipse cx="${cx - 96}" cy="${headY - 12}" rx="34" ry="150" fill="#F3E4C9" opacity="0.28"/>`;
-  body += `<path d="M${cx - 230},${H} Q${cx - 196},${H * 0.66} ${cx - 92},${H * 0.57} L${cx - 62},${H * 0.57} Q${cx - 160},${H * 0.68} ${cx - 190},${H} Z" fill="#F3E4C9" opacity="0.16"/>`;
+
+  // A head-and-shoulders silhouette, deliberately featureless: this is a plate
+  // standing in for a photograph of a real person, and a drawn face would be
+  // considerably worse than no face at all.
+  const cx = W * 0.5;
+  const neck = H * 0.62;
+  const shoulderY = H * 0.78;
+
+  // Shoulders: one smooth curve down to the frame edge, not a zigzag collar.
+  body +=
+    `<path d="M ${n(cx - 430)} ${n(H)} ` +
+    `C ${n(cx - 400)} ${n(shoulderY)}, ${n(cx - 190)} ${n(neck + 6)}, ${n(cx - 96)} ${n(neck - 20)} ` +
+    `L ${n(cx + 96)} ${n(neck - 20)} ` +
+    `C ${n(cx + 190)} ${n(neck + 6)}, ${n(cx + 400)} ${n(shoulderY)}, ${n(cx + 430)} ${n(H)} Z" ` +
+    `fill="#151B24"/>`;
+
+  // A collar, as two simple lapels, so it reads as a person in a shirt.
+  body +=
+    poly(
+      `${n(cx - 92)},${n(neck - 16)} ${n(cx - 16)},${n(neck - 10)} ${n(cx - 34)},${n(neck + 92)} ${n(cx - 104)},${n(neck + 30)}`,
+      '#1E262F',
+    ) +
+    poly(
+      `${n(cx + 92)},${n(neck - 16)} ${n(cx + 16)},${n(neck - 10)} ${n(cx + 34)},${n(neck + 92)} ${n(cx + 104)},${n(neck + 30)}`,
+      '#1E262F',
+    );
+
+  // Neck, then head.
+  body += rect(cx - 52, neck - 120, 104, 130, '#1A212B');
+  body += ell(cx, H * 0.36, 132, 166, '#1C242E');
+  // The lit side, offset toward the key light.
+  body += ell(cx - 26, H * 0.345, 106, 140, '#252E39');
+  // Rim light down the far edge — the one cue that makes it read as lit.
+  body += rect(0, 0, W, H, 'url(#rim)');
+  body +=
+    `<path d="M ${n(cx + 104)} ${n(H * 0.26)} C ${n(cx + 136)} ${n(H * 0.32)}, ${n(cx + 136)} ${n(H * 0.44)}, ${n(cx + 96)} ${n(H * 0.5)}" ` +
+    `stroke="#7FD4FF" stroke-opacity="0.3" stroke-width="7" fill="none"/>`;
+  // Hair mass, as one soft shape.
+  body += `<path d="M ${n(cx - 128)} ${n(H * 0.33)} C ${n(cx - 120)} ${n(H * 0.21)}, ${n(cx + 120)} ${n(H * 0.21)}, ${n(cx + 128)} ${n(H * 0.33)} C ${n(cx + 96)} ${n(H * 0.26)}, ${n(cx - 96)} ${n(H * 0.26)}, ${n(cx - 128)} ${n(H * 0.33)} Z" fill="#141A22"/>`;
+  void r;
   return { defs, body };
 }
 
@@ -591,247 +1184,74 @@ function portrait(r: () => number) {
    Registry
    ---------------------------------------------------------------------- */
 
+type Painter = (r: () => number) => { defs: string; body: string };
+
+const PAINTERS: Record<SceneKind, Painter> = {
+  'exterior-twilight': exteriorTwilight,
+  'exterior-day': exteriorDay,
+  'exterior-modern': exteriorModern,
+  'exterior-night': exteriorNight,
+  'interior-living': interiorLiving,
+  'interior-kitchen': interiorKitchen,
+  'interior-bedroom': interiorBedroom,
+  'interior-bath': interiorBath,
+  'interior-dining': interiorDining,
+  staircase,
+  detail,
+  pool,
+  terrace,
+  'aerial-property': aerialProperty,
+  'aerial-neighborhood': aerialNeighborhood,
+  'aerial-land': aerialLand,
+  'aerial-water': aerialWater,
+  'aerial-highway': aerialHighway,
+  'drone-flight': droneFlight,
+  'video-frame': videoFrame,
+  walkthrough,
+  'commercial-restaurant': commercialRestaurant,
+  'commercial-gym': commercialGym,
+  'commercial-auto': commercialAuto,
+  'commercial-hotel': commercialHotel,
+  'commercial-retail': commercialRetail,
+  'commercial-event': commercialEvent,
+  lifestyle,
+  gear,
+  portrait,
+};
+
 const cache = new Map<string, string>();
 
+/**
+ * A finished plate as a data URL, ready for an <img src>.
+ * Cached, because the same frame is drawn on every mount otherwise.
+ */
 export function renderScene(kind: SceneKind, seed: string): string {
   const key = `${kind}|${seed}`;
   const hit = cache.get(key);
   if (hit) return hit;
 
   const r = rng(key);
-  const noise = Math.round(r() * 9999);
-  let parts: { defs: string; body: string };
+  const painter = PAINTERS[kind] ?? exteriorTwilight;
+  const { defs, body } = painter(r);
 
-  switch (kind) {
-    case 'coast-dusk':
-      parts = coast(DUSK, r, true);
-      break;
-    case 'coast-day':
-      parts = coast(DAY, r, true);
-      break;
-    case 'coast-night':
-      parts = coast(NIGHT, r, true);
-      break;
-    case 'coastline':
-      parts = coastline(r);
-      break;
-    case 'terrace':
-      parts = terrace(r);
-      break;
-    case 'pool':
-      parts = pool(r);
-      break;
-    case 'interior-living':
-      parts = room({
-        wall: '#EAE2D4', wallShade: '#C6BAA6', floor: '#9E7A4E', floorHi: '#C7A778',
-        ceiling: '#DDD3C2', view: ['#BACAC9', '#7E9A9C'], light: '#FBEFD6',
-        furniture: [
-          { x: W * 0.08, y: H * 0.66, w: W * 0.2, h: 84, c: '#6B6153' },
-          { x: W * 0.07, y: H * 0.74, w: W * 0.22, h: 22, c: '#524A3F' },
-          { x: W * 0.74, y: H * 0.64, w: W * 0.16, h: 104, c: '#7A6F5F' },
-          { x: W * 0.36, y: H * 0.78, w: W * 0.28, h: 14, c: '#8B7355' },
-        ],
-      });
-      break;
-    case 'interior-dining':
-      parts = room({
-        wall: '#E7DFD0', wallShade: '#C2B6A2', floor: '#94713F', floorHi: '#BE9C6B',
-        ceiling: '#D8CEBD', view: ['#C6D2CE', '#8AA0A0'], light: '#FBEEd3',
-        windowX: W * 0.26, windowW: W * 0.68, pendant: true,
-        furniture: [
-          { x: W * 0.28, y: H * 0.71, w: W * 0.44, h: 20, c: '#4E3F2C' },
-          { x: W * 0.3, y: H * 0.73, w: 16, h: 96, c: '#4E3F2C' },
-          { x: W * 0.69, y: H * 0.73, w: 16, h: 96, c: '#4E3F2C' },
-        ],
-      });
-      break;
-    case 'interior-kitchen':
-      parts = room({
-        wall: '#E4DCCE', wallShade: '#BEB3A0', floor: '#9A7C55', floorHi: '#C2A67C',
-        ceiling: '#D6CCBB', view: ['#CBD6D2', '#93A6A4'], light: '#FBF0DA',
-        windowX: W * 0.32, windowW: W * 0.56,
-        furniture: [
-          { x: W * 0.22, y: H * 0.68, w: W * 0.56, h: 26, c: '#D7CDBA' },
-          { x: W * 0.24, y: H * 0.7, w: W * 0.52, h: 150, c: '#7E7466' },
-          { x: W * 0.06, y: H * 0.5, w: W * 0.12, h: 220, c: '#8C8272' },
-          { x: W * 0.84, y: H * 0.5, w: W * 0.12, h: 220, c: '#8C8272' },
-        ],
-      });
-      break;
-    case 'interior-bedroom':
-      parts = room({
-        wall: '#E9E1D3', wallShade: '#C8BCA8', floor: '#A0805A', floorHi: '#C8AA82',
-        ceiling: '#DCD2C1', view: ['#C0CFD0', '#82999C'], light: '#FBEFD8',
-        windowX: W * 0.42, windowW: W * 0.5,
-        furniture: [
-          { x: W * 0.06, y: H * 0.62, w: W * 0.34, h: 24, c: '#EFE9DC' },
-          { x: W * 0.06, y: H * 0.65, w: W * 0.34, h: 130, c: '#B9AE9B' },
-          { x: W * 0.04, y: H * 0.5, w: W * 0.03, h: 200, c: '#6E6454' },
-        ],
-      });
-      break;
-    case 'interior-bath':
-      parts = room({
-        wall: '#DED5C6', wallShade: '#B7AB98', floor: '#C3B49C', floorHi: '#DACDB6',
-        ceiling: '#D2C8B7', view: ['#C8D4D0', '#8EA2A0'], light: '#FBF2DF',
-        windowX: W * 0.5, windowW: W * 0.42,
-        furniture: [
-          { x: W * 0.12, y: H * 0.66, w: W * 0.26, h: 96, c: '#F2EEE6' },
-          { x: W * 0.12, y: H * 0.76, w: W * 0.26, h: 16, c: '#C4B9A6' },
-        ],
-      });
-      break;
-    case 'stair':
-      parts = stair(r);
-      break;
-    case 'joinery':
-      parts = detail({ base: '#8A6B45', slat: '#A98455', gap: '#4A3A27', hardware: '#A9854F', light: '#FBEBCC' });
-      break;
-    case 'timber-detail':
-      parts = detail({ base: '#1E1B18', slat: '#2C2723', gap: '#100E0C', hardware: '#6F7276', light: '#C9D3D8' });
-      break;
-    case 'alpine-house':
-      parts = alpine(r, true);
-      break;
-    case 'alpine-land':
-      parts = alpine(r, false);
-      break;
-    case 'alpine-interior':
-      parts = room({
-        wall: '#4A443E', wallShade: '#2C2823', floor: '#6B5943', floorHi: '#8A7458',
-        ceiling: '#3A352F', view: ['#D3DCE1', '#94A5AF'], light: '#F6E7CC',
-        windowX: W * 0.22, windowW: W * 0.7,
-        furniture: [
-          { x: W * 0.1, y: H * 0.7, w: W * 0.24, h: 90, c: '#6E6355' },
-          { x: W * 0.72, y: H * 0.46, w: W * 0.16, h: 320, c: '#5A5750' },
-          { x: W * 0.745, y: H * 0.64, w: W * 0.11, h: 90, c: '#E8A254' },
-        ],
-      });
-      break;
-    case 'villa':
-      parts = villa(r);
-      break;
-    case 'villa-water':
-      parts = water(r, true);
-      break;
-    case 'bay':
-      parts = water(r, false);
-      break;
-    case 'pavilion':
-      parts = pavilion(r);
-      break;
-    case 'pavilion-interior':
-      parts = room({
-        wall: '#D8D8CE', wallShade: '#AFAFA4', floor: '#8E8570', floorHi: '#B4AB93',
-        ceiling: '#2B2B27', view: ['#C5D2C2', '#7E9077'], light: '#F4F0DC',
-        windowX: W * 0.06, windowW: W * 0.88,
-        furniture: [
-          { x: W * 0.12, y: H * 0.7, w: W * 0.24, h: 80, c: '#6E6858' },
-          { x: W * 0.62, y: H * 0.68, w: W * 0.26, h: 20, c: '#3E3A32' },
-          { x: W * 0.64, y: H * 0.7, w: 14, h: 88, c: '#3E3A32' },
-          { x: W * 0.85, y: H * 0.7, w: 14, h: 88, c: '#3E3A32' },
-        ],
-      });
-      break;
-    case 'hills':
-      parts = hills(r);
-      break;
-    case 'city':
-      parts = city(r);
-      break;
-    case 'portrait':
-    default:
-      parts = portrait(r);
-      break;
-  }
+  // A held grain wash over everything, so a plate never looks like flat vector.
+  const finish =
+    radial('plate-vig', [[0, '#000000', 0], [1, '#000000', 0.34]], W * 0.5, H * 0.46, W * 0.8) +
+    `<filter id="plate-grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>`;
 
-  const out = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(wrap(parts.defs, parts.body, noise))}`;
-  cache.set(key, out);
-  return out;
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">` +
+    `<defs>${defs}${finish}</defs>` +
+    body +
+    rect(0, 0, W, H, 'url(#plate-vig)') +
+    `<rect width="${W}" height="${H}" filter="url(#plate-grain)" opacity="0.055"/>` +
+    '</svg>';
+
+  // encodeURIComponent, not base64: it survives every character we emit and
+  // keeps the markup readable in devtools.
+  const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  cache.set(key, url);
+  return url;
 }
 
-/* -------------------------------------------------------------------------
-   The two scenes that did not fit a family
-   ---------------------------------------------------------------------- */
-
-function terrace(r: () => number) {
-  const horizon = H * 0.5;
-  const defs =
-    grad('sky', [[0, '#3A2A1E'], [0.55, '#9E6B3E'], [1, '#EDC48D']]) +
-    grad('sea', [[0, '#4A6069'], [1, '#26333A']]) +
-    grad('stone', [[0, '#DCD3C2'], [1, '#A89B86']]) +
-    radial('lamp', [[0, '#FFD9A0', 0.6], [1, '#FFD9A0', 0]], W * 0.5, H * 0.72, W * 0.5);
-  let body = rect(0, 0, W, horizon, 'url(#sky)');
-  body += `<circle cx="${W * (0.3 + r() * 0.4)}" cy="${horizon - 96}" r="62" fill="#FFE2B2"/>`;
-  body += rect(0, horizon, W, H * 0.12, 'url(#sea)');
-  body += rect(0, horizon + H * 0.12, W, H - horizon - H * 0.12, 'url(#stone)');
-  // Paving, running to the edge.
-  for (let i = 0; i < 9; i++) {
-    const y = horizon + H * 0.12 + i * 52;
-    body += rect(0, y, W, 3, '#00000018');
-  }
-  body += rect(0, horizon + H * 0.12, W, 10, '#8F8371');
-  // The overhang that makes it a terrace, and its columns.
-  body += rect(0, 0, W, H * 0.16, '#2E2A24');
-  body += rect(0, H * 0.16, W, 8, '#00000044');
-  body += rect(W * 0.12, H * 0.16, 30, H * 0.52, '#EFE9DE');
-  body += rect(W * 0.84, H * 0.16, 30, H * 0.52, '#EFE9DE');
-  body += rect(0, 0, W, H, 'url(#lamp)');
-  // An outdoor hearth, low and wide.
-  body += rect(W * 0.38, H * 0.7, W * 0.24, 76, '#B4A890');
-  body += rect(W * 0.42, H * 0.665, W * 0.16, 40, '#E8A254', 'opacity="0.9"');
-  return { defs, body };
-}
-
-function pool(r: () => number) {
-  const horizon = H * 0.46;
-  const defs =
-    grad('sky', [[0, '#2B2118'], [0.55, '#96603A'], [1, '#EEC28D']]) +
-    grad('sea', [[0, '#42565E'], [1, '#2A373E']]) +
-    grad('pw', [[0, '#7FB6BE'], [1, '#356C7C']]) +
-    radial('gl', [[0, '#FFD9A0', 0.7], [1, '#FFD9A0', 0]], W * 0.6, horizon - 70, W * 0.6);
-  let body = rect(0, 0, W, horizon, 'url(#sky)');
-  body += rect(0, 0, W, horizon, 'url(#gl)');
-  body += `<circle cx="${W * (0.45 + r() * 0.3)}" cy="${horizon - 74}" r="58" fill="#FFE4B6"/>`;
-  body += rect(0, horizon, W, H * 0.08, 'url(#sea)');
-  // The infinity edge: a hairline of light where the pool meets the sea.
-  body += rect(0, horizon + H * 0.08, W, 8, '#F3E2C4', 'opacity="0.7"');
-  body += rect(0, horizon + H * 0.08 + 8, W, H * 0.34, 'url(#pw)');
-  for (let i = 0; i < 18; i++) {
-    const y = horizon + H * 0.1 + i * 20;
-    body += rect((r() - 0.5) * 200 + W * 0.3, y, 200 + r() * 500, 3, '#FFFFFF', 'opacity="0.13"');
-  }
-  body += specular(W * 0.6, horizon + H * 0.1, H * 0.86, '#FFE4B6', r);
-  // Coping and deck in the foreground.
-  body += rect(0, H * 0.88, W, H * 0.12, '#D8CFBE');
-  body += rect(0, H * 0.88, W, 10, '#EDE6D8');
-  for (let i = 0; i < 2; i++) {
-    const x = W * (0.12 + i * 0.62);
-    body += rect(x, H * 0.9, 210, 16, '#B6A98F');
-    body += poly(`${x},${H * 0.9} ${x + 70},${H * 0.9} ${x + 40},${H * 0.83} ${x - 10},${H * 0.83}`, '#C6BAA0');
-  }
-  return { defs, body };
-}
-
-function stair(r: () => number) {
-  const defs =
-    grad('wall', [[0, '#EDE6D9'], [1, '#B8AC98']]) +
-    radial('sl', [[0, '#FFF3DC', 0.75], [1, '#FFF3DC', 0]], W * 0.74, H * 0.16, W * 0.7);
-  let body = rect(0, 0, W, H, 'url(#wall)');
-  body += rect(0, 0, W, H, 'url(#sl)');
-  // Treads cantilevered from the plaster, each with its own shadow.
-  const n = 9;
-  for (let i = 0; i < n; i++) {
-    const y = H * 0.16 + i * (H * 0.08);
-    const x = W * 0.2 + i * (W * 0.055);
-    const w = W * 0.3;
-    body += rect(x + 12, y + 28, w, 22, '#000', 'opacity="0.22"');
-    body += rect(x, y, w, 26, '#B98A52');
-    body += rect(x, y, w, 7, '#D6A96C');
-    body += poly(`${x},${y + 26} ${x + w},${y + 26} ${x + w - 14},${y + 40} ${x - 14},${y + 40}`, '#8E6738');
-  }
-  body += rect(0, H * 0.9, W, H * 0.1, '#A98455');
-  body += rect(0, H * 0.9, W, 6, '#C79C63');
-  void r;
-  return { defs, body };
-}
+export const ALL_SCENES = Object.keys(PAINTERS) as SceneKind[];
