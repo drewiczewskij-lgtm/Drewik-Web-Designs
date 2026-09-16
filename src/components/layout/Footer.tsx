@@ -130,6 +130,14 @@ export function Footer() {
             property of {BRAND.name}.
           </p>
           <ul className="flex gap-5">
+            <li>
+              <Link
+                to="/admin"
+                className="text-[12px] text-faint transition-colors duration-200 hover:text-body"
+              >
+                Studio desk
+              </Link>
+            </li>
             {LEGAL_LINKS.map((l) => (
               <li key={l.to}>
                 <Link

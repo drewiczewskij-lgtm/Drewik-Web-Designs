@@ -6,6 +6,7 @@ import { SectionHead, Notice, Pill, Stat } from '@/components/ui/Bits';
 import { Field } from '@/components/ui/Field';
 import { Button } from '@/components/ui/Button';
 import { Seo } from '@/lib/seo';
+import { PhotoManager } from '@/components/admin/PhotoManager';
 import { useBooking } from '@/lib/booking';
 import { API_BASE, isLive } from '@/config/integrations';
 import { money, PACKAGES, ADDONS, getPackage } from '@shared/catalog.mjs';
@@ -125,15 +126,30 @@ export default function Admin() {
       <PageHeader
         label="Internal"
         title={['Studio desk.']}
-        lead="The diary, the price list, and where to change each of them."
+        lead="Your photographs, the diary, the price list, and where to change each of them."
         compact
       />
 
       <div className="section pt-12">
         <div className="shell flex flex-col gap-16">
+          {/* Photographs. First, because it is what this page is opened for. */}
+          <Reveal className="flex flex-col gap-6">
+            <SectionHead
+              index="01"
+              label="Photographs"
+              title={
+                <>
+                  Drag your work <span className="t-accent">onto the site.</span>
+                </>
+              }
+              lead="Drop photographs here and every page uses them straight away. No terminal, no build, nothing to edit."
+            />
+            <PhotoManager />
+          </Reveal>
+
           {/* Connection. */}
           <Reveal className="flex flex-col gap-5">
-            <SectionHead index="01" label="Bookings" title="The diary" />
+            <SectionHead index="02" label="Bookings" title="The diary" />
 
             {isLive() ? (
               <div className="glass edge flex flex-col gap-4 p-6">
@@ -237,7 +253,7 @@ export default function Admin() {
 
           {/* The price list, as configured. */}
           <Reveal className="flex flex-col gap-6">
-            <SectionHead index="02" label="Prices" title="What the site charges" />
+            <SectionHead index="03" label="Prices" title="What the site charges" />
             <Notice title="To change any of these">
               Edit <code className="font-mono text-[12px] text-cyan-soft">shared/catalog.mjs</code>.
               The website, the booking flow and the payment server all read that one
@@ -277,7 +293,7 @@ export default function Admin() {
 
           {/* The diary, as configured. */}
           <Reveal className="flex flex-col gap-6">
-            <SectionHead index="03" label="Availability" title="When the site lets people book" />
+            <SectionHead index="04" label="Availability" title="When the site lets people book" />
             <Notice title="To change any of these">
               Edit <code className="font-mono text-[12px] text-cyan-soft">shared/schedule.mjs</code> —
               working hours, slot length, buffer, notice period and blocked dates are all
@@ -325,7 +341,7 @@ export default function Admin() {
 
           {/* Content. */}
           <Reveal className="flex flex-col gap-6">
-            <SectionHead index="04" label="Content" title="Where everything else lives" />
+            <SectionHead index="05" label="Content" title="Where everything else lives" />
             <ul className="grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2">
               {[
                 ['Photographs and film', 'src/data/images.ts', 'One entry per image. Set `src` to a file path and it replaces the drawn plate.'],

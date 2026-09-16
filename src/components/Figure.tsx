@@ -8,6 +8,7 @@ import {
   type ImageKey,
 } from '@/data/images';
 import { toneWash } from '@/lib/plate';
+import { usePhoto } from '@/lib/photoStore';
 import { renderScene } from '@/lib/scenes';
 import { cn } from '@/lib/cn';
 
@@ -50,7 +51,12 @@ export function Figure({
   objectPosition,
 }: FigureProps) {
   const asset: ImageAsset = IMAGES[image];
-  const drawn = isDrawn(asset.src);
+
+  /* A photograph dropped onto the photo manager wins over everything else.
+     It is stored in this browser only — see `photoStore` — so this is a
+     preview, but while it is there it is what the frame should show. */
+  const dropped = usePhoto(image);
+  const drawn = !dropped && isDrawn(asset.src);
 
   // `failed` is sticky: once we fall back to the plate we never re-request the
   // photograph, or the two would trade places on every load event.
@@ -73,10 +79,14 @@ export function Figure({
     else setFailed(true);
   }, [image, drawn]);
 
-  const usePlate = drawn || failed;
-  const src = usePlate
-    ? renderScene(asset.scene, image)
-    : imageUrl(asset.src, priority ? 1800 : 1280, quality);
+  // A dropped photograph cannot fail to load — it is already in memory — so it
+  // skips the fallback path entirely.
+  const usePlate = !dropped && (drawn || failed);
+  const src = dropped
+    ? dropped.dataUrl
+    : usePlate
+      ? renderScene(asset.scene, image)
+      : imageUrl(asset.src, priority ? 1800 : 1280, quality);
 
   return (
     <div
@@ -96,8 +106,8 @@ export function Figure({
       <img
         ref={ref}
         src={src}
-        srcSet={usePlate ? undefined : imageSrcSet(asset.src, quality)}
-        sizes={usePlate ? undefined : sizes}
+        srcSet={usePlate || dropped ? undefined : imageSrcSet(asset.src, quality)}
+        sizes={usePlate || dropped ? undefined : sizes}
         alt={alt ?? asset.alt}
         loading={priority ? 'eager' : 'lazy'}
         decoding={priority ? 'sync' : 'async'}
@@ -110,7 +120,7 @@ export function Figure({
         className={cn('h-full w-full object-cover', imgClassName)}
         style={{
           objectPosition: objectPosition ?? asset.focus ?? '50% 50%',
-          opacity: eager || loaded || usePlate ? 1 : 0,
+          opacity: eager || loaded || usePlate || dropped ? 1 : 0,
           transition: eager ? undefined : 'opacity 1s cubic-bezier(.16,1,.3,1)',
         }}
       />
