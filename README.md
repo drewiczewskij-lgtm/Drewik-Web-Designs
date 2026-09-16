@@ -19,9 +19,21 @@ npm run build      # typecheck + production build to dist/
 npm run preview    # serve the production build
 npm run check:images   # verify every photo source actually resolves
 npm run build:static   # a build for plain static hosting (see below)
+npm run build:single   # the whole site as one double-clickable HTML file
 ```
 
 Node 20 or newer.
+
+### Keeping a copy
+
+`npm run build:single` folds everything — markup, styles, script, favicon —
+into a single `arcadia-estates.html` at the repo root. Double-click it and the
+site runs: no server, no install, and no network, since the drawn plates stand
+in for the photography when it cannot be fetched. It is about 670 KB.
+
+The trick is inlining the module rather than linking it; browsers refuse to load
+an external module over `file://`, which is why an ordinary build looks blank
+when you open it from disk.
 
 ### Hosting it somewhere
 
