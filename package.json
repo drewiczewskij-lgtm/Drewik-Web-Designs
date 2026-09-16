@@ -12,8 +12,8 @@
     "check:images": "node scripts/check-images.mjs",
     "server": "node api/server.mjs",
     "dev:full": "node scripts/dev-full.mjs",
-    "build:static": "VITE_ROUTER=hash VITE_BASE=./ npm run build",
-    "build:single": "VITE_SINGLE=1 VITE_ROUTER=hash VITE_BASE=./ tsc -b && VITE_SINGLE=1 VITE_ROUTER=hash VITE_BASE=./ vite build && node scripts/bundle-single.mjs",
+    "build:static": "node scripts/build-variant.mjs static",
+    "build:single": "node scripts/build-variant.mjs single",
     "test:booking": "node scripts/test-booking.mjs",
     "link:work": "node scripts/link-work.mjs"
   },

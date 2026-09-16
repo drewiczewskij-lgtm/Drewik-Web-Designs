@@ -30,6 +30,72 @@ Node 20 or newer.
 
 ---
 
+## Opening it on Windows (PowerShell)
+
+### The quickest look — no install at all
+
+```powershell
+npm run build:single
+```
+
+That folds the entire site into one file, `km-productions.html`, about 730 KB.
+Double-click it and the site runs: no server, no internet, nothing to set up.
+Every page, the portfolio viewer and the whole booking flow work from the file.
+
+To open it from PowerShell:
+
+```powershell
+Invoke-Item .\km-productions.html
+```
+
+### Running it properly, from scratch
+
+```powershell
+# 1. Install Node and Git (skip either if you already have it).
+#    Close and reopen PowerShell afterwards so the PATH updates.
+winget install OpenJS.NodeJS.LTS
+winget install Git.Git
+
+# 2. Get the code.
+git clone https://github.com/drewiczewskij-lgtm/Drewik-Web-Designs.git
+cd Drewik-Web-Designs
+git checkout claude/serene-wozniak-bgkmv6
+
+# 3. Install and run.
+npm install
+npm run dev
+```
+
+Then open <http://localhost:5173>. Edits save and appear instantly. `Ctrl+C`
+stops it.
+
+### If PowerShell refuses to run npm
+
+A default Windows install blocks script files, so `npm` fails with *"npm.ps1
+cannot be loaded because running scripts is disabled on this system"*. This is
+the usual fix, and it only affects your own user account:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+Answer `Y`, then reopen PowerShell.
+
+### Other useful commands
+
+```powershell
+npm run dev:full      # the site AND the booking server, together
+npm run build         # production build into dist\
+npm run preview       # serve that build, to check it before deploying
+npm run test:booking  # 27 checks on pricing and availability
+npm run link:work     # wire files from public\work\ into the site
+```
+
+All of these work the same in PowerShell, `cmd` and a terminal on macOS or
+Linux — none of them depends on shell syntax.
+
+---
+
 ## The five files you will actually edit
 
 Almost everything you will want to change lives in one of these. Nothing else
