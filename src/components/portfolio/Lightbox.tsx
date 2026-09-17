@@ -9,6 +9,7 @@ import {
   videoEmbedUrl,
   type PortfolioItem,
 } from '@/data/portfolio';
+import { useFilmSource } from '@/lib/videoStore';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 
@@ -87,7 +88,46 @@ export function Lightbox({
     return <Modal open={false} onClose={onClose} label="Portfolio viewer"><span /></Modal>;
   }
 
-  const playable = isPlayable(item);
+  return (
+    <Viewer
+      item={item}
+      items={items}
+      index={index ?? 0}
+      open={open}
+      onClose={onClose}
+      go={go}
+      playing={playing}
+      setPlaying={setPlaying}
+      mediaFailed={mediaFailed}
+      setMediaFailed={setMediaFailed}
+      direction={direction}
+      reduced={reduced}
+    />
+  );
+}
+
+/** Split out so the film lookup can be a hook without sitting behind a return. */
+function Viewer({
+  item, items, index, open, onClose, go, playing, setPlaying,
+  mediaFailed, setMediaFailed, direction, reduced,
+}: {
+  item: PortfolioItem;
+  items: PortfolioItem[];
+  index: number;
+  open: boolean;
+  onClose: () => void;
+  go: (delta: number) => void;
+  playing: boolean;
+  setPlaying: (v: boolean) => void;
+  mediaFailed: boolean;
+  setMediaFailed: (v: boolean) => void;
+  direction: number;
+  reduced: boolean;
+}) {
+  /* A film added through the manager wins over whatever the data file says —
+     the same rule the photographs follow. */
+  const added = useFilmSource(item.id);
+  const playable = Boolean(added) || isPlayable(item);
 
   return (
     <Modal open={open} onClose={onClose} label={`${item.title} — ${item.location}`} className="px-0">
@@ -118,13 +158,13 @@ export function Lightbox({
               transition={{ duration: reduced ? 0.15 : 0.38, ease: EASE_OUT_EXPO }}
               className="relative flex h-full max-h-full w-full items-center justify-center"
             >
-              {playing && item.video && !mediaFailed ? (
+              {playing && (added || item.video) && !mediaFailed ? (
                 <div className="relative w-full max-w-[min(100%,1500px)] overflow-hidden border border-white/10 bg-black">
                   <div className="aspect-video w-full">
-                    {item.video.provider === 'file' ? (
+                    {(added ? added.kind === 'file' : item.video!.provider === 'file') ? (
                       // eslint-disable-next-line jsx-a11y/media-has-caption
                       <video
-                        src={videoEmbedUrl(item.video)}
+                        src={added ? added.src : videoEmbedUrl(item.video!)}
                         controls
                         autoPlay
                         playsInline
@@ -133,7 +173,11 @@ export function Lightbox({
                       />
                     ) : (
                       <iframe
-                        src={videoEmbedUrl(item.video)}
+                        src={
+                          added
+                            ? videoEmbedUrl({ provider: added.kind as 'youtube' | 'vimeo', id: added.src })
+                            : videoEmbedUrl(item.video!)
+                        }
                         title={`${item.title} — film`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
@@ -175,24 +219,15 @@ export function Lightbox({
                             <>
                               That film could not be loaded. Check the file exists at{' '}
                               <code className="font-mono text-[12px] text-cyan-soft">
-                                public{item.video?.id}
+                                {added ? added.src.slice(0, 48) : `public${item.video?.id ?? ''}`}
                               </code>
                               .
                             </>
                           ) : (
                             <>
                               This is a frame from the film. The film itself has not been
-                              added yet — put the file in{' '}
-                              <code className="font-mono text-[12px] text-cyan-soft">
-                                public/work/
-                              </code>{' '}
-                              and give this item a{' '}
-                              <code className="font-mono text-[12px] text-cyan-soft">video</code>{' '}
-                              source in{' '}
-                              <code className="font-mono text-[12px] text-cyan-soft">
-                                src/data/portfolio.ts
-                              </code>
-                              .
+                              added yet — open the studio desk and drop the video on it,
+                              or paste a YouTube or Vimeo link.
                             </>
                           )}
                         </p>
