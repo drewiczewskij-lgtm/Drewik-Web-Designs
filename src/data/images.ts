@@ -148,17 +148,17 @@ export const IMAGES = {
   /* — Hero and home — */
   heroTwilight: {
     src: '/work/r/aerial-estate-drive-2400.jpg',
-    alt: 'A white brick house photographed from the air in daylight, showing its roof, a brick entrance path and courtyard, a concrete drive curving in from the left, and mature trees on every side.',
+    alt: 'A white brick house with a steep shingled roof photographed from the air in daylight, showing the roof, a brick entrance path and courtyard, a concrete drive curving in from the left, and mature trees on every side with a neighbouring roof beyond.',
     tone: 'aerial',
     scene: 'exterior-twilight',
     focus: '50% 55%',
   },
   homeAerial: {
-    src: '',
-    alt: 'A house and its grounds from the air, showing the roof, drive and garden.',
+    src: '/work/r/modern-pool-aerial-2400.jpg',
+    alt: 'A white modern farmhouse photographed from the air, with a covered porch opening onto a pale stone terrace, a rectangular pool and spa, a putting green to one side and a sport court to the other.',
     tone: 'aerial',
     scene: 'aerial-property',
-    focus: '50% 55%',
+    focus: '50% 52%',
   },
   homeInterior: {
     src: '/work/r/piano-room-2400.jpg',
@@ -212,10 +212,11 @@ export const IMAGES = {
     focus: '50% 48%',
   },
   reKitchen: {
-    src: 'photo-1600489000022-c2086d79f9d4',
-    alt: 'A kitchen with a stone island, pendant lighting and full-height cabinetry.',
+    src: '/work/r/kitchen-2400.jpg',
+    alt: 'A kitchen with two islands, one in white oak with a marble top and leather stools, white cabinetry and a gold mosaic backsplash behind the range, conical pendants overhead and a glazed opening through to the pool.',
     tone: 'interior',
     scene: 'interior-kitchen',
+    focus: '50% 50%',
   },
   reBedroom: {
     src: '/work/r/primary-bedroom-2400.jpg',
@@ -240,10 +241,11 @@ export const IMAGES = {
     focus: '50% 50%',
   },
   reStair: {
-    src: 'photo-1600607688969-a5bfcd646154',
-    alt: 'A staircase with timber treads and a slim metal balustrade.',
+    src: '/work/r/entry-hall-2400.jpg',
+    alt: 'A double-height entry hall with twin staircases rising either side to a railed landing, brass wall lights on white walls, and a round table on a jute rug beneath an arched opening through to the living room.',
     tone: 'interior',
     scene: 'staircase',
+    focus: '50% 45%',
   },
   entryStair: {
     // ► entry-stair.jpg
@@ -258,6 +260,13 @@ export const IMAGES = {
     tone: 'interior',
     scene: 'detail',
     focus: '50% 52%',
+  },
+  reBathFeature: {
+    src: '/work/r/bath-feature-2400.jpg',
+    alt: 'A bathroom papered in a dark green and gold crane print, with a white freestanding oval tub, a wall-mounted spout, a gilt mirror above a marble shelf and a brass trolley beside the tub.',
+    tone: 'interior',
+    scene: 'interior-bath',
+    focus: '50% 50%',
   },
   rePool: {
     // ► pool-terrace.jpg
@@ -292,17 +301,18 @@ export const IMAGES = {
     focus: '50% 48%',
   },
   aerialNeighborhood: {
-    src: '',
-    alt: 'A residential neighbourhood from the air, with streets, rooftops and mature trees.',
+    src: '/work/r/neighbourhood-aerial-2400.jpg',
+    alt: 'A residential street photographed from directly above, showing a house and its plot between neighbouring roofs, with sidewalks, lawns and parked cars either side.',
     tone: 'aerial',
     scene: 'aerial-neighborhood',
-    focus: '50% 55%',
+    focus: '50% 50%',
   },
   aerialLand: {
-    src: 'photo-1500382017468-9049fed747ef',
-    alt: 'Open farmland and fields photographed from above in low golden light.',
-    tone: 'aerial',
+    src: '/work/r/pond-aerial-2400.jpg',
+    alt: 'A brick house on a corner plot photographed from the air, with a green pond and open lawn behind it, curving roads and sidewalks in front, and neighbouring houses beyond.',
+    tone: 'water',
     scene: 'aerial-land',
+    focus: '50% 48%',
   },
   aerialWater: {
     src: '',
@@ -312,10 +322,11 @@ export const IMAGES = {
     focus: '50% 48%',
   },
   aerialHighway: {
-    src: 'photo-1502920917128-1aa500764cbd',
-    alt: 'A road running through open country, photographed from the air.',
+    src: '/work/r/estate-in-trees-2400.jpg',
+    alt: 'A white house with a steep shingled roof photographed from high above, set in dense woodland, with a pool and terrace behind it and a broad concrete drive curving up to the front.',
     tone: 'aerial',
     scene: 'aerial-highway',
+    focus: '50% 50%',
   },
   droneInFlight: {
     src: '',

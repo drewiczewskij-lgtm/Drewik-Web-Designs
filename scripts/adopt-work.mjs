@@ -83,13 +83,9 @@ const ADOPT = {
 
   /* — The second batch: seven camera and drone originals — */
   'dji_20260818101503_0009_d': {
-    key: 'aerialNeighborhood',
+    // Moved to the home page hero; a real neighbourhood frame took its old tile.
+    key: 'heroTwilight',
     slug: 'aerial-estate-drive',
-    item: {
-      id: 'aerial-neighbourhood',
-      title: 'The property from above',
-      caption: 'High over the drive at midday — house, courtyard and tree line in one frame.',
-    },
     alt: 'A white brick house with a steep shingled roof photographed from the air in daylight, showing the roof, a brick entrance path and courtyard, a concrete drive curving in from the left, and mature trees on every side with a neighbouring roof beyond.',
     tone: 'aerial',
     focus: '50% 55%',
@@ -245,6 +241,43 @@ const ADOPT = {
   'event': {
     key: 'commEvent', slug: 'event', tone: 'night', focus: '50% 50%',
     alt: 'An event at night with stage lighting over a crowd.',
+  },
+  /* — Second batch of camera and drone originals — */
+  '30 view f': {
+    key: 'aerialNeighborhood', slug: 'neighbourhood-aerial', tone: 'aerial', focus: '50% 50%',
+    item: { id: 'aerial-neighbourhood', title: 'Neighbourhood from above',
+      caption: 'Straight down over the street, so a buyer can read the plot against its neighbours.' },
+    alt: 'A residential street photographed from directly above, showing a house and its plot between neighbouring roofs, with sidewalks, lawns and parked cars either side.',
+  },
+  '31': {
+    key: 'aerialLand', slug: 'pond-aerial', tone: 'water', focus: '50% 48%',
+    item: { id: 'acreage', title: 'The pond lots from above',
+      caption: 'The water, the lawns and the road in one frame — what a plan drawing cannot show.' },
+    alt: 'A brick house on a corner plot photographed from the air, with a green pond and open lawn behind it, curving roads and sidewalks in front, and neighbouring houses beyond.',
+  },
+  'dji_20260814114011_0119_d (1)': {
+    key: 'homeAerial', slug: 'modern-pool-aerial', tone: 'aerial', focus: '50% 52%',
+    alt: 'A white modern farmhouse photographed from the air, with a covered porch opening onto a pale stone terrace, a rectangular pool and spa, a putting green to one side and a sport court to the other.',
+  },
+  'dji_20260818101521_0012_d': {
+    key: 'aerialHighway', slug: 'estate-in-trees', tone: 'aerial', focus: '50% 50%',
+    item: { id: 'commercial-frontage', title: 'Estate in the trees',
+      caption: 'High enough to place the house in its setting, with the drive and pool still readable.' },
+    alt: 'A white house with a steep shingled roof photographed from high above, set in dense woodland, with a pool and terrace behind it and a broad concrete drive curving up to the front.',
+  },
+  'dsc09690 (1)': {
+    key: 'reStair', slug: 'entry-hall', tone: 'interior', focus: '50% 45%',
+    item: { id: 'staircase', title: 'Entry hall and stair',
+      caption: 'Dead centre on the arch, so both flights of the stair land symmetrically.' },
+    alt: 'A double-height entry hall with twin staircases rising either side to a railed landing, brass wall lights on white walls, and a round table on a jute rug beneath an arched opening through to the living room.',
+  },
+  'dsc09696 (1)': {
+    key: 'reKitchen', slug: 'kitchen', tone: 'interior', focus: '50% 50%',
+    alt: 'A kitchen with two islands, one in white oak with a marble top and leather stools, white cabinetry and a gold mosaic backsplash behind the range, conical pendants overhead and a glazed opening through to the pool.',
+  },
+  '8 primary bath (1)': {
+    key: 'reBathFeature', slug: 'bath-feature', tone: 'interior', focus: '50% 50%',
+    alt: 'A bathroom papered in a dark green and gold crane print, with a white freestanding oval tub, a wall-mounted spout, a gilt mirror above a marble shelf and a brass trolley beside the tub.',
   },
 };
 

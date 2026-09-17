@@ -140,7 +140,6 @@ export const PORTFOLIO: PortfolioItem[] = [
   {
     id: 'kitchen-island',
     title: 'Kitchen',
-    location: 'Tupelo, MS',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reKitchen',
@@ -171,12 +170,12 @@ export const PORTFOLIO: PortfolioItem[] = [
   },
   {
     id: 'aerial-neighbourhood',
-    title: 'The property from above',
+    title: 'Neighbourhood from above',
     category: 'drone',
     kind: 'photo',
     image: 'aerialNeighborhood',
     aspect: 'wide',
-    caption: 'High over the drive at midday — house, courtyard and tree line in one frame.',
+    caption: 'Straight down over the street, so a buyer can read the plot against its neighbours.',
     service: 'Aerial photography',
   },
   {
@@ -191,13 +190,12 @@ export const PORTFOLIO: PortfolioItem[] = [
   },
   {
     id: 'acreage',
-    title: 'Acreage and creek',
-    location: 'Pontotoc County, MS',
+    title: 'The pond lots from above',
     category: 'drone',
     kind: 'photo',
     image: 'aerialLand',
     aspect: 'tall',
-    caption: 'Land listings live or die on the aerial. Boundaries legible, creek line visible.',
+    caption: 'The water, the lawns and the road in one frame — what a plan drawing cannot show.',
     service: 'Aerial photography',
   },
   {
@@ -222,6 +220,16 @@ export const PORTFOLIO: PortfolioItem[] = [
     service: 'Photo package',
   },
   {
+    id: 'bath-feature',
+    title: 'Bath, papered walls',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reBathFeature',
+    aspect: 'wide',
+    caption: 'Exposed for the paper and the tub together, which fight each other under one setting.',
+    service: 'Photo package',
+  },
+  {
     id: 'bath-detail',
     title: 'Primary bath',
     category: 'real-estate-photo',
@@ -233,13 +241,12 @@ export const PORTFOLIO: PortfolioItem[] = [
   },
   {
     id: 'staircase',
-    title: 'Stair and balustrade',
-    location: 'Oxford, MS',
+    title: 'Entry hall and stair',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reStair',
     aspect: 'tall',
-    caption: 'Shot on a tilt-shift so the verticals stay vertical. They always should.',
+    caption: 'Dead centre on the arch, so both flights of the stair land symmetrically.',
     service: 'Photo package',
   },
   {
@@ -372,13 +379,12 @@ export const PORTFOLIO: PortfolioItem[] = [
   },
   {
     id: 'commercial-frontage',
-    title: 'Commercial frontage',
-    location: 'Highway 45, MS',
+    title: 'Estate in the trees',
     category: 'drone',
     kind: 'photo',
     image: 'aerialHighway',
     aspect: 'tall',
-    caption: 'Traffic counts are an argument. An aerial at dusk makes it for you.',
+    caption: 'High enough to place the house in its setting, with the drive and pool still readable.',
     service: 'Aerial photography',
   },
 ];
