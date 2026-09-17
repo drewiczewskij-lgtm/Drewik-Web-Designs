@@ -91,7 +91,9 @@ export function imageUrl(src: string, width: number, quality = 72): string {
   const own = RESPONSIVE.exec(src);
   if (own) {
     // Snap to a width the script actually wrote; anything else would 404.
-    const step = IMAGE_WIDTHS.reduce((best, w) => (Math.abs(w - width) < Math.abs(best - width) ? w : best));
+    const ceiling = Number(own[2]);
+    const available = IMAGE_WIDTHS.filter((w) => w <= ceiling);
+    const step = available.reduce((best, w) => (Math.abs(w - width) < Math.abs(best - width) ? w : best), ceiling);
     return inlined(`${own[1]}-${step}${own[3]}`);
   }
   if (/^https?:\/\//.test(src) || src.startsWith('/')) return src;
@@ -108,11 +110,14 @@ export function imageSrcSet(src: string, quality = 72): string | undefined {
   if (isDrawn(src)) return undefined;
   const own = RESPONSIVE.exec(src);
   if (own) {
-    // A width the one-file build left out would 404, so drop it from the set.
-    const steps = IMAGE_WIDTHS.map((w) => ({ w, url: inlined(`${own[1]}-${w}${own[3]}`) })).filter(
-      ({ w, url }) => url !== `${own[1]}-${w}${own[3]}` || !isInlining(),
-    );
-    return steps.map(({ w, url }) => `${url} ${w}w`).join(', ');
+    // `src` points at the largest file written, so anything wider was never
+    // made — offering it would 404. The one-file build leaves out wider sizes
+    // again, so drop those too rather than hand the browser a dead data URI.
+    const ceiling = Number(own[2]);
+    const steps = IMAGE_WIDTHS.filter((w) => w <= ceiling)
+      .map((w) => ({ w, url: inlined(`${own[1]}-${w}${own[3]}`) }))
+      .filter(({ w, url }) => url !== `${own[1]}-${w}${own[3]}` || !isInlining());
+    return steps.length > 0 ? steps.map(({ w, url }) => `${url} ${w}w`).join(', ') : undefined;
   }
   if (/^https?:\/\//.test(src) || src.startsWith('/')) return undefined;
   return IMAGE_WIDTHS.map((w) => `${imageUrl(src, w, quality)} ${w}w`).join(', ');
@@ -152,10 +157,11 @@ export const IMAGES = {
 
   /* — Real estate: stills — */
   reExteriorTwilight: {
-    src: 'photo-1523217582562-09d0def993a6',
-    alt: 'A house photographed at dusk with the interior lights on and the sky still holding colour.',
-    tone: 'twilight',
+    src: '/work/r/front-elevation-1800.jpg',
+    alt: 'A white painted brick house with a steep shingled roof and round dormer windows, seen at an angle from a broad concrete forecourt, with brick steps rising between clipped hedges to an arched front door and magnolias either side.',
+    tone: 'daylight',
     scene: 'exterior-twilight',
+    focus: '50% 48%',
   },
   reExteriorDay: {
     // ► front-elevation.jpg
@@ -165,10 +171,11 @@ export const IMAGES = {
     scene: 'exterior-day',
   },
   reExteriorModern: {
-    src: 'photo-1600585154340-be6161a56a0c',
-    alt: 'A contemporary house of stacked rectangular volumes with wide glazing.',
-    tone: 'twilight',
+    src: '/work/r/contemporary-exterior-1800.jpg',
+    alt: 'A contemporary white house with black framed windows, a standing-seam porch roof and a timber front door, photographed from a raised angle across a wide concrete drive and clipped lawn, with pines behind.',
+    tone: 'daylight',
     scene: 'exterior-modern',
+    focus: '50% 52%',
   },
   reExteriorNight: {
     src: 'photo-1512918728675-ed5a9ecdebfd',
@@ -202,10 +209,11 @@ export const IMAGES = {
   },
   reDining: {
     // ► dining-room.jpg
-    src: 'photo-1600121848594-d8644e57abab',
-    alt: 'A dining room with a long table, upholstered chairs and pendant lighting above.',
+    src: '/work/r/dining-room-1800.jpg',
+    alt: 'A dining room with charcoal walls and ceiling, a dark oval table set for eight in pale upholstered chairs, a cluster of amber glass globe pendants overhead, and an arched glass-fronted cabinet to the left, open through to a lit kitchen beyond.',
     tone: 'interior',
     scene: 'interior-dining',
+    focus: '50% 50%',
   },
   reStair: {
     src: 'photo-1600607688969-a5bfcd646154',
@@ -228,16 +236,18 @@ export const IMAGES = {
   },
   rePool: {
     // ► pool-terrace.jpg
-    src: 'photo-1571003123894-1f0594d2b5d9',
-    alt: 'A rectangular swimming pool beside a house, with paved coping and a lawn beyond.',
+    src: '/work/r/pool-wide-1800.jpg',
+    alt: 'A long rectangular pool with pale stone coping running the length of a lawn, in front of a white painted brick house with a covered terrace, loungers along the near edge and mature trees behind.',
     tone: 'water',
     scene: 'pool',
+    focus: '50% 55%',
   },
   reTerrace: {
-    src: 'photo-1600585154526-990dced4db0d',
-    alt: 'A covered outdoor terrace with seating, looking out onto a garden.',
-    tone: 'twilight',
+    src: '/work/r/covered-terrace-1800.jpg',
+    alt: 'The back of a white painted brick house on a bright day, seen across a long rectangular pool with pale stone coping, folded parasols and loungers on the lawn either side, and a covered terrace with seating under the eaves.',
+    tone: 'daylight',
     scene: 'terrace',
+    focus: '50% 45%',
   },
   reWalkthrough: {
     src: 'photo-1600585154084-4e5fe7c39198',

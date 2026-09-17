@@ -130,7 +130,7 @@ function Viewer({
   const playable = Boolean(added) || isPlayable(item);
 
   return (
-    <Modal open={open} onClose={onClose} label={`${item.title} — ${item.location}`} className="px-0">
+    <Modal open={open} onClose={onClose} label={item.location ? `${item.title} — ${item.location}` : item.title} className="px-0">
       <div className="flex h-[100svh] w-full flex-col">
         {/* Top bar: where you are in the set, and the way out. */}
         <div className="flex shrink-0 items-center justify-between gap-4 px-4 py-4 sm:px-8">
@@ -252,9 +252,11 @@ function Viewer({
               <p className="max-w-[62ch] text-[13px] leading-relaxed text-muted">{item.caption}</p>
             </div>
             <div className="flex shrink-0 flex-col gap-0.5 sm:text-right">
-              <p className="font-mono text-[11px] tracking-[0.16em] text-cyan-soft uppercase">
-                {item.location}
-              </p>
+              {item.location && (
+                <p className="font-mono text-[11px] tracking-[0.16em] text-cyan-soft uppercase">
+                  {item.location}
+                </p>
+              )}
               {item.service && <p className="text-[12px] text-faint">{item.service}</p>}
             </div>
           </div>

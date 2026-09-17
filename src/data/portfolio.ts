@@ -45,8 +45,13 @@ export interface VideoSource {
 export interface PortfolioItem {
   id: string;
   title: string;
-  /** Where it was shot. Keep it to a town — never a full street address. */
-  location: string;
+  /**
+   * Where it was shot. Keep it to a town — never a full street address.
+   * Leave it out rather than guess: an invented town on a real photograph is
+   * a claim about where the work was done, and the tile hides the line when
+   * there is nothing true to put in it.
+   */
+  location?: string;
   category: PortfolioCategory;
   kind: 'photo' | 'video';
   image: ImageKey;
@@ -63,20 +68,18 @@ export interface PortfolioItem {
 export const PORTFOLIO: PortfolioItem[] = [
   {
     id: 'twilight-glass-house',
-    title: 'Twilight exterior',
-    location: 'Oxford, MS',
+    title: 'Front elevation',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reExteriorTwilight',
     aspect: 'wide',
-    caption: 'The twenty-minute window after sunset where the sky and the windows balance.',
+    caption: 'Late morning from the forecourt, with the brick steps leading up to the door.',
     service: 'Premium package',
     featured: true,
   },
   {
     id: 'aerial-roofline',
     title: 'Pool terrace from the air',
-    location: 'Mississippi',
     category: 'drone',
     kind: 'photo',
     image: 'aerialProperty',
@@ -181,13 +184,12 @@ export const PORTFOLIO: PortfolioItem[] = [
   },
   {
     id: 'pool-dusk',
-    title: 'Pool, blue hour',
-    location: 'Oxford, MS',
+    title: 'Pool and rear elevation',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'rePool',
     aspect: 'square',
-    caption: 'Pool lights on, deck lights on, sky not yet black. Timing is the whole shot.',
+    caption: 'The full length of the pool with the house behind it, shot square from the far coping.',
     service: 'Twilight add-on',
   },
   {
@@ -237,7 +239,6 @@ export const PORTFOLIO: PortfolioItem[] = [
   {
     id: 'dining',
     title: 'Dining room',
-    location: 'Columbus, MS',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reDining',
@@ -248,7 +249,6 @@ export const PORTFOLIO: PortfolioItem[] = [
   {
     id: 'terrace-fire',
     title: 'Covered terrace',
-    location: 'Tupelo, MS',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reTerrace',
@@ -259,7 +259,6 @@ export const PORTFOLIO: PortfolioItem[] = [
   {
     id: 'modern-cantilever',
     title: 'Contemporary exterior',
-    location: 'Oxford, MS',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reExteriorModern',

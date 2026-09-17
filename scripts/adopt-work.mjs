@@ -30,48 +30,48 @@ const WRITE = process.argv.includes('--write');
 
 /** filename (without extension, lowercased) → where it goes and what it shows. */
 const ADOPT = {
-  'dining-room': {
+  'dsc00078': {
+    key: 'reTerrace',
+    slug: 'covered-terrace',
+    alt: 'The back of a white painted brick house on a bright day, seen across a long rectangular pool with pale stone coping, folded parasols and loungers on the lawn either side, and a covered terrace with seating under the eaves.',
+    tone: 'daylight',
+    focus: '50% 45%',
+  },
+  'zrzut ekranu 2026-09-16 163432': {
     key: 'reDining',
     slug: 'dining-room',
     alt: 'A dining room with charcoal walls and ceiling, a dark oval table set for eight in pale upholstered chairs, a cluster of amber glass globe pendants overhead, and an arched glass-fronted cabinet to the left, open through to a lit kitchen beyond.',
     tone: 'interior',
     focus: '50% 50%',
   },
-  'covered-terrace': {
-    key: 'reTerrace',
-    slug: 'covered-terrace',
-    alt: 'The back of a white painted brick house on a bright day, seen across a long rectangular pool with stone coping, loungers and folded parasols on the lawn either side and a covered terrace with seating under the eaves.',
-    tone: 'daylight',
-    focus: '50% 45%',
-  },
-  'living-room': {
-    key: 'reLiving',
-    slug: 'living-room',
-    alt: 'A double-height living room with a pale stone chimney breast running the full height to the ceiling, a lit fire, cream sectional sofas and tan leather armchairs on an oak floor, large abstract canvases either side and a railed landing above.',
-    tone: 'interior',
-    focus: '50% 50%',
-  },
-  'twilight-exterior': {
-    key: 'reExteriorTwilight',
-    slug: 'front-elevation',
-    // This photograph is bright midday, not dusk. The slot is named for the
-    // drawing it replaces, and the portfolio tile on it claimed a sunset that
-    // is not in the frame, so the tile gets retitled with the photograph.
-    item: {
-      id: 'twilight-glass-house',
-      title: 'Front elevation',
-      caption: 'Square to the door, midday, with the roses in front of the stair.',
-    },
-    alt: 'The symmetrical front of a white painted brick house with a steep shingled roof and two round dormer windows, an arched black front door at the head of a wide brick stair, clipped box either side and roses in the foreground.',
-    tone: 'daylight',
-    focus: '50% 50%',
-  },
-  'contemporary-exterior': {
+  'zrzut ekranu 2026-09-16 163259': {
     key: 'reExteriorModern',
     slug: 'contemporary-exterior',
     alt: 'A contemporary white house with black framed windows, a standing-seam porch roof and a timber front door, photographed from a raised angle across a wide concrete drive and clipped lawn, with pines behind.',
     tone: 'daylight',
     focus: '50% 52%',
+  },
+  'zrzut ekranu 2026-09-16 164854': {
+    key: 'rePool',
+    slug: 'pool-wide',
+    alt: 'A long rectangular pool with pale stone coping running the length of a lawn, in front of a white painted brick house with a covered terrace, loungers along the near edge and mature trees behind.',
+    tone: 'water',
+    focus: '50% 55%',
+  },
+  'zrzut ekranu 2026-09-16 165104': {
+    key: 'reExteriorTwilight',
+    slug: 'front-elevation',
+    // The photograph is bright midday from the forecourt, not dusk. The slot is
+    // named for the drawing it replaces, and the portfolio tile on it claimed a
+    // sunset that is not in the frame, so the tile is retitled to match.
+    item: {
+      id: 'twilight-glass-house',
+      title: 'Front elevation',
+      caption: 'Late morning from the forecourt, with the brick steps leading up to the door.',
+    },
+    alt: 'A white painted brick house with a steep shingled roof and round dormer windows, seen at an angle from a broad concrete forecourt, with brick steps rising between clipped hedges to an arched front door and magnolias either side.',
+    tone: 'daylight',
+    focus: '50% 48%',
   },
 };
 

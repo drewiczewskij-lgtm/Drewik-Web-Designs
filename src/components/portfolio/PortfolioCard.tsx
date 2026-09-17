@@ -31,6 +31,7 @@ export function PortfolioCard({
   const { ref, onPointerMove, onPointerLeave } = useTilt<HTMLButtonElement>(4);
   const playable = isPlayable(item);
   const isVideo = item.kind === 'video';
+  const where = item.location ? `, ${item.location}` : '';
 
   return (
     <motion.li
@@ -93,9 +94,11 @@ export function PortfolioCard({
             <h3 className="font-display text-[17px] leading-tight font-semibold text-bright sm:text-[19px]">
               {item.title}
             </h3>
-            <p className="font-mono text-[10.5px] tracking-[0.14em] text-cyan-soft/90 uppercase">
-              {item.location}
-            </p>
+            {item.location && (
+              <p className="font-mono text-[10.5px] tracking-[0.14em] text-cyan-soft/90 uppercase">
+                {item.location}
+              </p>
+            )}
             <p className="max-h-0 overflow-hidden text-[12.5px] leading-snug text-body/90 opacity-0 transition-[max-height,opacity,margin] duration-500 ease-[cubic-bezier(.16,1,.3,1)] group-hover:mt-1 group-hover:max-h-24 group-hover:opacity-100 group-focus-visible:mt-1 group-focus-visible:max-h-24 group-focus-visible:opacity-100">
               {item.caption}
             </p>
@@ -111,9 +114,9 @@ export function PortfolioCard({
         <span className="sr-only">
           {isVideo
             ? playable
-              ? `Play the film: ${item.title}, ${item.location}.`
-              : `Open a still from the film: ${item.title}, ${item.location}.`
-            : `View the photograph: ${item.title}, ${item.location}.`}
+              ? `Play the film: ${item.title}${where}.`
+              : `Open a still from the film: ${item.title}${where}.`
+            : `View the photograph: ${item.title}${where}.`}
         </span>
       </button>
     </motion.li>

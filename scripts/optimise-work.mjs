@@ -56,9 +56,16 @@ const results = await page.evaluate(
       img.src = dataUrl;
     });
 
+    // Never upscale. Every step at or below the original is written, plus the
+    // first step above it, which carries the original's own width — so a 940px
+    // screenshot yields 640 and 960 (the 960 file is really 940), and not three
+    // more identical copies pretending to be 2400px wide.
+    const wanted = widths.filter((w) => w <= img.naturalWidth);
+    const next = widths.find((w) => w > img.naturalWidth);
+    if (next !== undefined) wanted.push(next);
+
     const out = [];
-    for (const w of widths) {
-      // Never upscale: a 1600px original stays 1600px at the 1800 and 2400 steps.
+    for (const w of wanted) {
       const width = Math.min(w, img.naturalWidth);
       const height = Math.round((width / img.naturalWidth) * img.naturalHeight);
       const canvas = document.createElement('canvas');
@@ -86,4 +93,5 @@ for (const v of results.out) {
   console.log(`  /work/r/${slugArg}-${v.w}.jpg  ${v.width}×${v.height}  ${(buf.length / 1024).toFixed(0)} KB`);
 }
 console.log(`  ${(total / 1e6).toFixed(2)} MB for the whole set; a phone loads only the first.`);
-console.log(`\n  src: '/work/r/${slugArg}-1800.jpg'`);
+const largest = results.out[results.out.length - 1].w;
+console.log(`\n  src: '/work/r/${slugArg}-${largest}.jpg'`);
