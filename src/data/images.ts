@@ -147,15 +147,15 @@ export function imageSrcSet(src: string, quality = 72): string | undefined {
 export const IMAGES = {
   /* — Hero and home — */
   heroTwilight: {
-    src: '/work/r/aerial-estate-2400.jpg',
-    alt: 'A large white house with a grey shingle roof seen from the air in late afternoon light, wrapped around a brick pool terrace with a lit turquoise pool and screened porch, surrounded by mature magnolias.',
-    tone: 'aerial',
-    scene: 'exterior-twilight',
-    focus: '50% 48%',
-  },
-  homeAerial: {
     src: '/work/r/aerial-estate-drive-2400.jpg',
     alt: 'A white brick house photographed from the air in daylight, showing its roof, a brick entrance path and courtyard, a concrete drive curving in from the left, and mature trees on every side.',
+    tone: 'aerial',
+    scene: 'exterior-twilight',
+    focus: '50% 55%',
+  },
+  homeAerial: {
+    src: '',
+    alt: 'A house and its grounds from the air, showing the roof, drive and garden.',
     tone: 'aerial',
     scene: 'aerial-property',
     focus: '50% 55%',
@@ -168,8 +168,8 @@ export const IMAGES = {
     focus: '50% 50%',
   },
   homeFilm: {
-    src: '/work/r/living-room-fireplace-2400.jpg',
-    alt: 'A double-height living room with a pale limestone chimney breast rising the full height of the wall, a lit fire below a timber mantel, cream sofas and tan leather armchairs on an oak floor, and a railed landing above.',
+    src: '',
+    alt: 'A frame from a property film, held wide across a lit room.',
     tone: 'interior',
     scene: 'video-frame',
     focus: '50% 48%',
@@ -185,8 +185,8 @@ export const IMAGES = {
   },
   reExteriorDay: {
     // ► front-elevation.jpg
-    src: '/work/r/front-elevation-960.jpg',
-    alt: 'A white painted brick house with a steep shingled roof and round dormer windows, seen from a broad concrete forecourt, with brick steps rising between clipped hedges to an arched front door.',
+    src: '',
+    alt: 'The front of a house in daylight, square to the door.',
     tone: 'daylight',
     scene: 'exterior-day',
     focus: '50% 48%',
@@ -275,8 +275,8 @@ export const IMAGES = {
     focus: '50% 45%',
   },
   reWalkthrough: {
-    src: '/work/r/piano-room-2400.jpg',
-    alt: 'A bright reception room with white panelled walls and tall multi-pane windows on two sides, a grand piano with its lid raised at the far end, and a round low table at the centre of a wide oak floor.',
+    src: '',
+    alt: 'A hallway looking through to a bright room at the end.',
     tone: 'interior',
     scene: 'walkthrough',
     focus: '50% 50%',
@@ -292,8 +292,8 @@ export const IMAGES = {
     focus: '50% 48%',
   },
   aerialNeighborhood: {
-    src: '/work/r/aerial-estate-drive-2400.jpg',
-    alt: 'A white brick house with a steep shingled roof photographed from the air in daylight, showing the roof, a brick entrance path and courtyard, a concrete drive curving in from the left, and mature trees on every side with a neighbouring roof beyond.',
+    src: '',
+    alt: 'A residential neighbourhood from the air, with streets, rooftops and mature trees.',
     tone: 'aerial',
     scene: 'aerial-neighborhood',
     focus: '50% 55%',
@@ -305,8 +305,8 @@ export const IMAGES = {
     scene: 'aerial-land',
   },
   aerialWater: {
-    src: '/work/r/aerial-estate-2400.jpg',
-    alt: 'A large white house and its brick pool terrace seen from the air in late afternoon light, with a lit turquoise pool and mature magnolias all around.',
+    src: '',
+    alt: 'A waterfront property from the air, with a dock or shoreline in frame.',
     tone: 'aerial',
     scene: 'aerial-water',
     focus: '50% 48%',
@@ -318,8 +318,8 @@ export const IMAGES = {
     scene: 'aerial-highway',
   },
   droneInFlight: {
-    src: '/work/r/aerial-estate-drive-2400.jpg',
-    alt: 'A white brick house photographed from the air in daylight, showing its roof, a brick entrance path and courtyard, and a concrete drive curving in through mature trees.',
+    src: '',
+    alt: 'A camera drone in flight against an open sky.',
     tone: 'aerial',
     scene: 'drone-flight',
     focus: '50% 55%',
@@ -327,8 +327,8 @@ export const IMAGES = {
 
   /* — Video — */
   filmFrameA: {
-    src: '/work/r/piano-room-2400.jpg',
-    alt: 'A bright reception room with white panelled walls and tall multi-pane windows on two sides, a grand piano at the far end and a round low table on a wide oak floor.',
+    src: '',
+    alt: 'A frame from a property film, the camera moving through a doorway.',
     tone: 'interior',
     scene: 'video-frame',
     focus: '50% 50%',
@@ -348,8 +348,8 @@ export const IMAGES = {
     scene: 'commercial-restaurant',
   },
   commGym: {
-    src: '/work/r/home-gym-2400.jpg',
-    alt: 'A gym with a rowing machine in the foreground, a wall-mounted training screen and weights bench, a cedar sauna cabin against the far wall, and rolled mats and dumbbells to one side.',
+    src: '',
+    alt: 'A gym floor with equipment in use under the lighting of the room itself.',
     tone: 'interior',
     scene: 'commercial-gym',
     focus: '50% 52%',
@@ -400,8 +400,8 @@ export const IMAGES = {
     focus: '50% 32%',
   },
   gearStill: {
-    src: '/work/r/covered-terrace-2400.jpg',
-    alt: 'The back of a white painted brick house on a bright day, seen across a long rectangular pool with pale stone coping and a covered terrace under the eaves.',
+    src: '',
+    alt: 'Camera bodies, lenses and a drone laid out on a work surface.',
     tone: 'daylight',
     scene: 'gear',
     focus: '50% 45%',

@@ -79,7 +79,7 @@ export default function Portfolio() {
           </>
         }
         lead="Pick a package, choose a date, and it is in the diary."
-        image="reExteriorModern"
+        image="reKitchen"
       />
 
       <Footer />

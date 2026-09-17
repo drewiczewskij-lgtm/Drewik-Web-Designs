@@ -346,7 +346,7 @@ export const PORTFOLIO: PortfolioItem[] = [
     image: 'lifestyleTerrace',
     aspect: 'wide',
     caption: 'The full length of the pool with the house behind it, from the far coping.',
-    service: 'Commercial',
+    service: 'Photo package',
   },
   {
     id: 'drone-in-flight',
@@ -470,4 +470,18 @@ export function watchUrl(item: PortfolioItem): string | undefined {
   if (item.video.provider === 'youtube') return `https://www.youtube.com/watch?v=${item.video.id}`;
   if (item.video.provider === 'vimeo') return `https://vimeo.com/${item.video.id}`;
   return undefined;
+}
+
+/**
+ * Drops pieces whose photograph is already on the page.
+ *
+ * Several sections draw from the same small pool — a services grid, a featured
+ * strip, a page header — and each is written without knowing what the others
+ * chose. With thirteen photographs and twenty-three frames that meant the same
+ * aerial three times on one screen, which makes a body of work look thinner
+ * than it is. Each section passes what is already spoken for.
+ */
+export function withoutImages(items: PortfolioItem[], used: Iterable<ImageKey>): PortfolioItem[] {
+  const taken = new Set(used);
+  return items.filter((item) => !taken.has(item.image));
 }

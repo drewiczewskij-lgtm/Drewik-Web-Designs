@@ -66,7 +66,7 @@ export default function Home({ ready = true }: { ready?: boolean }) {
           </>
         }
         lead="Buyers scroll past a listing in under two seconds. Give them a reason to stop."
-        image="aerialProperty"
+        image="reTerrace"
         primary={{ label: 'Book your property shoot', to: '/book' }}
         secondary={{ label: 'See real estate work', to: '/real-estate' }}
       />

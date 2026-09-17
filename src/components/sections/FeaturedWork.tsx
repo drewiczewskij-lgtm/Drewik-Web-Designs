@@ -6,7 +6,8 @@ import { Reveal } from '@/components/fx/Reveal';
 import { SectionHead } from '@/components/ui/Bits';
 import { Arrow } from '@/components/ui/Button';
 import { Lightbox } from '@/components/portfolio/Lightbox';
-import { FEATURED_WORK, categoryLabel } from '@/data/portfolio';
+import { FEATURED_WORK, categoryLabel, withoutImages } from '@/data/portfolio';
+import { SERVICES } from '@/data/services';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 
 /* ============================================================================
@@ -28,6 +29,10 @@ export function FeaturedWork({ index = '04' }: { index?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<number | null>(null);
   const reduced = usePrefersReducedMotion();
+
+  /* The hero and the services grid pick first; this strip takes what is left,
+     so the home page never shows the same photograph twice. */
+  const featured = withoutImages(FEATURED_WORK, ['heroTwilight', ...SERVICES.map((s) => s.image)]);
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -61,7 +66,7 @@ export function FeaturedWork({ index = '04' }: { index?: string }) {
         </div>
 
         <div ref={ref} className="mt-14 grid grid-cols-1 gap-3 md:grid-cols-12 md:gap-4">
-          {FEATURED_WORK.map((item, i) => (
+          {featured.map((item, i) => (
             <motion.div
               key={item.id}
               style={{ y: i === 0 || i === 3 ? slow : fast, willChange: 'transform' }}
@@ -105,7 +110,7 @@ export function FeaturedWork({ index = '04' }: { index?: string }) {
       </div>
 
       <Lightbox
-        items={FEATURED_WORK}
+        items={featured}
         index={open}
         onClose={() => setOpen(null)}
         onIndexChange={setOpen}

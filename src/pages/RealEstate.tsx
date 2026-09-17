@@ -8,7 +8,7 @@ import { PortfolioGrid } from '@/components/portfolio/PortfolioGrid';
 import { CtaBand } from '@/components/sections/CtaBand';
 import { Process } from '@/components/sections/Process';
 import { Seo, serviceSchema, breadcrumbSchema } from '@/lib/seo';
-import { PORTFOLIO } from '@/data/portfolio';
+import { PORTFOLIO, withoutImages } from '@/data/portfolio';
 import { CONTACT } from '@/data/site';
 import { getPackage, money } from '@shared/catalog.mjs';
 import type { ImageKey } from '@/data/images';
@@ -55,7 +55,10 @@ const COVERAGE: Coverage[] = [
   {
     id: 'twilight',
     name: 'Twilight photography',
-    image: 'reExteriorTwilight',
+    // Waiting for an actual blue-hour frame. The page header already holds the
+    // only exterior there is, and that one was shot at midday — putting it here
+    // would both repeat it and illustrate sunset with daylight.
+    image: 'reExteriorNight',
     body: 'The twenty minutes after sunset when the sky still holds colour and the windows have come on. It is consistently the best-performing single photograph on a listing, and there is exactly one of them per day.',
     points: [
       'Shot in the real blue-hour window',
@@ -104,8 +107,17 @@ const COVERAGE: Coverage[] = [
 
 export default function RealEstate() {
   const photo = getPackage('photo');
-  const reWork = PORTFOLIO.filter(
-    (p) => p.category === 'real-estate-photo' || p.category === 'real-estate-video' || p.category === 'drone',
+  /* The page header, the six service blocks and the pool band all name a
+     photograph before this strip runs; it takes what none of them claimed. */
+  const spokenFor: ImageKey[] = ['reExteriorTwilight', 'rePool', ...COVERAGE.map((c) => c.image)];
+  const reWork = withoutImages(
+    PORTFOLIO.filter(
+      (p) =>
+        p.category === 'real-estate-photo' ||
+        p.category === 'real-estate-video' ||
+        p.category === 'drone',
+    ),
+    spokenFor,
   );
 
   return (
