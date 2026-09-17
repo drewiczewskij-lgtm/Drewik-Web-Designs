@@ -3,6 +3,28 @@
 Anything in this folder is served from the site root, so a file saved as
 `public/work/hero-twilight.jpg` is reachable at `/work/hero-twilight.jpg`.
 
+## First: shrink the file
+
+A drone or camera file is 10–25 MB. Never serve one — a visitor on a phone
+would wait half a minute for one picture. Put the original in `masters/` (it
+sits outside `public/`, so it never ships) and run:
+
+```bash
+npm run optimise:work -- masters/DJI_20260914165227_0100_D.jpg aerial-estate
+```
+
+That writes five sizes into `public/work/r/` and prints the line to paste:
+
+```
+src: '/work/r/aerial-estate-1800.jpg'
+```
+
+The site hands the browser all five, so a phone downloads about 100 KB and a
+desktop downloads the wide one. The 13 MB master stays yours.
+
+**Rewrite the `alt` text when you do this.** Only you know what is in your
+photograph, and the line sitting there describes the drawing it replaced.
+
 ## The fast way
 
 1. Save your files here, named after the image key they belong to

@@ -65,9 +65,21 @@ export function isDrawn(src: string): boolean {
   return src.trim().length === 0;
 }
 
+/**
+ * A file written by `npm run optimise:work` — `/work/r/<name>-<width>.jpg`.
+ * The width lives in the filename, so the set is derivable without a manifest.
+ */
+const RESPONSIVE = /^(\/work\/r\/.+)-(\d+)(\.[a-z]+)$/;
+
 /** One source URL at a given width. Absolute and rooted paths pass through. */
 export function imageUrl(src: string, width: number, quality = 72): string {
   if (isDrawn(src)) return '';
+  const own = RESPONSIVE.exec(src);
+  if (own) {
+    // Snap to a width the script actually wrote; anything else would 404.
+    const step = IMAGE_WIDTHS.reduce((best, w) => (Math.abs(w - width) < Math.abs(best - width) ? w : best));
+    return `${own[1]}-${step}${own[3]}`;
+  }
   if (/^https?:\/\//.test(src) || src.startsWith('/')) return src;
   const params = new URLSearchParams({
     auto: 'format',
@@ -80,6 +92,8 @@ export function imageUrl(src: string, width: number, quality = 72): string {
 
 export function imageSrcSet(src: string, quality = 72): string | undefined {
   if (isDrawn(src)) return undefined;
+  const own = RESPONSIVE.exec(src);
+  if (own) return IMAGE_WIDTHS.map((w) => `${own[1]}-${w}${own[3]} ${w}w`).join(', ');
   if (/^https?:\/\//.test(src) || src.startsWith('/')) return undefined;
   return IMAGE_WIDTHS.map((w) => `${imageUrl(src, w, quality)} ${w}w`).join(', ');
 }
@@ -214,11 +228,12 @@ export const IMAGES = {
 
   /* — Aerial — */
   aerialProperty: {
-    // ► aerial-farmhouse.jpg
-    src: 'photo-1592595896551-12b371d546d5',
-    alt: 'A house and its grounds photographed from directly above, showing the roof, drive and garden.',
+    // KM Productions, shot on a DJI drone. Re-encoded by `npm run optimise:work`.
+    src: '/work/r/aerial-estate-1800.jpg',
+    alt: 'A large white house with a grey shingle roof seen from the air in late afternoon light, wrapped around a brick pool terrace with a lit turquoise pool, screened porch and clipped hedges, surrounded by mature magnolias.',
     tone: 'aerial',
     scene: 'aerial-property',
+    focus: '50% 48%',
   },
   aerialNeighborhood: {
     src: 'photo-1449844908441-8829872d2607',
