@@ -71,6 +71,20 @@ export function isDrawn(src: string): boolean {
  */
 const RESPONSIVE = /^(\/work\/r\/.+)-(\d+)(\.[a-z]+)$/;
 
+/**
+ * The one-file build has no folder to read photographs from, so
+ * `scripts/bundle-single.mjs` writes them into this global as data URIs before
+ * the app runs. Empty in every other build, where the files are really there.
+ */
+function isInlining(): boolean {
+  return Boolean((globalThis as { __KM_INLINE__?: Record<string, string> }).__KM_INLINE__);
+}
+
+function inlined(path: string): string {
+  const map = (globalThis as { __KM_INLINE__?: Record<string, string> }).__KM_INLINE__;
+  return map?.[path] ?? path;
+}
+
 /** One source URL at a given width. Absolute and rooted paths pass through. */
 export function imageUrl(src: string, width: number, quality = 72): string {
   if (isDrawn(src)) return '';
@@ -78,7 +92,7 @@ export function imageUrl(src: string, width: number, quality = 72): string {
   if (own) {
     // Snap to a width the script actually wrote; anything else would 404.
     const step = IMAGE_WIDTHS.reduce((best, w) => (Math.abs(w - width) < Math.abs(best - width) ? w : best));
-    return `${own[1]}-${step}${own[3]}`;
+    return inlined(`${own[1]}-${step}${own[3]}`);
   }
   if (/^https?:\/\//.test(src) || src.startsWith('/')) return src;
   const params = new URLSearchParams({
@@ -93,7 +107,13 @@ export function imageUrl(src: string, width: number, quality = 72): string {
 export function imageSrcSet(src: string, quality = 72): string | undefined {
   if (isDrawn(src)) return undefined;
   const own = RESPONSIVE.exec(src);
-  if (own) return IMAGE_WIDTHS.map((w) => `${own[1]}-${w}${own[3]} ${w}w`).join(', ');
+  if (own) {
+    // A width the one-file build left out would 404, so drop it from the set.
+    const steps = IMAGE_WIDTHS.map((w) => ({ w, url: inlined(`${own[1]}-${w}${own[3]}`) })).filter(
+      ({ w, url }) => url !== `${own[1]}-${w}${own[3]}` || !isInlining(),
+    );
+    return steps.map(({ w, url }) => `${url} ${w}w`).join(', ');
+  }
   if (/^https?:\/\//.test(src) || src.startsWith('/')) return undefined;
   return IMAGE_WIDTHS.map((w) => `${imageUrl(src, w, quality)} ${w}w`).join(', ');
 }
