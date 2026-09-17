@@ -105,6 +105,7 @@ export const PORTFOLIO: PortfolioItem[] = [
     location: 'Tupelo, MS',
     category: 'real-estate-video',
     kind: 'video',
+    video: { provider: 'youtube', id: 'YlCDz_P0Wh4' },
     image: 'filmFrameA',
     aspect: 'wide',
     caption: 'A full property film — approach, walkthrough and aerial, cut to one piece.',
