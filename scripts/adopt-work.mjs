@@ -152,7 +152,7 @@ const ADOPT = {
        photograph once it exists, because only the photograph knows. — */
   'portrait': {
     key: 'founderPortrait', slug: 'founder', tone: 'studio', focus: '50% 35%',
-    alt: 'The founder of KM Productions, photographed from the chest up.',
+    alt: 'Bryan Miller, photographed from the chest up in a navy suit and a patterned tie against a plain white background.',
   },
   'twilight-exterior-dusk': {
     key: 'reExteriorNight', slug: 'twilight-exterior', tone: 'twilight', focus: '50% 52%',

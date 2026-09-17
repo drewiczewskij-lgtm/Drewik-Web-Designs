@@ -404,11 +404,11 @@ export const IMAGES = {
     // ► DROP THE FOUNDER'S PHOTOGRAPH HERE. Put the file in `public/work/`
     //   and write the path, e.g. '/work/founder.jpg'. Then rewrite `alt` below
     //   to describe the actual photograph.
-    src: '',
-    alt: 'Portrait of the founder of KM Productions. A drawn stand-in until the photograph is added.',
+    src: '/work/r/founder-640.jpg',
+    alt: 'Bryan Miller, photographed from the chest up in a navy suit and a patterned tie against a plain white background.',
     tone: 'studio',
     scene: 'portrait',
-    focus: '50% 32%',
+    focus: '50% 30%',
   },
   gearStill: {
     src: '',
