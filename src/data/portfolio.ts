@@ -417,7 +417,12 @@ export function isRealWork(item: PortfolioItem, ownImage: (key: ImageKey) => boo
 
 export function videoEmbedUrl(v: VideoSource): string {
   if (v.provider === 'youtube') {
-    return `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1`;
+    /* www.youtube.com rather than youtube-nocookie.com. The nocookie host is
+       the privacy-preserving one and was the better default, but it is the
+       domain that blockers, school and office networks cut first, and a film a
+       client cannot watch is worse than a cookie. `modestbranding` is dropped:
+       YouTube ignores it now. */
+    return `https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&playsinline=1`;
   }
   if (v.provider === 'vimeo') return `https://player.vimeo.com/video/${v.id}?autoplay=1&title=0&byline=0`;
   return v.id;
