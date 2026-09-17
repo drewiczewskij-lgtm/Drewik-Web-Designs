@@ -9,8 +9,8 @@ import {
   type PortfolioCategory,
   type PortfolioItem,
 } from '@/data/portfolio';
-import { IMAGES } from '@/data/images';
-import { isPlaceholderSource } from '@/lib/photoStore';
+import { IMAGES, isOwnWork } from '@/data/images';
+import { OWN_WORK_ONLY } from '@/data/site';
 import { usePhotos } from '@/lib/photoStore';
 import { EASE_UI } from '@/lib/motion';
 import { cn } from '@/lib/cn';
@@ -43,33 +43,42 @@ export function PortfolioGrid({
 
   const dropped = usePhotos();
 
+  const ownImage = (key: keyof typeof IMAGES) => isOwnWork(IMAGES[key].src, Boolean(dropped[key]));
+
+  /* The house rule, applied at the door: a piece counts when it is a film KM
+     Productions actually shot or a photograph they actually supplied. With
+     `OWN_WORK_ONLY` set, everything else leaves the grid rather than sitting in
+     it as an empty frame — a portfolio of blanks reads as broken, a short
+     portfolio of real work reads as deliberate. This is the set the filters,
+     the counts and the viewer all work from, so none of them can disagree. */
+  const shown = useMemo(
+    () => (OWN_WORK_ONLY ? items.filter((i) => isRealWork(i, ownImage)) : items),
+    [items, dropped],
+  );
+
   const visible = useMemo(() => {
     const filtered =
-      !showFilters || category === 'all' ? items : items.filter((i) => i.category === category);
+      !showFilters || category === 'all' ? shown : shown.filter((i) => i.category === category);
 
-    /* Real work leads. While most of the grid is still stand-ins, a piece that
-       is genuinely the studio's own is otherwise indistinguishable from the
-       twenty-five around it — so it gets the first tile instead of being
-       buried in the middle. A stable sort keeps everything else in order. */
-    const ownImage = (key: keyof typeof IMAGES) =>
-      !isPlaceholderSource(IMAGES[key].src, Boolean(dropped[key]));
-
+    /* Real work leads. With the rule off, a genuine piece is otherwise
+       indistinguishable from the stand-ins around it, so it takes the first
+       tile instead of being buried. A stable sort keeps the rest in order. */
     return [...filtered].sort((a, b) => {
       const ra = isRealWork(a, ownImage) ? 0 : 1;
       const rb = isRealWork(b, ownImage) ? 0 : 1;
       return ra - rb;
     });
-  }, [items, category, showFilters, dropped]);
+  }, [shown, category, showFilters, dropped]);
 
   // Counts come from the same source the filter uses, so a tab can never
   // advertise a number it will not deliver.
   const counts = useMemo(() => {
     const map = new Map<string, number>();
     for (const c of CATEGORIES) {
-      map.set(c.id, c.id === 'all' ? items.length : items.filter((i) => i.category === c.id).length);
+      map.set(c.id, c.id === 'all' ? shown.length : shown.filter((i) => i.category === c.id).length);
     }
     return map;
-  }, [items]);
+  }, [shown]);
 
   const active = CATEGORIES.find((c) => c.id === category);
 

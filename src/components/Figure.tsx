@@ -4,9 +4,11 @@ import {
   imageSrcSet,
   imageUrl,
   isDrawn,
+  isOwnWork,
   type ImageAsset,
   type ImageKey,
 } from '@/data/images';
+import { OWN_WORK_ONLY } from '@/data/site';
 import { toneWash } from '@/lib/plate';
 import { usePhoto } from '@/lib/photoStore';
 import { renderScene } from '@/lib/scenes';
@@ -58,6 +60,12 @@ export function Figure({
   const dropped = usePhoto(image);
   const drawn = !dropped && isDrawn(asset.src);
 
+  /* Not KM Productions' own photograph, and the house rule says only their work
+     is shown. Hold the space with a quiet surface — no drawing, no stock frame,
+     nothing that could be mistaken for their photography — and let the real one
+     take it over the moment it is added. */
+  const notOurs = OWN_WORK_ONLY && !isOwnWork(asset.src, Boolean(dropped));
+
   // `failed` is sticky: once we fall back to the plate we never re-request the
   // photograph, or the two would trade places on every load event.
   const [failed, setFailed] = useState(false);
@@ -72,21 +80,39 @@ export function Figure({
   // An image served from cache can finish before React attaches its handlers,
   // so read the element itself once on mount.
   useEffect(() => {
-    if (drawn) return;
+    if (drawn || notOurs) return;
     const el = ref.current;
     if (!el || !el.complete) return;
     if (el.naturalWidth > 0) setLoaded(true);
     else setFailed(true);
-  }, [image, drawn]);
+  }, [image, drawn, notOurs]);
 
   // A dropped photograph cannot fail to load — it is already in memory — so it
   // skips the fallback path entirely.
-  const usePlate = !dropped && (drawn || failed);
+  /* With the house rule on, a photograph that fails to load falls back to
+     nothing, not to a drawn plate: a missing file is a problem to fix, and
+     quietly dressing it up as artwork is how one went unnoticed on the
+     real-estate header. */
+  const usePlate = !dropped && (drawn || failed) && !OWN_WORK_ONLY;
+  const blank = OWN_WORK_ONLY && failed && !dropped;
   const src = dropped
     ? dropped.dataUrl
     : usePlate
       ? renderScene(asset.scene, image)
       : imageUrl(asset.src, priority ? 1800 : 1280, quality);
+
+  if (notOurs || blank) {
+    return (
+      <div
+        // Empty on purpose, and empty is the honest state. `alt` would describe
+        // a photograph that is not here, so the frame is hidden from assistive
+        // technology entirely rather than announced as an image.
+        aria-hidden="true"
+        className={cn('overflow-hidden bg-surface/40', className)}
+        style={style}
+      />
+    );
+  }
 
   return (
     <div

@@ -92,6 +92,7 @@ function setField(source, key, field, value, opener = `  ${key}: {`) {
   return source.slice(0, found.index) + found[1] + body + found[3] + source.slice(found.index + found[0].length);
 }
 
+const OUT_DIR = join(root, 'public/work/r');
 const mastersDir = join(root, 'masters');
 let files = [];
 try {
@@ -134,7 +135,18 @@ for (const job of jobs) {
     console.error(`  could not re-encode ${job.file}`);
     process.exit(1);
   }
-  source = setField(source, job.key, 'src', `/work/r/${job.slug}-1800.jpg`);
+  /* Ask the folder which widths exist rather than assuming 1800: a 940px
+     screenshot only ever yields 640 and 960, and naming a file that was never
+     written is a 404 that degrades into a drawn plate — the exact thing the
+     owner does not want on the page. */
+  const written = (await readdir(OUT_DIR))
+    .map((f) => Number(new RegExp(`^${job.slug}-(\\d+)\\.jpg$`).exec(f)?.[1]))
+    .filter((w) => Number.isFinite(w));
+  if (written.length === 0) {
+    console.error(`  ${job.slug} produced no files`);
+    process.exit(1);
+  }
+  source = setField(source, job.key, 'src', `/work/r/${job.slug}-${Math.max(...written)}.jpg`);
   source = setField(source, job.key, 'alt', job.alt);
   source = setField(source, job.key, 'tone', job.tone);
   source = setField(source, job.key, 'focus', job.focus);

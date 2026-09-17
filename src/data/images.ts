@@ -60,6 +60,23 @@ export const IMAGE_BASE = 'https://images.unsplash.com/';
 /** Widths generated for `srcset`. Few on purpose, to limit cache churn. */
 export const IMAGE_WIDTHS = [640, 960, 1280, 1800, 2400] as const;
 
+/**
+ * THE HOUSE RULE: only KM Productions' own footage is ever shown.
+ *
+ * A frame counts as the owner's work when its file lives under `/work/` — that
+ * is, it came out of `masters/` through `npm run optimise:work` — or when a
+ * photograph has been dropped onto the photo manager in this browser.
+ *
+ * Everything else (a stock photo id, an empty `src` that would draw a plate)
+ * is not their work, and with `OWN_WORK_ONLY` set the site shows nothing there
+ * rather than standing something in. The portfolio drops those pieces entirely;
+ * a decorative frame elsewhere becomes a quiet empty surface until a real
+ * photograph arrives. Nothing is invented, and nothing is passed off as theirs.
+ */
+export function isOwnWork(src: string, dropped = false): boolean {
+  return dropped || src.trim().startsWith('/work/');
+}
+
 /** True when this entry has no photograph yet and should draw its plate. */
 export function isDrawn(src: string): boolean {
   return src.trim().length === 0;
@@ -157,7 +174,7 @@ export const IMAGES = {
 
   /* — Real estate: stills — */
   reExteriorTwilight: {
-    src: '/work/r/front-elevation-1800.jpg',
+    src: '/work/r/front-elevation-960.jpg',
     alt: 'A white painted brick house with a steep shingled roof and round dormer windows, seen at an angle from a broad concrete forecourt, with brick steps rising between clipped hedges to an arched front door and magnolias either side.',
     tone: 'daylight',
     scene: 'exterior-twilight',
@@ -171,7 +188,7 @@ export const IMAGES = {
     scene: 'exterior-day',
   },
   reExteriorModern: {
-    src: '/work/r/contemporary-exterior-1800.jpg',
+    src: '/work/r/contemporary-exterior-960.jpg',
     alt: 'A contemporary white house with black framed windows, a standing-seam porch roof and a timber front door, photographed from a raised angle across a wide concrete drive and clipped lawn, with pines behind.',
     tone: 'daylight',
     scene: 'exterior-modern',
@@ -209,7 +226,7 @@ export const IMAGES = {
   },
   reDining: {
     // ► dining-room.jpg
-    src: '/work/r/dining-room-1800.jpg',
+    src: '/work/r/dining-room-960.jpg',
     alt: 'A dining room with charcoal walls and ceiling, a dark oval table set for eight in pale upholstered chairs, a cluster of amber glass globe pendants overhead, and an arched glass-fronted cabinet to the left, open through to a lit kitchen beyond.',
     tone: 'interior',
     scene: 'interior-dining',
@@ -236,14 +253,14 @@ export const IMAGES = {
   },
   rePool: {
     // ► pool-terrace.jpg
-    src: '/work/r/pool-wide-1800.jpg',
+    src: '/work/r/pool-wide-960.jpg',
     alt: 'A long rectangular pool with pale stone coping running the length of a lawn, in front of a white painted brick house with a covered terrace, loungers along the near edge and mature trees behind.',
     tone: 'water',
     scene: 'pool',
     focus: '50% 55%',
   },
   reTerrace: {
-    src: '/work/r/covered-terrace-1800.jpg',
+    src: '/work/r/covered-terrace-2400.jpg',
     alt: 'The back of a white painted brick house on a bright day, seen across a long rectangular pool with pale stone coping, folded parasols and loungers on the lawn either side, and a covered terrace with seating under the eaves.',
     tone: 'daylight',
     scene: 'terrace',
@@ -259,7 +276,7 @@ export const IMAGES = {
   /* — Aerial — */
   aerialProperty: {
     // KM Productions, shot on a DJI drone. Re-encoded by `npm run optimise:work`.
-    src: '/work/r/aerial-estate-1800.jpg',
+    src: '/work/r/aerial-estate-2400.jpg',
     alt: 'A large white house with a grey shingle roof seen from the air in late afternoon light, wrapped around a brick pool terrace with a lit turquoise pool, screened porch and clipped hedges, surrounded by mature magnolias.',
     tone: 'aerial',
     scene: 'aerial-property',

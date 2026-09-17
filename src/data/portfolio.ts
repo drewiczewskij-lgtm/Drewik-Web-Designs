@@ -1,4 +1,5 @@
 import type { ImageKey } from '@/data/images';
+import { OWN_WORK_ONLY } from '@/data/site';
 
 /* ============================================================================
    THE PORTFOLIO
@@ -416,4 +417,14 @@ export function videoEmbedUrl(v: VideoSource): string {
   }
   if (v.provider === 'vimeo') return `https://player.vimeo.com/video/${v.id}?autoplay=1&title=0&byline=0`;
   return v.id;
+}
+
+/**
+ * The pieces the site will actually show, given the house rule.
+ *
+ * Page copy counts from here rather than from `PORTFOLIO`, so a headline can
+ * never advertise twenty-eight pieces above a grid holding six.
+ */
+export function shownPortfolio(ownImage: (key: ImageKey) => boolean): PortfolioItem[] {
+  return OWN_WORK_ONLY ? PORTFOLIO.filter((item) => isRealWork(item, ownImage)) : PORTFOLIO;
 }

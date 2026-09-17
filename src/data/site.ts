@@ -1,3 +1,12 @@
+/**
+ * Show only KM Productions' own photographs and films.
+ *
+ * Turning this off brings back the drawn plates and stock frames that stand in
+ * for work not yet supplied — useful while building, wrong in front of clients.
+ * See `isOwnWork` in `data/images.ts` for what counts.
+ */
+export const OWN_WORK_ONLY = true;
+
 /* ============================================================================
    KM PRODUCTIONS — BUSINESS DETAILS
    ----------------------------------------------------------------------------

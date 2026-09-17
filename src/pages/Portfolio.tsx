@@ -4,7 +4,9 @@ import { Footer } from '@/components/layout/Footer';
 import { PortfolioGrid } from '@/components/portfolio/PortfolioGrid';
 import { CtaBand } from '@/components/sections/CtaBand';
 import { Seo, breadcrumbSchema } from '@/lib/seo';
-import { CATEGORIES, PORTFOLIO, type PortfolioCategory } from '@/data/portfolio';
+import { CATEGORIES, shownPortfolio, type PortfolioCategory } from '@/data/portfolio';
+import { IMAGES, isOwnWork, type ImageKey } from '@/data/images';
+import { usePhotos } from '@/lib/photoStore';
 import { CONTACT } from '@/data/site';
 
 /**
@@ -21,6 +23,18 @@ export default function Portfolio() {
     ? (requested as PortfolioCategory)
     : 'all';
 
+  /* Count what the grid will really show. The alternative — counting every
+     item in the file — put "28 pieces" above a grid of six. */
+  const dropped = usePhotos();
+  const count = shownPortfolio((key: ImageKey) =>
+    isOwnWork(IMAGES[key].src, Boolean(dropped[key])),
+  ).length;
+
+  const lead =
+    count === 0
+      ? 'The first pieces are being added. Call and we will send recent work straight over.'
+      : `${count} ${count === 1 ? 'piece' : 'pieces'} of our own work. Open any of them full screen — the arrow keys walk the set.`;
+
   return (
     <>
       <Seo
@@ -36,7 +50,7 @@ export default function Portfolio() {
       <PageHeader
         label="Portfolio"
         title={['Selected work.']}
-        lead={`${PORTFOLIO.length} pieces across property, aerial, commercial and lifestyle. Open any of them full screen — the arrow keys walk the set.`}
+        lead={lead}
         breadcrumb={[
           { name: 'Home', path: '/' },
           { name: 'Portfolio', path: '/portfolio' },
