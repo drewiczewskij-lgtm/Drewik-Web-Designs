@@ -59,12 +59,12 @@ export const CONTACT = {
  * without a profile is simply not rendered — see `LIVE_SOCIALS` below.
  */
 export const SOCIALS = [
-  {
-    id: 'youtube',
-    label: 'YouTube',
-    handle: 'KM Productions',
-    url: 'https://www.youtube.com/channel/UCECyfOoEwMqy_N7HAbe7HEg',
-  },
+  /*
+   * YouTube is deliberately not listed. The films are hosted there and the
+   * portfolio plays them, but the channel itself holds only unlisted uploads,
+   * so an icon pointing at it sends a client to what looks like an empty
+   * account. Put the entry back once the channel has something public on it.
+   */
   {
     id: 'instagram',
     label: 'Instagram',
