@@ -17,6 +17,7 @@
     "test:booking": "node scripts/test-booking.mjs",
     "link:work": "node scripts/link-work.mjs",
     "optimise:work": "node scripts/optimise-work.mjs",
+    "adopt": "node scripts/adopt-work.mjs",
     "use:stock": "node scripts/use-stock.mjs",
     "make:og": "node scripts/make-og.mjs",
     "make:seo": "node scripts/make-seo.mjs"
