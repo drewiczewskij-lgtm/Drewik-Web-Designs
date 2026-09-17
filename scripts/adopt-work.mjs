@@ -30,6 +30,7 @@ const WRITE = process.argv.includes('--write');
 
 /** filename (without extension, lowercased) → where it goes and what it shows. */
 const ADOPT = {
+  /* — The first batch: five frames, four of them screenshots — */
   'dsc00078': {
     key: 'reTerrace',
     slug: 'covered-terrace',
@@ -52,8 +53,15 @@ const ADOPT = {
     focus: '50% 52%',
   },
   'zrzut ekranu 2026-09-16 164854': {
-    key: 'rePool',
+    // Displaced from rePool by a full-size original of a better pool.
+    key: 'lifestyleTerrace',
     slug: 'pool-wide',
+    item: {
+      id: 'terrace-lifestyle',
+      title: 'Pool and rear elevation',
+      category: 'real-estate-photo',
+      caption: 'The full length of the pool with the house behind it, from the far coping.',
+    },
     alt: 'A long rectangular pool with pale stone coping running the length of a lawn, in front of a white painted brick house with a covered terrace, loungers along the near edge and mature trees behind.',
     tone: 'water',
     focus: '50% 55%',
@@ -61,9 +69,8 @@ const ADOPT = {
   'zrzut ekranu 2026-09-16 165104': {
     key: 'reExteriorTwilight',
     slug: 'front-elevation',
-    // The photograph is bright midday from the forecourt, not dusk. The slot is
-    // named for the drawing it replaces, and the portfolio tile on it claimed a
-    // sunset that is not in the frame, so the tile is retitled to match.
+    // Bright midday from the forecourt, not dusk. The slot is named for the
+    // drawing it replaces, and the tile claimed a sunset not in the frame.
     item: {
       id: 'twilight-glass-house',
       title: 'Front elevation',
@@ -72,6 +79,77 @@ const ADOPT = {
     alt: 'A white painted brick house with a steep shingled roof and round dormer windows, seen at an angle from a broad concrete forecourt, with brick steps rising between clipped hedges to an arched front door and magnolias either side.',
     tone: 'daylight',
     focus: '50% 48%',
+  },
+
+  /* — The second batch: seven camera and drone originals — */
+  'dji_20260818101503_0009_d': {
+    key: 'aerialNeighborhood',
+    slug: 'aerial-estate-drive',
+    item: {
+      id: 'aerial-neighbourhood',
+      title: 'The property from above',
+      caption: 'High over the drive at midday — house, courtyard and tree line in one frame.',
+    },
+    alt: 'A white brick house with a steep shingled roof photographed from the air in daylight, showing the roof, a brick entrance path and courtyard, a concrete drive curving in from the left, and mature trees on every side with a neighbouring roof beyond.',
+    tone: 'aerial',
+    focus: '50% 55%',
+  },
+  'dsc00064': {
+    key: 'rePool',
+    slug: 'pool-garden',
+    item: {
+      id: 'pool-dusk',
+      title: 'Pool and garden',
+      caption: 'Square down the length of the pool, with the cypress screen holding the far edge.',
+    },
+    alt: 'A rectangular swimming pool with pale stone coping and clear turquoise water, a row of tall narrow cypresses along the far side behind a black railing, loungers on the grass to the left and two white in-water chairs in the foreground.',
+    tone: 'water',
+    focus: '50% 55%',
+  },
+  'dsc00159': {
+    key: 'homeInterior',
+    slug: 'piano-room',
+    alt: 'A bright reception room with white panelled walls and tall multi-pane windows on two sides, a grand piano with its lid raised at the far end, a round low table at the centre of a wide oak floor, and a chrome chandelier overhead.',
+    tone: 'interior',
+    focus: '50% 50%',
+  },
+  'dsc00258': {
+    key: 'reBath',
+    slug: 'primary-bath',
+    alt: 'A bathroom in pale grey and white with a long double vanity under a full-width mirror, chrome tube sconces either side, and a glass walk-in shower tiled in white to the right, over a marble mosaic floor.',
+    tone: 'interior',
+    focus: '50% 50%',
+  },
+  'dsc00270': {
+    key: 'reDetail',
+    slug: 'home-gym',
+    alt: 'A home gym with a rowing machine in the foreground, a wall-mounted training screen and weights bench to the right, a cedar infrared sauna cabin against the far wall, and rolled exercise mats and dumbbells to one side, on a pale oak floor.',
+    tone: 'interior',
+    focus: '50% 52%',
+  },
+  'dsc09705': {
+    key: 'reLiving',
+    slug: 'living-room-fireplace',
+    item: {
+      id: 'living-room-flambient',
+      title: 'Living room',
+      caption: 'Held for the fire and the window light at once, with the landing above kept in frame.',
+    },
+    alt: 'A double-height living room with a pale limestone chimney breast rising the full height of the wall, a lit fire below a timber mantel, cream sectional sofas and tan leather armchairs on an oak floor, and a railed landing overlooking from above.',
+    tone: 'interior',
+    focus: '50% 48%',
+  },
+  'dsc09753': {
+    key: 'reBedroom',
+    slug: 'primary-bedroom',
+    item: {
+      id: 'primary-suite',
+      title: 'Primary suite',
+      caption: 'Square to the bed, with both shuttered windows left in the frame.',
+    },
+    alt: 'A large bedroom with a pale upholstered bed centred between two cane-fronted chests, shuttered windows either side, four square wood reliefs on the wall above, a leather bench at the foot and a patterned rug across a wide oak floor.',
+    tone: 'interior',
+    focus: '50% 50%',
   },
 };
 
@@ -155,9 +233,9 @@ for (const job of jobs) {
     // The tile is matched on its id line, so the fields below it are the
     // right ones even though several tiles share a shape.
     const opener = `    id: '${job.item.id}',`;
-    for (const field of ['title', 'caption']) {
-      if (job.item[field] === undefined) continue;
-      portfolio = setField(portfolio, job.item.id, field, job.item[field], opener);
+    for (const [field, value] of Object.entries(job.item)) {
+      if (field === 'id') continue;
+      portfolio = setField(portfolio, job.item.id, field, value, opener);
     }
   }
 }

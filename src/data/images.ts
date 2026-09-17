@@ -160,10 +160,11 @@ export const IMAGES = {
     scene: 'aerial-property',
   },
   homeInterior: {
-    src: 'photo-1600607687939-ce8a6c25118c',
-    alt: 'A bright living room with a sectional sofa, timber floor and a full-height window.',
+    src: '/work/r/piano-room-2400.jpg',
+    alt: 'A bright reception room with white panelled walls and tall multi-pane windows on two sides, a grand piano with its lid raised at the far end, a round low table at the centre of a wide oak floor, and a chrome chandelier overhead.',
     tone: 'interior',
     scene: 'interior-living',
+    focus: '50% 50%',
   },
   homeFilm: {
     src: 'photo-1523217582562-09d0def993a6',
@@ -201,10 +202,11 @@ export const IMAGES = {
     scene: 'exterior-night',
   },
   reLiving: {
-    src: 'photo-1600607687920-4e2a09cf159d',
-    alt: 'A living room with a pale sofa, timber flooring and tall windows.',
+    src: '/work/r/living-room-fireplace-2400.jpg',
+    alt: 'A double-height living room with a pale limestone chimney breast rising the full height of the wall, a lit fire below a timber mantel, cream sectional sofas and tan leather armchairs on an oak floor, and a railed landing overlooking from above.',
     tone: 'interior',
     scene: 'interior-living',
+    focus: '50% 48%',
   },
   reKitchen: {
     src: 'photo-1600489000022-c2086d79f9d4',
@@ -213,16 +215,18 @@ export const IMAGES = {
     scene: 'interior-kitchen',
   },
   reBedroom: {
-    src: 'photo-1600566753086-00f18fb6b3ea',
-    alt: 'A bedroom with an upholstered headboard, bedside lamps and a window to one side.',
+    src: '/work/r/primary-bedroom-2400.jpg',
+    alt: 'A large bedroom with a pale upholstered bed centred between two cane-fronted chests, shuttered windows either side, four square wood reliefs on the wall above, a leather bench at the foot and a patterned rug across a wide oak floor.',
     tone: 'interior',
     scene: 'interior-bedroom',
+    focus: '50% 50%',
   },
   reBath: {
-    src: 'photo-1600210492486-724fe5c67fb0',
-    alt: 'A bathroom with a freestanding tub, stone tiling and a large mirror.',
+    src: '/work/r/primary-bath-2400.jpg',
+    alt: 'A bathroom in pale grey and white with a long double vanity under a full-width mirror, chrome tube sconces either side, and a glass walk-in shower tiled in white to the right, over a marble mosaic floor.',
     tone: 'interior',
     scene: 'interior-bath',
+    focus: '50% 50%',
   },
   reDining: {
     // ► dining-room.jpg
@@ -246,15 +250,16 @@ export const IMAGES = {
     scene: 'foyer',
   },
   reDetail: {
-    src: 'photo-1600607687644-c7171b42498b',
-    alt: 'A close detail of timber joinery and metal hardware, lit from the side.',
+    src: '/work/r/home-gym-2400.jpg',
+    alt: 'A home gym with a rowing machine in the foreground, a wall-mounted training screen and weights bench to the right, a cedar infrared sauna cabin against the far wall, and rolled exercise mats and dumbbells to one side, on a pale oak floor.',
     tone: 'interior',
     scene: 'detail',
+    focus: '50% 52%',
   },
   rePool: {
     // ► pool-terrace.jpg
-    src: '/work/r/pool-wide-960.jpg',
-    alt: 'A long rectangular pool with pale stone coping running the length of a lawn, in front of a white painted brick house with a covered terrace, loungers along the near edge and mature trees behind.',
+    src: '/work/r/pool-garden-2400.jpg',
+    alt: 'A rectangular swimming pool with pale stone coping and clear turquoise water, a row of tall narrow cypresses along the far side behind a black railing, loungers on the grass to the left and two white in-water chairs in the foreground.',
     tone: 'water',
     scene: 'pool',
     focus: '50% 55%',
@@ -283,10 +288,11 @@ export const IMAGES = {
     focus: '50% 48%',
   },
   aerialNeighborhood: {
-    src: 'photo-1449844908441-8829872d2607',
-    alt: 'A residential neighbourhood seen from the air, with streets, rooftops and mature trees.',
+    src: '/work/r/aerial-estate-drive-2400.jpg',
+    alt: 'A white brick house with a steep shingled roof photographed from the air in daylight, showing the roof, a brick entrance path and courtyard, a concrete drive curving in from the left, and mature trees on every side with a neighbouring roof beyond.',
     tone: 'aerial',
     scene: 'aerial-neighborhood',
+    focus: '50% 55%',
   },
   aerialLand: {
     src: 'photo-1500382017468-9049fed747ef',
@@ -367,10 +373,11 @@ export const IMAGES = {
 
   /* — Lifestyle — */
   lifestyleTerrace: {
-    src: 'photo-1600585154340-be6161a56a0c',
-    alt: 'An outdoor terrace in evening light, set up for entertaining.',
-    tone: 'twilight',
+    src: '/work/r/pool-wide-960.jpg',
+    alt: 'A long rectangular pool with pale stone coping running the length of a lawn, in front of a white painted brick house with a covered terrace, loungers along the near edge and mature trees behind.',
+    tone: 'water',
     scene: 'lifestyle',
+    focus: '50% 55%',
   },
 
   /* — The company — */

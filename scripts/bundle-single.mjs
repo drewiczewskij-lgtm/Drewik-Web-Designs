@@ -67,10 +67,11 @@ try {
  * instead, as data URIs on a global the image layer checks.
  *
  * Only the narrower sizes come along: base64 costs a third more than the file,
- * and a 2400px frame would triple the size of the document for a width nobody
- * viewing a single HTML file is likely to need.
+ * so carrying every width would put this one document into the tens of
+ * megabytes. 960px is the most a browser panel will ask for; the hosted build
+ * in `dist/` still serves the full set up to 2400.
  */
-const INLINE_MAX_WIDTH = 1280;
+const INLINE_MAX_WIDTH = 960;
 const inline = {};
 try {
   const dir = join(root, 'public', 'work', 'r');

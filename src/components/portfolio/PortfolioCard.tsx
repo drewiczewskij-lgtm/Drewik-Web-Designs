@@ -1,6 +1,12 @@
 import { motion } from 'motion/react';
 import { Figure } from '@/components/Figure';
-import { categoryLabel, isPlayable, type PortfolioItem } from '@/data/portfolio';
+import {
+  categoryLabel,
+  filmPoster,
+  filmPosterFallback,
+  isPlayable,
+  type PortfolioItem,
+} from '@/data/portfolio';
 import { useTilt } from '@/lib/useTilt';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 import { cn } from '@/lib/cn';
@@ -58,6 +64,8 @@ export function PortfolioCard({
       >
         <Figure
           image={item.image}
+          ownSrc={filmPoster(item)}
+          ownSrcFallback={filmPosterFallback(item)}
           className="absolute inset-0 h-full w-full"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />

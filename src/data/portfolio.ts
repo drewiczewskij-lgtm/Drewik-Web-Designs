@@ -92,12 +92,11 @@ export const PORTFOLIO: PortfolioItem[] = [
   {
     id: 'living-room-flambient',
     title: 'Living room',
-    location: 'Starkville, MS',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reLiving',
     aspect: 'square',
-    caption: 'Flambient blend: ambient for colour, flash for detail, window kept blue.',
+    caption: 'Held for the fire and the window light at once, with the landing above kept in frame.',
     service: 'Photo package',
     featured: true,
   },
@@ -153,12 +152,11 @@ export const PORTFOLIO: PortfolioItem[] = [
   {
     id: 'primary-suite',
     title: 'Primary suite',
-    location: 'Columbus, MS',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reBedroom',
     aspect: 'tall',
-    caption: 'Bedside lamps on, ceiling light off. Rooms photograph better lit from low down.',
+    caption: 'Square to the bed, with both shuttered windows left in the frame.',
     service: 'Photo package',
   },
   {
@@ -174,23 +172,22 @@ export const PORTFOLIO: PortfolioItem[] = [
   },
   {
     id: 'aerial-neighbourhood',
-    title: 'Neighbourhood at dusk',
-    location: 'Tupelo, MS',
+    title: 'The property from above',
     category: 'drone',
     kind: 'photo',
     image: 'aerialNeighborhood',
     aspect: 'wide',
-    caption: 'Context sells the house as much as the house does. Flown at civil twilight.',
+    caption: 'High over the drive at midday — house, courtyard and tree line in one frame.',
     service: 'Aerial photography',
   },
   {
     id: 'pool-dusk',
-    title: 'Pool and rear elevation',
+    title: 'Pool and garden',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'rePool',
     aspect: 'square',
-    caption: 'The full length of the pool with the house behind it, shot square from the far coping.',
+    caption: 'Square down the length of the pool, with the cypress screen holding the far edge.',
     service: 'Twilight add-on',
   },
   {
@@ -216,9 +213,18 @@ export const PORTFOLIO: PortfolioItem[] = [
     service: 'Aerial video',
   },
   {
+    id: 'home-gym',
+    title: 'Home gym',
+    category: 'real-estate-photo',
+    kind: 'photo',
+    image: 'reDetail',
+    aspect: 'wide',
+    caption: 'The room buyers ask about and listings usually skip.',
+    service: 'Photo package',
+  },
+  {
     id: 'bath-detail',
     title: 'Primary bath',
-    location: 'Starkville, MS',
     category: 'real-estate-photo',
     kind: 'photo',
     image: 'reBath',
@@ -335,13 +341,12 @@ export const PORTFOLIO: PortfolioItem[] = [
   },
   {
     id: 'terrace-lifestyle',
-    title: 'Terrace, evening',
-    location: 'Oxford, MS',
-    category: 'lifestyle',
+    title: 'Pool and rear elevation',
+    category: 'real-estate-photo',
     kind: 'photo',
     image: 'lifestyleTerrace',
     aspect: 'wide',
-    caption: 'People in the space, back-lit. Lifestyle frames outperform empty rooms on social.',
+    caption: 'The full length of the pool with the house behind it, from the far coping.',
     service: 'Commercial',
   },
   {
@@ -427,4 +432,23 @@ export function videoEmbedUrl(v: VideoSource): string {
  */
 export function shownPortfolio(ownImage: (key: ImageKey) => boolean): PortfolioItem[] {
   return OWN_WORK_ONLY ? PORTFOLIO.filter((item) => isRealWork(item, ownImage)) : PORTFOLIO;
+}
+
+/**
+ * The still a film's tile shows before it is played.
+ *
+ * YouTube serves a frame of the film itself at a predictable address, which is
+ * the studio's own footage — so a film whose poster slot holds no photograph
+ * shows a frame of itself rather than an empty box. `maxresdefault` exists only
+ * for films uploaded above 720p; `hqdefault` always exists, so it is the
+ * fallback rather than a broken frame.
+ */
+export function filmPoster(item: PortfolioItem): string | undefined {
+  if (item.video?.provider !== 'youtube') return undefined;
+  return `https://i.ytimg.com/vi/${item.video.id}/maxresdefault.jpg`;
+}
+
+export function filmPosterFallback(item: PortfolioItem): string | undefined {
+  if (item.video?.provider !== 'youtube') return undefined;
+  return `https://i.ytimg.com/vi/${item.video.id}/hqdefault.jpg`;
 }

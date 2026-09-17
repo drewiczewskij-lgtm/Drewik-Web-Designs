@@ -28,6 +28,14 @@ interface FigureProps {
   /** Disables the fade so a parent can choreograph the entrance itself. */
   eager?: boolean;
   objectPosition?: string;
+  /**
+   * Use this source instead of the library entry's, and count it as the
+   * studio's own work. Only for frames that genuinely are theirs — a still
+   * lifted from their own film, say — never as a way round the house rule.
+   */
+  ownSrc?: string;
+  /** Tried once if `ownSrc` fails, before the frame gives up and goes blank. */
+  ownSrcFallback?: string;
 }
 
 /**
@@ -51,6 +59,8 @@ export function Figure({
   quality = 72,
   eager = false,
   objectPosition,
+  ownSrc,
+  ownSrcFallback,
 }: FigureProps) {
   const asset: ImageAsset = IMAGES[image];
 
@@ -64,7 +74,12 @@ export function Figure({
      is shown. Hold the space with a quiet surface — no drawing, no stock frame,
      nothing that could be mistaken for their photography — and let the real one
      take it over the moment it is added. */
-  const notOurs = OWN_WORK_ONLY && !isOwnWork(asset.src, Boolean(dropped));
+  const notOurs = OWN_WORK_ONLY && !ownSrc && !isOwnWork(asset.src, Boolean(dropped));
+
+  // One retry, then blank. Two states rather than a loop, so a poster that is
+  // simply not there cannot flip back and forth on every load event.
+  const [posterTry, setPosterTry] = useState(0);
+  const poster = ownSrc && posterTry === 0 ? ownSrc : ownSrc ? ownSrcFallback : undefined;
 
   // `failed` is sticky: once we fall back to the plate we never re-request the
   // photograph, or the two would trade places on every load event.
@@ -75,7 +90,8 @@ export function Figure({
   useEffect(() => {
     setFailed(false);
     setLoaded(false);
-  }, [image]);
+    setPosterTry(0);
+  }, [image, ownSrc]);
 
   // An image served from cache can finish before React attaches its handlers,
   // so read the element itself once on mount.
@@ -97,11 +113,13 @@ export function Figure({
   const blank = OWN_WORK_ONLY && failed && !dropped;
   const src = dropped
     ? dropped.dataUrl
-    : usePlate
-      ? renderScene(asset.scene, image)
-      : imageUrl(asset.src, priority ? 1800 : 1280, quality);
+    : poster
+      ? poster
+      : usePlate
+        ? renderScene(asset.scene, image)
+        : imageUrl(asset.src, priority ? 1800 : 1280, quality);
 
-  if (notOurs || blank) {
+  if (notOurs || (blank && !poster)) {
     return (
       <div
         // Empty on purpose, and empty is the honest state. `alt` would describe
@@ -132,8 +150,8 @@ export function Figure({
       <img
         ref={ref}
         src={src}
-        srcSet={usePlate || dropped ? undefined : imageSrcSet(asset.src, quality)}
-        sizes={usePlate || dropped ? undefined : sizes}
+        srcSet={usePlate || dropped || poster ? undefined : imageSrcSet(asset.src, quality)}
+        sizes={usePlate || dropped || poster ? undefined : sizes}
         alt={alt ?? asset.alt}
         loading={priority ? 'eager' : 'lazy'}
         decoding={priority ? 'sync' : 'async'}
@@ -141,6 +159,11 @@ export function Figure({
         draggable={false}
         onLoad={() => setLoaded(true)}
         onError={() => {
+          // A missing maxres poster gets one shot at the smaller one.
+          if (ownSrc && posterTry === 0 && ownSrcFallback) {
+            setPosterTry(1);
+            return;
+          }
           if (!failed) setFailed(true);
         }}
         className={cn('h-full w-full object-cover', imgClassName)}

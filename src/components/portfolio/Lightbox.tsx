@@ -5,6 +5,8 @@ import { Modal, CloseButton } from '@/components/ui/Modal';
 import { Pill } from '@/components/ui/Bits';
 import {
   categoryLabel,
+  filmPoster,
+  filmPosterFallback,
   isPlayable,
   videoEmbedUrl,
   type PortfolioItem,
@@ -193,6 +195,8 @@ function Viewer({
                 <div className="relative flex h-full w-full items-center justify-center">
                   <Figure
                     image={item.image}
+                    ownSrc={filmPoster(item)}
+                    ownSrcFallback={filmPosterFallback(item)}
                     priority
                     sizes="100vw"
                     className="h-full max-h-full w-full"
