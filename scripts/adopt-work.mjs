@@ -151,6 +151,101 @@ const ADOPT = {
     tone: 'interior',
     focus: '50% 50%',
   },
+  /* — Waiting. Save a file under one of these names and this places it. The
+       alt text here is the brief the shot was asked for; rewrite it to the
+       photograph once it exists, because only the photograph knows. — */
+  'portrait': {
+    key: 'founderPortrait', slug: 'founder', tone: 'studio', focus: '50% 35%',
+    alt: 'The founder of KM Productions, photographed from the chest up.',
+  },
+  'twilight-exterior-dusk': {
+    key: 'reExteriorNight', slug: 'twilight-exterior', tone: 'twilight', focus: '50% 52%',
+    alt: 'A house at dusk with the interior lights on and the sky still holding colour.',
+  },
+  'kitchen': {
+    key: 'reKitchen', slug: 'kitchen', tone: 'interior', focus: '50% 50%',
+    alt: 'A kitchen with an island, pendant lighting over it and full-height cabinetry.',
+  },
+  'exterior-day': {
+    key: 'reExteriorDay', slug: 'exterior-day', tone: 'daylight', focus: '50% 50%',
+    alt: 'The front of a house in daylight, photographed square to the door.',
+  },
+  'hallway': {
+    key: 'reWalkthrough', slug: 'hallway', tone: 'interior', focus: '50% 50%',
+    alt: 'A hallway looking through to a bright room at the end.',
+  },
+  'staircase': {
+    key: 'reStair', slug: 'staircase', tone: 'interior', focus: '50% 50%',
+    alt: 'A staircase with timber treads and a slim metal balustrade.',
+  },
+  'entry-hall': {
+    key: 'entryStair', slug: 'entry-hall', tone: 'interior', focus: '50% 45%',
+    alt: 'A double-height entry hall with a staircase rising to a landing above.',
+  },
+  'detail': {
+    key: 'filmFrameB', slug: 'detail', tone: 'interior', focus: '50% 50%',
+    alt: 'A close interior detail — a handle, a tap, a corner of stone.',
+  },
+  'aerial-neighbourhood': {
+    key: 'aerialNeighborhood', slug: 'aerial-neighbourhood', tone: 'aerial', focus: '50% 50%',
+    alt: 'A residential neighbourhood from the air, with streets, rooftops and mature trees.',
+  },
+  'aerial-water': {
+    key: 'aerialWater', slug: 'aerial-water', tone: 'water', focus: '50% 50%',
+    alt: 'A waterfront property from the air, with a dock or shoreline in frame.',
+  },
+  'aerial-land': {
+    key: 'aerialLand', slug: 'aerial-land', tone: 'aerial', focus: '50% 50%',
+    alt: 'Open farmland and fields photographed from above in low golden light.',
+  },
+  'aerial-highway': {
+    key: 'aerialHighway', slug: 'aerial-highway', tone: 'aerial', focus: '50% 50%',
+    alt: 'A road running through open country, photographed from the air.',
+  },
+  'drone-in-flight': {
+    key: 'droneInFlight', slug: 'drone-in-flight', tone: 'daylight', focus: '50% 45%',
+    alt: 'A camera drone in flight against an open sky.',
+  },
+  'aerial-house': {
+    key: 'homeAerial', slug: 'aerial-house', tone: 'aerial', focus: '50% 50%',
+    alt: 'A house and its grounds from the air, showing the roof, drive and garden.',
+  },
+  'film-still-room': {
+    key: 'homeFilm', slug: 'film-still-room', tone: 'interior', focus: '50% 50%',
+    alt: 'A frame from a property film, held wide across a lit room.',
+  },
+  'film-still-doorway': {
+    key: 'filmFrameA', slug: 'film-still-doorway', tone: 'interior', focus: '50% 50%',
+    alt: 'A frame from a property film, the camera moving through a doorway.',
+  },
+  'gear': {
+    key: 'gearStill', slug: 'gear', tone: 'studio', focus: '50% 50%',
+    alt: 'Camera bodies, lenses and a drone laid out on a work surface.',
+  },
+  'restaurant': {
+    key: 'commRestaurant', slug: 'restaurant', tone: 'interior', focus: '50% 50%',
+    alt: 'A restaurant interior during service, with warm lighting over the tables.',
+  },
+  'gym': {
+    key: 'commGym', slug: 'gym', tone: 'interior', focus: '50% 50%',
+    alt: 'A gym floor with equipment in use under the lighting of the room itself.',
+  },
+  'car': {
+    key: 'commAuto', slug: 'car', tone: 'studio', focus: '50% 50%',
+    alt: 'A car photographed in three-quarter view under controlled lighting.',
+  },
+  'hotel': {
+    key: 'commHotel', slug: 'hotel', tone: 'twilight', focus: '50% 50%',
+    alt: 'A hotel exterior at dusk with lit windows and a lit entrance.',
+  },
+  'retail': {
+    key: 'commRetail', slug: 'retail', tone: 'interior', focus: '50% 50%',
+    alt: 'A retail interior with rails of stock and track lighting.',
+  },
+  'event': {
+    key: 'commEvent', slug: 'event', tone: 'night', focus: '50% 50%',
+    alt: 'An event at night with stage lighting over a crowd.',
+  },
 };
 
 const imagesFile = join(root, 'src/data/images.ts');
