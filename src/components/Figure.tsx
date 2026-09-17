@@ -76,10 +76,14 @@ export function Figure({
      take it over the moment it is added. */
   const notOurs = OWN_WORK_ONLY && !ownSrc && !isOwnWork(asset.src, Boolean(dropped));
 
-  // One retry, then blank. Two states rather than a loop, so a poster that is
-  // simply not there cannot flip back and forth on every load event.
+  /* Three states, not two. 0 tries the poster, 1 tries the smaller one, and 2
+     means both are gone — at which point `poster` must become undefined so the
+     frame falls through to blank. Leaving it set was the bug that put a broken
+     image icon in the viewer: a film still processing has no thumbnail yet, and
+     the element kept rendering a source that was never going to arrive. */
   const [posterTry, setPosterTry] = useState(0);
-  const poster = ownSrc && posterTry === 0 ? ownSrc : ownSrc ? ownSrcFallback : undefined;
+  const posterChain = [ownSrc, ownSrcFallback].filter(Boolean) as string[];
+  const poster = posterChain[posterTry];
 
   // `failed` is sticky: once we fall back to the plate we never re-request the
   // photograph, or the two would trade places on every load event.
@@ -119,7 +123,8 @@ export function Figure({
         ? renderScene(asset.scene, image)
         : imageUrl(asset.src, priority ? 1800 : 1280, quality);
 
-  if (notOurs || (blank && !poster)) {
+  const posterSpent = posterChain.length > 0 && poster === undefined;
+  if (notOurs || posterSpent || (blank && !poster)) {
     return (
       <div
         // Empty on purpose, and empty is the honest state. `alt` would describe
@@ -159,9 +164,12 @@ export function Figure({
         draggable={false}
         onLoad={() => setLoaded(true)}
         onError={() => {
-          // A missing maxres poster gets one shot at the smaller one.
-          if (ownSrc && posterTry === 0 && ownSrcFallback) {
-            setPosterTry(1);
+          /* Walk the poster chain, and step one PAST its end: at that index
+             `poster` is undefined, which is what makes the frame go blank.
+             Stopping on the last entry leaves a dead source rendering, which
+             is a broken-image icon rather than an empty frame. */
+          if (posterChain.length > 0 && posterTry < posterChain.length) {
+            setPosterTry(posterTry + 1);
             return;
           }
           if (!failed) setFailed(true);

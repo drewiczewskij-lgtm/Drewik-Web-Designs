@@ -105,7 +105,6 @@ export const PORTFOLIO: PortfolioItem[] = [
     //   `npm run link:work -- --write`; it matches this id by name.
     id: '277-north-place',
     title: '277 North Place',
-    location: 'Tupelo, MS',
     category: 'real-estate-video',
     kind: 'video',
     video: { provider: 'youtube', id: '54KRujJcgAw' },
