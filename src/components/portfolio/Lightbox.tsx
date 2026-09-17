@@ -7,6 +7,7 @@ import {
   categoryLabel,
   filmPoster,
   filmPosterFallback,
+  watchUrl,
   isPlayable,
   videoEmbedUrl,
   type PortfolioItem,
@@ -262,6 +263,16 @@ function Viewer({
                 </p>
               )}
               {item.service && <p className="text-[12px] text-faint">{item.service}</p>}
+              {playable && watchUrl(item) && (
+                <a
+                  href={watchUrl(item)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-[12px] text-cyan-soft underline decoration-cyan-soft/40 underline-offset-4 transition-colors hover:text-bright hover:decoration-bright/60"
+                >
+                  Watch on YouTube ↗
+                </a>
+              )}
             </div>
           </div>
         </div>

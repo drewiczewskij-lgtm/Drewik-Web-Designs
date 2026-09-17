@@ -451,3 +451,18 @@ export function filmPosterFallback(item: PortfolioItem): string | undefined {
   if (item.video?.provider !== 'youtube') return undefined;
   return `https://i.ytimg.com/vi/${item.video.id}/hqdefault.jpg`;
 }
+
+/**
+ * The film's own page, for opening in a new tab.
+ *
+ * An embedded player is at the mercy of whatever frames the page: a preview
+ * sandbox, a corporate network or a strict content policy can refuse the iframe
+ * while the film itself is perfectly fine. A plain link always works, so every
+ * film carries one rather than leaving a blocked embed as the only route to it.
+ */
+export function watchUrl(item: PortfolioItem): string | undefined {
+  if (!item.video) return undefined;
+  if (item.video.provider === 'youtube') return `https://www.youtube.com/watch?v=${item.video.id}`;
+  if (item.video.provider === 'vimeo') return `https://vimeo.com/${item.video.id}`;
+  return undefined;
+}

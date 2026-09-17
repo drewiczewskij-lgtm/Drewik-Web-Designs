@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   IMAGES,
   imageSrcSet,
@@ -76,14 +76,51 @@ export function Figure({
      take it over the moment it is added. */
   const notOurs = OWN_WORK_ONLY && !ownSrc && !isOwnWork(asset.src, Boolean(dropped));
 
-  /* Three states, not two. 0 tries the poster, 1 tries the smaller one, and 2
-     means both are gone — at which point `poster` must become undefined so the
-     frame falls through to blank. Leaving it set was the bug that put a broken
-     image icon in the viewer: a film still processing has no thumbnail yet, and
-     the element kept rendering a source that was never going to arrive. */
-  const [posterTry, setPosterTry] = useState(0);
-  const posterChain = [ownSrc, ownSrcFallback].filter(Boolean) as string[];
-  const poster = posterChain[posterTry];
+  /* Probe the film's thumbnail off-screen and only ever render one that came
+     back. Reacting to `onError` on a live element meant the broken source was
+     already on the page — that is the icon that kept showing — and it could not
+     catch YouTube's other answer for a film still processing: a 120x90 grey
+     placeholder, which loads perfectly well and is not a picture of anything.
+     A real thumbnail is at least 320px wide, so width is the test. */
+  const posterChain = useMemo(
+    () => [ownSrc, ownSrcFallback].filter(Boolean) as string[],
+    [ownSrc, ownSrcFallback],
+  );
+  const [poster, setPoster] = useState<string | undefined>(undefined);
+  const [posterSettled, setPosterSettled] = useState(posterChain.length === 0);
+
+  useEffect(() => {
+    if (posterChain.length === 0) {
+      setPoster(undefined);
+      setPosterSettled(true);
+      return;
+    }
+    let cancelled = false;
+    setPoster(undefined);
+    setPosterSettled(false);
+
+    void (async () => {
+      for (const url of posterChain) {
+        const ok = await new Promise<boolean>((done) => {
+          const probe = new Image();
+          probe.onload = () => done(probe.naturalWidth >= 320);
+          probe.onerror = () => done(false);
+          probe.src = url;
+        });
+        if (cancelled) return;
+        if (ok) {
+          setPoster(url);
+          setPosterSettled(true);
+          return;
+        }
+      }
+      if (!cancelled) setPosterSettled(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [posterChain]);
 
   // `failed` is sticky: once we fall back to the plate we never re-request the
   // photograph, or the two would trade places on every load event.
@@ -94,7 +131,6 @@ export function Figure({
   useEffect(() => {
     setFailed(false);
     setLoaded(false);
-    setPosterTry(0);
   }, [image, ownSrc]);
 
   // An image served from cache can finish before React attaches its handlers,
@@ -123,8 +159,11 @@ export function Figure({
         ? renderScene(asset.scene, image)
         : imageUrl(asset.src, priority ? 1800 : 1280, quality);
 
-  const posterSpent = posterChain.length > 0 && poster === undefined;
-  if (notOurs || posterSpent || (blank && !poster)) {
+  /* A film keeps its frame empty until the probe has spoken, and for good if it
+     found nothing. The play control sits on top either way, so an empty frame
+     here is a poster-less player, not a broken one. */
+  const noPoster = posterChain.length > 0 && (!posterSettled || poster === undefined);
+  if (notOurs || noPoster || (blank && !poster)) {
     return (
       <div
         // Empty on purpose, and empty is the honest state. `alt` would describe
@@ -164,14 +203,6 @@ export function Figure({
         draggable={false}
         onLoad={() => setLoaded(true)}
         onError={() => {
-          /* Walk the poster chain, and step one PAST its end: at that index
-             `poster` is undefined, which is what makes the frame go blank.
-             Stopping on the last entry leaves a dead source rendering, which
-             is a broken-image icon rather than an empty frame. */
-          if (posterChain.length > 0 && posterTry < posterChain.length) {
-            setPosterTry(posterTry + 1);
-            return;
-          }
           if (!failed) setFailed(true);
         }}
         className={cn('h-full w-full object-cover', imgClassName)}
