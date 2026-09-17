@@ -7,10 +7,13 @@ import { Button, Arrow } from '@/components/ui/Button';
 import { CtaBand } from '@/components/sections/CtaBand';
 import { Seo, breadcrumbSchema } from '@/lib/seo';
 import { BRAND, CONTACT, FOUNDER, DIFFERENTIATORS } from '@/data/site';
-import { IMAGES, isDrawn } from '@/data/images';
+import { IMAGES, isOwnWork } from '@/data/images';
 
 export default function About() {
-  const portraitIsDrawn = isDrawn(IMAGES.founderPortrait.src);
+  /* The one frame no other photograph can stand in for. Every other empty slot
+     can borrow from the property work; a portrait cannot, so the page says so
+     plainly rather than showing a stranger or an unexplained blank. */
+  const noPortrait = !isOwnWork(IMAGES.founderPortrait.src);
 
   return (
     <>
@@ -56,12 +59,12 @@ export default function About() {
               </div>
             </div>
 
-            {portraitIsDrawn && (
+            {noPortrait && (
               <Notice className="mt-4" title="Portrait not added yet">
-                This is a drawn stand-in, not a photograph of a real person. Put the
-                founder’s photo in <code className="font-mono text-[12px] text-cyan-soft">public/work/</code>{' '}
-                and set <code className="font-mono text-[12px] text-cyan-soft">founderPortrait.src</code>{' '}
-                in <code className="font-mono text-[12px] text-cyan-soft">src/data/images.ts</code>.
+                This frame is empty on purpose — no photograph of a real person is
+                invented here. Put a portrait in{' '}
+                <code className="font-mono text-[12px] text-cyan-soft">masters/</code> and run{' '}
+                <code className="font-mono text-[12px] text-cyan-soft">npm run optimise:work</code>.
               </Notice>
             )}
 
