@@ -71,7 +71,18 @@ export const SOCIALS = [
     handle: '@_kmproductions_40',
     url: 'https://www.instagram.com/_kmproductions_40/',
   },
-  { id: 'facebook', label: 'Facebook', handle: '', url: '' },
+  {
+    id: 'facebook',
+    label: 'Facebook',
+    handle: 'Bryan Miller',
+    /*
+     * A share link rather than the profile's own address, and the `mibextid`
+     * the app tacks on is dropped: it is a tracking token from whoever copied
+     * the link, it says nothing to a visitor, and it does not belong in a
+     * page's markup. Swap this for facebook.com/<name> when that is to hand.
+     */
+    url: 'https://www.facebook.com/share/1EdWdgUs92/',
+  },
 ] as const;
 
 /** The accounts that actually have somewhere to send a visitor. */
