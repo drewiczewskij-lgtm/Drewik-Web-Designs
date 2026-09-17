@@ -10,6 +10,7 @@ import {
   STORAGE_BUDGET_BYTES,
   bytesUsed,
   clearAll,
+  isPlaceholderSource,
   put,
   remove,
   slotForFilename,
@@ -322,7 +323,11 @@ function Slot({
 }) {
   const [over, setOver] = useState(false);
   const asset = IMAGES[imageKey];
-  const source = stored ? 'yours' : isDrawn(asset.src) ? 'drawn' : 'stock';
+  const source = !isPlaceholderSource(asset.src, Boolean(stored))
+    ? 'yours'
+    : isDrawn(asset.src)
+      ? 'drawn'
+      : 'stock';
 
   return (
     <li>

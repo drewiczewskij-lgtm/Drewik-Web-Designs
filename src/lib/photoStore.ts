@@ -233,32 +233,16 @@ export function slotForFilename(filename: string): ImageKey | null {
 /**
  * True when a frame is NOT the owner's own work.
  *
- * This matters more than it looks. A portfolio is a claim: these are
- * photographs I took. A stock photograph of a stranger's house sitting under a
- * caption describing how the light was handled is that claim made falsely, to
- * someone deciding whether to hire a photographer. So every frame that is not
- * the owner's own gets labelled, and the label disappears by itself the moment
- * a real photograph replaces it.
- *
- * Own work means: a file in `public/work/` (a rooted path), or a photograph
+ * Own work means a file in `public/work/` (a rooted path) or a photograph
  * dropped onto the photo manager. Everything else — a drawn plate, a stock id,
  * any remote URL — is a stand-in.
+ *
+ * Used by the photo manager's badge, so the owner can see at a glance which
+ * frames are still someone else's before the site goes anywhere public.
  */
 export function isPlaceholderSource(src: string, dropped: boolean): boolean {
   if (dropped) return false;
   const s = src.trim();
   if (s === '') return true;
   return !s.startsWith('/');
-}
-
-/** The hook form, for components. */
-export function useIsPlaceholder(key: ImageKey, src: string): boolean {
-  const dropped = usePhoto(key);
-  return isPlaceholderSource(src, Boolean(dropped));
-}
-
-/** How many of the given frames are still stand-ins. */
-export function usePlaceholderCount(keys: readonly ImageKey[]): number {
-  const photos = usePhotos();
-  return keys.filter((k) => !photos[k]).length;
 }
