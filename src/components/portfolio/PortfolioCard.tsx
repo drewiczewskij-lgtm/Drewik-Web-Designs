@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
 import { Figure } from '@/components/Figure';
 import { categoryLabel, isPlayable, type PortfolioItem } from '@/data/portfolio';
+import { IMAGES } from '@/data/images';
+import { useIsPlaceholder } from '@/lib/photoStore';
 import { useTilt } from '@/lib/useTilt';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 import { cn } from '@/lib/cn';
@@ -31,6 +33,8 @@ export function PortfolioCard({
   const { ref, onPointerMove, onPointerLeave } = useTilt<HTMLButtonElement>(4);
   const playable = isPlayable(item);
   const isVideo = item.kind === 'video';
+  // A portfolio claims authorship. Anything not the owner's own says so.
+  const placeholder = useIsPlaceholder(item.image, IMAGES[item.image].src);
 
   return (
     <motion.li
@@ -70,8 +74,18 @@ export function PortfolioCard({
 
         <div className="relative flex h-full flex-col justify-between p-5">
           <div className="flex items-start justify-between gap-3">
-            <span className="t-label rounded-full border border-white/12 bg-void/55 px-2.5 py-1 text-[9.5px] backdrop-blur-md">
-              {categoryLabel(item.category)}
+            <span className="flex flex-wrap items-center gap-1.5">
+              <span className="t-label rounded-full border border-white/12 bg-void/55 px-2.5 py-1 text-[9.5px] backdrop-blur-md">
+                {categoryLabel(item.category)}
+              </span>
+              {placeholder && (
+                <span
+                  className="t-label rounded-full border border-amber/45 bg-amber/15 px-2.5 py-1 text-[9.5px] text-amber backdrop-blur-md"
+                  title="A stand-in image, not work by this studio"
+                >
+                  Sample
+                </span>
+              )}
             </span>
 
             {isVideo && (

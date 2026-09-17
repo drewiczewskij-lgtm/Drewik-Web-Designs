@@ -6,7 +6,9 @@ import { CtaBand } from '@/components/sections/CtaBand';
 import { Notice } from '@/components/ui/Bits';
 import { Seo, breadcrumbSchema } from '@/lib/seo';
 import { CATEGORIES, PORTFOLIO, type PortfolioCategory } from '@/data/portfolio';
-import { IMAGES, isDrawn } from '@/data/images';
+import { IMAGES } from '@/data/images';
+import { usePhotos } from '@/lib/photoStore';
+import { isPlaceholderSource } from '@/lib/photoStore';
 import { CONTACT } from '@/data/site';
 
 /**
@@ -23,9 +25,15 @@ export default function Portfolio() {
     ? (requested as PortfolioCategory)
     : 'all';
 
-  // True while no real photograph has been added yet. Drives one honest line
-  // at the top of the grid, and disappears the moment any image gets a source.
-  const allDrawn = Object.values(IMAGES).every((img) => isDrawn(img.src));
+  /* How many pieces on this page are still stand-ins.
+     This used to ask "are they ALL drawings?", which quietly answered no the
+     moment stock photographs were switched on — and the notice disappeared
+     while the grid was still full of other people's houses. It counts what is
+     actually not this studio's work now, and reaches zero on its own. */
+  const dropped = usePhotos();
+  const notMine = PORTFOLIO.filter(
+    (p) => isPlaceholderSource(IMAGES[p.image].src, Boolean(dropped[p.image])),
+  ).length;
 
   return (
     <>
@@ -59,13 +67,22 @@ export default function Portfolio() {
           <h2 id="all-work" className="sr-only">
             All work
           </h2>
-          {allDrawn && (
-            <Notice className="mb-10 max-w-[74ch]" title="About these images">
-              Every frame below is a composed illustration, not a photograph — drawn by
-              the site itself so the portfolio reads complete before real work has been
-              uploaded. Each one is a placeholder for a specific shot and is replaced by
-              adding a file path to <code className="font-mono text-[12px] text-cyan-soft">src/data/images.ts</code>.
-              The captions describe how each shot is made, and those stay true.
+          {notMine > 0 && (
+            <Notice
+              tone="warn"
+              className="mb-10 max-w-[76ch]"
+              title={
+                notMine === PORTFOLIO.length
+                  ? 'These are samples, not this studio’s work'
+                  : `${notMine} of these ${PORTFOLIO.length} are samples, not this studio’s work`
+              }
+            >
+              Every piece marked <span className="text-amber">Sample</span> is a
+              stand-in — a stock photograph or a drawn illustration — put here so the
+              page reads complete while the real portfolio is assembled. The captions
+              describe how each kind of shot is made, and those stay true, but the
+              images are not ours to take credit for. Each label disappears on its own
+              as soon as the real photograph replaces it.
             </Notice>
           )}
 

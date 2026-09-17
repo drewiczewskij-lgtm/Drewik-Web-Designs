@@ -1,9 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Figure } from '@/components/Figure';
 import { Button } from '@/components/ui/Button';
 import { Notice, Pill } from '@/components/ui/Bits';
-import { IMAGES, isDrawn, type ImageKey } from '@/data/images';
+import { IMAGES, IMAGE_KEYS, isDrawn, type ImageKey } from '@/data/images';
+import { PORTFOLIO } from '@/data/portfolio';
+import { SERVICES, COMMERCIAL_SECTORS } from '@/data/services';
 import {
   STORAGE_BUDGET_BYTES,
   bytesUsed,
@@ -28,49 +30,62 @@ import { cn } from '@/lib/cn';
    in its real layout in ten seconds is worth having even so.
    ========================================================================= */
 
-/** Grouped, because a flat list of thirty-six slots is a wall. */
-const GROUPS: { label: string; note: string; keys: ImageKey[] }[] = [
-  {
-    label: 'The five you sent',
-    note: 'These match the photographs you shared. Drop them here first.',
-    keys: ['reExteriorDay', 'rePool', 'entryStair', 'reDining', 'aerialProperty'],
-  },
-  {
-    label: 'Home page',
-    note: 'The hero and the three frames beneath it.',
-    keys: ['heroTwilight', 'homeAerial', 'homeInterior', 'homeFilm'],
-  },
-  {
-    label: 'Interiors',
-    note: 'Room by room.',
-    keys: ['reLiving', 'reKitchen', 'reBedroom', 'reBath', 'reStair', 'reDetail', 'reWalkthrough'],
-  },
-  {
-    label: 'Exteriors',
-    note: 'Elevations, twilight and outdoor living.',
-    keys: ['reExteriorTwilight', 'reExteriorModern', 'reExteriorNight', 'reTerrace'],
-  },
-  {
-    label: 'Aerial',
-    note: 'Everything shot from the air.',
-    keys: ['aerialNeighborhood', 'aerialLand', 'aerialWater', 'aerialHighway', 'droneInFlight'],
-  },
-  {
-    label: 'Film stills',
-    note: 'Frames pulled from the films.',
-    keys: ['filmFrameA', 'filmFrameB'],
-  },
-  {
-    label: 'Commercial',
-    note: 'Work for businesses rather than listings.',
-    keys: ['commRestaurant', 'commGym', 'commAuto', 'commHotel', 'commRetail', 'commEvent', 'lifestyleTerrace'],
-  },
-  {
-    label: 'The company',
-    note: 'The founder’s portrait and the kit.',
-    keys: ['founderPortrait', 'gearStill'],
-  },
-];
+/* Grouped by the page each frame appears on, worked out from the data rather
+   than typed out here — so a new portfolio piece or service shows up in this
+   panel without anyone remembering to add it. A frame used on several pages is
+   listed once, under the first page that claims it. */
+
+const unique = (keys: ImageKey[]) => [...new Set(keys)];
+
+function buildGroups(): { label: string; note: string; keys: ImageKey[] }[] {
+  const claimed = new Set<ImageKey>();
+  const take = (keys: ImageKey[]) => {
+    const out = unique(keys).filter((k) => !claimed.has(k));
+    for (const k of out) claimed.add(k);
+    return out;
+  };
+
+  const groups = [
+    {
+      label: 'Portfolio',
+      note: 'Every piece in the portfolio grid. These are the ones that claim to be your work, so replace them first.',
+      keys: take(PORTFOLIO.map((p) => p.image)),
+    },
+    {
+      label: 'Services',
+      note: 'One image per service, on the services page and the home page cards.',
+      keys: take(SERVICES.map((sv) => sv.image)),
+    },
+    {
+      label: 'Commercial',
+      note: 'The eight business types on the commercial page.',
+      keys: take(COMMERCIAL_SECTORS.map((c) => c.image)),
+    },
+    {
+      label: 'Home page',
+      note: 'The hero and the frames beneath it.',
+      keys: take(['heroTwilight', 'homeAerial', 'homeInterior', 'homeFilm'] as ImageKey[]),
+    },
+    {
+      label: 'About',
+      note: 'The founder’s portrait and the equipment still.',
+      keys: take(['founderPortrait', 'gearStill'] as ImageKey[]),
+    },
+  ];
+
+  // Anything not claimed above still needs somewhere to be replaced from.
+  const rest = IMAGE_KEYS.filter((k) => !claimed.has(k));
+  if (rest.length) {
+    groups.push({
+      label: 'Elsewhere',
+      note: 'Used in page headers and the call-to-action bands.',
+      keys: rest,
+    });
+  }
+  return groups.filter((g) => g.keys.length > 0);
+}
+
+const GROUPS = buildGroups();
 
 const ORDER: ImageKey[] = GROUPS.flatMap((g) => g.keys);
 
@@ -148,8 +163,6 @@ export function PhotoManager() {
     },
     [acceptMany],
   );
-
-  const groups = useMemo(() => GROUPS, []);
 
   return (
     <div
@@ -272,7 +285,7 @@ export function PhotoManager() {
 
       {/* Every slot, grouped. */}
       <div className="flex flex-col gap-10">
-        {groups.map((group) => (
+        {GROUPS.map((group) => (
           <section key={group.label} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <h3 className="t-label">{group.label}</h3>
