@@ -65,8 +65,12 @@ export const SOCIALS = [
     handle: 'KM Productions',
     url: 'https://www.youtube.com/channel/UCECyfOoEwMqy_N7HAbe7HEg',
   },
-  // Waiting for the real profile address. Paste it in and the icon appears.
-  { id: 'instagram', label: 'Instagram', handle: '', url: '' },
+  {
+    id: 'instagram',
+    label: 'Instagram',
+    handle: '@_kmproductions_40',
+    url: 'https://www.instagram.com/_kmproductions_40/',
+  },
   { id: 'facebook', label: 'Facebook', handle: '', url: '' },
 ] as const;
 
