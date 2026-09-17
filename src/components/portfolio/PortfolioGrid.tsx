@@ -5,9 +5,13 @@ import { Lightbox } from './Lightbox';
 import {
   CATEGORIES,
   PORTFOLIO,
+  isRealWork,
   type PortfolioCategory,
   type PortfolioItem,
 } from '@/data/portfolio';
+import { IMAGES } from '@/data/images';
+import { isPlaceholderSource } from '@/lib/photoStore';
+import { usePhotos } from '@/lib/photoStore';
 import { EASE_UI } from '@/lib/motion';
 import { cn } from '@/lib/cn';
 
@@ -37,10 +41,25 @@ export function PortfolioGrid({
   const [category, setCategory] = useState<PortfolioCategory | 'all'>(initialCategory);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  const dropped = usePhotos();
+
   const visible = useMemo(() => {
-    if (!showFilters) return items;
-    return category === 'all' ? items : items.filter((i) => i.category === category);
-  }, [items, category, showFilters]);
+    const filtered =
+      !showFilters || category === 'all' ? items : items.filter((i) => i.category === category);
+
+    /* Real work leads. While most of the grid is still stand-ins, a piece that
+       is genuinely the studio's own is otherwise indistinguishable from the
+       twenty-five around it — so it gets the first tile instead of being
+       buried in the middle. A stable sort keeps everything else in order. */
+    const ownImage = (key: keyof typeof IMAGES) =>
+      !isPlaceholderSource(IMAGES[key].src, Boolean(dropped[key]));
+
+    return [...filtered].sort((a, b) => {
+      const ra = isRealWork(a, ownImage) ? 0 : 1;
+      const rb = isRealWork(b, ownImage) ? 0 : 1;
+      return ra - rb;
+    });
+  }, [items, category, showFilters, dropped]);
 
   // Counts come from the same source the filter uses, so a tab can never
   // advertise a number it will not deliver.

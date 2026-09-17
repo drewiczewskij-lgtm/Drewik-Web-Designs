@@ -398,6 +398,19 @@ export function isPlayable(item: PortfolioItem): boolean {
   return item.kind === 'video' && !!item.video && item.video.id.trim().length > 0;
 }
 
+/**
+ * True when a piece is backed by the studio's own work rather than a stand-in:
+ * a film with a real source, or a photograph pointing at a file in
+ * `public/work/`. Stock ids and drawn plates are not.
+ *
+ * The grid puts these first. Real work should lead a portfolio, and while most
+ * of it is still placeholder, a piece that IS real is otherwise impossible to
+ * pick out of twenty-six identical-looking tiles.
+ */
+export function isRealWork(item: PortfolioItem, ownImage: (key: ImageKey) => boolean): boolean {
+  return isPlayable(item) || ownImage(item.image);
+}
+
 export function videoEmbedUrl(v: VideoSource): string {
   if (v.provider === 'youtube') {
     return `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1`;
