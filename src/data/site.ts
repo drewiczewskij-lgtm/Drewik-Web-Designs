@@ -50,13 +50,28 @@ export const CONTACT = {
   responseTime: 'within one business day',
 } as const;
 
-/** Social accounts. Delete a line and the icon disappears from the footer. */
+/**
+ * Social accounts.
+ *
+ * An account appears in the footer and on the contact page only once its `url`
+ * points at the real profile. A link to instagram.com with no account after it
+ * sends a client to a login page and looks like a dead business, so an entry
+ * without a profile is simply not rendered — see `LIVE_SOCIALS` below.
+ */
 export const SOCIALS = [
-  { id: 'instagram', label: 'Instagram', handle: '@kmproductions', url: 'https://instagram.com/' }, // PLACEHOLDER
-  { id: 'youtube', label: 'YouTube', handle: 'KM Productions', url: 'https://youtube.com/' }, // PLACEHOLDER
-  { id: 'facebook', label: 'Facebook', handle: 'KM Productions', url: 'https://facebook.com/' }, // PLACEHOLDER
-  { id: 'vimeo', label: 'Vimeo', handle: 'kmproductions', url: 'https://vimeo.com/' }, // PLACEHOLDER
+  {
+    id: 'youtube',
+    label: 'YouTube',
+    handle: 'KM Productions',
+    url: 'https://www.youtube.com/channel/UCECyfOoEwMqy_N7HAbe7HEg',
+  },
+  // Waiting for the real profile address. Paste it in and the icon appears.
+  { id: 'instagram', label: 'Instagram', handle: '', url: '' },
+  { id: 'facebook', label: 'Facebook', handle: '', url: '' },
 ] as const;
+
+/** The accounts that actually have somewhere to send a visitor. */
+export const LIVE_SOCIALS = SOCIALS.filter((s) => s.url.trim().length > 0);
 
 /* ---------------------------------------------------------------------------
    THE FOUNDER

@@ -178,7 +178,7 @@ function Viewer({
                       <iframe
                         src={
                           added
-                            ? videoEmbedUrl({ provider: added.kind as 'youtube' | 'vimeo', id: added.src })
+                            ? videoEmbedUrl({ provider: added.kind as 'youtube', id: added.src })
                             : videoEmbedUrl(item.video!)
                         }
                         title={`${item.title} — film`}
@@ -232,7 +232,7 @@ function Viewer({
                             <>
                               This is a frame from the film. The film itself has not been
                               added yet — open the studio desk and drop the video on it,
-                              or paste a YouTube or Vimeo link.
+                              or paste a YouTube link.
                             </>
                           )}
                         </p>

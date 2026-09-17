@@ -5,7 +5,7 @@ import { SectionHead, Notice } from '@/components/ui/Bits';
 import { Button, Arrow } from '@/components/ui/Button';
 import { EnquiryForm, type EnquiryField } from '@/components/forms/EnquiryForm';
 import { Seo, localBusinessSchema, breadcrumbSchema } from '@/lib/seo';
-import { BRAND, CONTACT, SOCIALS } from '@/data/site';
+import { BRAND, CONTACT, LIVE_SOCIALS } from '@/data/site';
 import { SERVICES } from '@/data/services';
 import { workingDaysSummary } from '@shared/schedule.mjs';
 
@@ -125,7 +125,7 @@ export default function Contact() {
             <Reveal delay={0.1} className="flex flex-col gap-3">
               <p className="t-label">Follow the work</p>
               <ul className="flex flex-wrap gap-2">
-                {SOCIALS.map((s) => (
+                {LIVE_SOCIALS.map((s) => (
                   <li key={s.id}>
                     <a
                       href={s.url}

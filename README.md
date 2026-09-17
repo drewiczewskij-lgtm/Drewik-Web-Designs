@@ -181,7 +181,7 @@ frame is yours:
 the drawing, and that description becomes wrong the moment a real photograph is
 behind it. See `public/work/README.md` for sizes worth exporting at.
 
-Films work the same way, with a file or a YouTube/Vimeo id:
+Films work the same way, with a file or a YouTube id:
 
 ```ts
     video: { provider: 'file', id: '/work/277-north-place.mp4' },

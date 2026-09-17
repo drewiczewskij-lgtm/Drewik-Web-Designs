@@ -24,7 +24,7 @@ import { cn } from '@/lib/cn';
    Two ways to put a film on a portfolio piece, offered side by side because
    they are for different things and the difference matters.
 
-   A LINK to YouTube or Vimeo is weightless, plays on every device, and is
+   A LINK to YouTube is weightless, plays on every device, and is
    still there after the site is deployed. It is what a working site should
    use — nobody should serve a 300MB file from their own hosting.
 
@@ -63,7 +63,7 @@ export function FilmManager() {
   return (
     <div className="flex flex-col gap-8">
       <Notice title="A link is better than a file">
-        A YouTube or Vimeo link weighs nothing, plays everywhere, and still works
+        A YouTube link weighs nothing, plays everywhere, and still works
         once this site is online — that is what a published site should use. A
         dropped file is held in this browser only, which is right for checking how
         a cut sits on the page and wrong for anything public.
@@ -206,7 +206,7 @@ function FilmSlot({
               htmlFor={`link-${item.id}`}
               className="t-label"
             >
-              YouTube or Vimeo link
+              YouTube link
             </label>
             <div className="flex gap-2">
               <input
@@ -232,7 +232,7 @@ function FilmSlot({
             </div>
             {bad && (
               <p role="alert" className="text-[12.5px] text-bad">
-                That is not a YouTube or Vimeo address. Paste the whole link from the
+                That is not a YouTube address. Paste the whole link from the
                 browser bar and it will be read correctly.
               </p>
             )}

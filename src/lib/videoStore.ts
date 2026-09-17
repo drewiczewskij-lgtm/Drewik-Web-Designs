@@ -17,7 +17,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 
    TWO WAYS TO GIVE THE SITE A FILM, and they are genuinely different:
 
-     A HOSTED LINK — YouTube or Vimeo. Weightless, works on every device, and
+     A HOSTED LINK — YouTube. Weightless, works on every device, and
      survives being deployed. This is what a real site should use: nobody
      should be serving a 300MB file from their own hosting.
 
@@ -40,7 +40,7 @@ export interface StoredFilm {
   at: number;
 }
 
-export type LinkProvider = 'youtube' | 'vimeo';
+export type LinkProvider = 'youtube';
 
 export interface FilmLink {
   provider: LinkProvider;
@@ -162,7 +162,7 @@ export async function putFilm(id: string, file: File): Promise<StoredFilm> {
   } catch (e) {
     throw new Error(
       e instanceof Error && /quota/i.test(e.message)
-        ? 'There is not enough room in this browser for that film. Use a YouTube or Vimeo link instead.'
+        ? 'There is not enough room in this browser for that film. Use a YouTube link instead.'
         : 'That film could not be stored in this browser.',
     );
   }
@@ -243,8 +243,6 @@ export function parseFilmLink(input: string): FilmLink | null {
     t.match(/^([\w-]{11})$/);
   if (yt) return { provider: 'youtube', videoId: yt[1] };
 
-  const vm = t.match(/vimeo\.com\/(?:video\/)?(\d{6,})/i) ?? t.match(/^(\d{6,})$/);
-  if (vm) return { provider: 'vimeo', videoId: vm[1] };
 
   return null;
 }
@@ -271,7 +269,7 @@ export function formatBytes(n: number): string {
 }
 
 /** What the viewer should play for a portfolio item, if anything was added. */
-export function useFilmSource(id: string): { kind: 'file' | 'youtube' | 'vimeo'; src: string } | null {
+export function useFilmSource(id: string): { kind: 'file' | 'youtube'; src: string } | null {
   const stored = useFilms();
   const linked = useFilmLinks();
   const [, force] = useState(0);

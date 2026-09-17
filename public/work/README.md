@@ -65,7 +65,7 @@ For a film, open `src/data/portfolio.ts` and give the item a source:
     video: { provider: 'file', id: '/work/277-north-place.mp4' },
 ```
 
-YouTube and Vimeo work too, if you would rather not host the file:
+YouTube works too, if you would rather not host the file:
 
 ```ts
     video: { provider: 'youtube', id: 'dQw4w9WgXcQ' },

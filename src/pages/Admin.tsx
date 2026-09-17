@@ -158,7 +158,7 @@ export default function Admin() {
                   Add your <span className="t-accent">videos.</span>
                 </>
               }
-              lead="Paste a YouTube or Vimeo link, or drop the file straight in. Each one plays from its piece in the portfolio."
+              lead="Paste a YouTube link, or drop the file straight in. Each one plays from its piece in the portfolio."
             />
             <FilmManager />
           </Reveal>

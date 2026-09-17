@@ -10,7 +10,7 @@ import { OWN_WORK_ONLY } from '@/data/site';
    2. Add an item here pointing at that key.
 
    Photographs need nothing else. For a film, add `video` — either a file you
-   host or a YouTube/Vimeo id — and the card opens a player instead of a viewer:
+   host or a YouTube id — and the card opens a player instead of a viewer:
 
        { kind: 'video', video: { provider: 'youtube', id: 'dQw4w9WgXcQ' } }
        { kind: 'video', video: { provider: 'file', id: '/work/ridge-house.mp4' } }
@@ -38,8 +38,8 @@ export const CATEGORIES: { id: PortfolioCategory | 'all'; label: string; blurb: 
 ];
 
 export interface VideoSource {
-  provider: 'youtube' | 'vimeo' | 'file';
-  /** A YouTube/Vimeo id, or a path/URL for a file. */
+  provider: 'youtube' | 'file';
+  /** A YouTube id, or a path/URL for a file served from this site. */
   id: string;
 }
 
@@ -430,7 +430,6 @@ export function videoEmbedUrl(v: VideoSource): string {
        YouTube ignores it now. */
     return `https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&playsinline=1`;
   }
-  if (v.provider === 'vimeo') return `https://player.vimeo.com/video/${v.id}?autoplay=1&title=0&byline=0`;
   return v.id;
 }
 
@@ -474,7 +473,6 @@ export function filmPosterFallback(item: PortfolioItem): string | undefined {
 export function watchUrl(item: PortfolioItem): string | undefined {
   if (!item.video) return undefined;
   if (item.video.provider === 'youtube') return `https://www.youtube.com/watch?v=${item.video.id}`;
-  if (item.video.provider === 'vimeo') return `https://vimeo.com/${item.video.id}`;
   return undefined;
 }
 

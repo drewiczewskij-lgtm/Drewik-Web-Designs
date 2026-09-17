@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BRAND, CONTACT, FOOTER_LINKS, LEGAL_LINKS, NAV, SOCIALS } from '@/data/site';
+import { BRAND, CONTACT, FOOTER_LINKS, LEGAL_LINKS, NAV, LIVE_SOCIALS } from '@/data/site';
 import { Button, Arrow } from '@/components/ui/Button';
 import { Reveal } from '@/components/fx/Reveal';
 import { workingDaysSummary } from '@shared/schedule.mjs';
@@ -107,7 +107,7 @@ export function Footer() {
 
             <p className="t-label mt-4">Follow</p>
             <ul className="flex flex-wrap gap-2">
-              {SOCIALS.map((s) => (
+              {LIVE_SOCIALS.map((s) => (
                 <li key={s.id}>
                   <a
                     href={s.url}
