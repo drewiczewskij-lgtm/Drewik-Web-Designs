@@ -132,6 +132,14 @@ function Viewer({
   const added = useFilmSource(item.id);
   const playable = Boolean(added) || isPlayable(item);
 
+  /* Where a hosted film lives. Null for a film served from this site, which
+     still plays in place because nothing third-party has to be framed. */
+  const hostedWatchUrl = added
+    ? added.kind === 'file'
+      ? null
+      : `https://www.youtube.com/watch?v=${added.src}`
+    : (watchUrl(item) ?? null);
+
   return (
     <Modal open={open} onClose={onClose} label={item.location ? `${item.title} — ${item.location}` : item.title} className="px-0">
       <div className="flex h-[100svh] w-full flex-col">
@@ -174,22 +182,7 @@ function Viewer({
                         onError={() => setMediaFailed(true)}
                         className="h-full w-full"
                       />
-                    ) : (
-                      <iframe
-                        src={
-                          added
-                            ? videoEmbedUrl({ provider: added.kind as 'youtube', id: added.src })
-                            : videoEmbedUrl(item.video!)
-                        }
-                        title={`${item.title} — film`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        // The player is third-party: give it nothing it does
-                        // not need, and no reach back into this page.
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        className="h-full w-full border-0"
-                      />
-                    )}
+                    ) : null}
                   </div>
                 </div>
               ) : (
@@ -206,7 +199,30 @@ function Viewer({
 
                   {item.kind === 'video' && (
                     <div className="absolute inset-0 grid place-items-center">
-                      {playable && !mediaFailed ? (
+                      {playable && !mediaFailed && hostedWatchUrl ? (
+                        /* A hosted film opens where it lives. An embedded
+                           player is at the mercy of whatever frames this page —
+                           a preview sandbox, a company network, a content
+                           policy — and when one refuses the iframe the viewer
+                           is left staring at a grey rectangle with no way
+                           forward. A link cannot be blocked that way. */
+                        <a
+                          href={hostedWatchUrl}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="group flex items-center gap-3 rounded-full border border-white/25 bg-void/70 py-4 pr-7 pl-5 backdrop-blur-lg transition-[transform,border-color] duration-300 ease-[cubic-bezier(.23,1,.32,1)] hover:scale-[1.03] hover:border-neon active:scale-95"
+                          style={{ boxShadow: '0 0 48px -12px rgb(45 125 255 / 0.9)' }}
+                        >
+                          <span className="grid h-10 w-10 place-items-center rounded-full bg-neon/20">
+                            <svg width="14" height="17" viewBox="0 0 18 22" fill="none" aria-hidden="true">
+                              <path d="M0 0L18 11L0 22V0Z" fill="currentColor" className="text-bright" />
+                            </svg>
+                          </span>
+                          <span className="font-mono text-[11px] tracking-[0.16em] text-bright uppercase">
+                            Watch on YouTube
+                          </span>
+                        </a>
+                      ) : playable && !mediaFailed ? (
                         <button
                           type="button"
                           onClick={() => setPlaying(true)}
