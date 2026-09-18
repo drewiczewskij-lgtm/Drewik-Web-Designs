@@ -8,8 +8,15 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { getPackage, quote, SIZE_TIERS, type QuoteResult } from '@shared/catalog.mjs';
-import { bookingWindow, isoDate } from '@shared/schedule.mjs';
+import {
+  getPackage,
+  getAddon,
+  getSizeTier,
+  quote,
+  SIZE_TIERS,
+  type QuoteResult,
+} from '@shared/catalog.mjs';
+import { bookingWindow, isoDate, formatDate, formatTime } from '@shared/schedule.mjs';
 import {
   createBooking,
   fetchAvailability,
@@ -18,6 +25,7 @@ import {
   type CustomerDetails,
 } from '@/lib/api';
 import { isLive } from '@/config/integrations';
+import { openMail, line } from '@/lib/mailto';
 
 /* ============================================================================
    THE BOOKING
@@ -418,8 +426,12 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Demonstration: there is nowhere to send them, so show the confirmation —
-    // which states plainly that no payment was taken.
+    /* No server: hand the request to the customer's own mail client, addressed
+       to the studio, with everything they chose already typed out. They press
+       send and it is an ordinary email — so the reply lands in their inbox and
+       the two of them carry on there. */
+    if (!isLive()) openMail(...requestEmail(completed));
+
     setSubmitting(false);
     setStep('confirmed');
   }, [draft, pricing]);
@@ -561,3 +573,44 @@ function toView(b: CompletedBooking): ConfirmedView {
 
 /** Today, for the calendar's initial month. */
 export const today = () => isoDate(new Date());
+
+/* ---------------------------------------------------------------------------
+   THE REQUEST, AS AN EMAIL
+   Written for the person who has to read it on a phone between shoots: the
+   property and the date first, because that is what decides whether it can be
+   taken at all, and the reference last for filing.
+   ------------------------------------------------------------------------ */
+
+function requestEmail(b: CompletedBooking): [string, string] {
+  const pkg = getPackage(b.packageId);
+  const addons = b.addonIds
+    .map((id) => getAddon(id)?.name)
+    .filter(Boolean)
+    .join(', ');
+  const tier = getSizeTier(b.sizeTierId);
+  const hours = Math.floor(b.minutes / 60);
+  const mins = b.minutes % 60;
+
+  const subject = `Shoot request — ${b.customer.address || 'a property'} — ${formatDate(b.date)}`;
+
+  const body =
+    `Hello,\n\nI would like to book a shoot and get a price for this property.\n\n` +
+    `— THE PROPERTY —\n` +
+    line('Address', b.customer.address) +
+    line('Size', tier?.label) +
+    `\n— WHEN —\n` +
+    line('Date', formatDate(b.date)) +
+    line('Time', formatTime(b.time)) +
+    line('Expected on site', `about ${hours}h${mins ? ` ${mins}m` : ''}`) +
+    `\n— COVERAGE —\n` +
+    line('Package', pkg?.name) +
+    line('Add-ons', addons || 'none') +
+    `\n— ME —\n` +
+    line('Name', b.customer.name) +
+    line('Phone', b.customer.phone) +
+    line('Email', b.customer.email) +
+    (b.customer.notes ? `\nNotes:\n${b.customer.notes}\n` : '') +
+    `\nReference: ${b.reference}\n`;
+
+  return [subject, body];
+}

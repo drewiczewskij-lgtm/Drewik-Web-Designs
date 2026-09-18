@@ -3,8 +3,9 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Field, TextArea, Select } from '@/components/ui/Field';
 import { Button, Arrow } from '@/components/ui/Button';
 import { Notice } from '@/components/ui/Bits';
-import { CONTACT } from '@/data/site';
+import { BRAND, CONTACT } from '@/data/site';
 import { FORM_ENDPOINT, formsAreLive } from '@/config/integrations';
+import { openMail } from '@/lib/mailto';
 import { sendEnquiry } from '@/lib/api';
 import { email as emailRule, formatPhone, phone as phoneRule, minLength, required, validate } from '@/lib/validate';
 import { EASE_OUT_EXPO } from '@/lib/motion';
@@ -97,8 +98,15 @@ export function EnquiryForm({
     setTransportError(null);
 
     if (!formsAreLive()) {
-      // Nothing to send it to. Pause just long enough to read as deliberate.
-      window.setTimeout(() => setState('sent'), 550);
+      /* No form service: hand it to the visitor's own mail client, already
+         written and addressed. They press send and it is an ordinary email,
+         so the reply reaches them in the usual place. */
+      const body = Object.entries(values)
+        .filter(([, v]) => String(v ?? '').trim())
+        .map(([k, v]) => `${k[0].toUpperCase()}${k.slice(1)}: ${v}`)
+        .join('\n');
+      openMail(subject, `${body}\n`);
+      window.setTimeout(() => setState('sent'), 400);
       return;
     }
 
@@ -142,12 +150,12 @@ export function EnquiryForm({
           <p className="max-w-[52ch] text-[14px] leading-relaxed text-muted">
             {formsAreLive()
               ? (successBody ?? `Thank you. You will hear back ${CONTACT.responseTime}.`)
-              : 'Your message is complete and valid — but this site has no form service connected yet, so nothing was transmitted. Nobody has received it.'}
+              : `Your email app should have opened with this message ready to send to ${BRAND.name}. Press send there and it is on its way — you will hear back ${CONTACT.responseTime}.`}
           </p>
         </div>
 
         {!formsAreLive() && (
-          <Notice tone="warn" title="Please use these instead">
+          <Notice title="If your email app did not open">
             <p className="flex flex-col gap-1">
               <a href={`tel:${CONTACT.phoneHref}`} className="link-rule w-fit font-mono">
                 {CONTACT.phone}

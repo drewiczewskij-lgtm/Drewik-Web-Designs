@@ -271,15 +271,15 @@ export function StepSend() {
         </ul>
 
         {!live && (
-          <Notice tone="warn" title="Demonstration mode — this request will not be sent">
-            This site is not yet connected to a server, so pressing the button below
-            will <span className="text-bright">not</span> send anything and will{' '}
-            <span className="text-bright">not</span> reserve a real appointment. It
-            walks through the confirmation so the flow can be seen end to end. Call{' '}
+          <Notice title="This opens your email app">
+            Pressing send writes this request into a new email, already addressed to{' '}
+            {BRAND.name} with everything you have chosen. Press send there too and it
+            is on its way — the reply comes back to your own inbox. If nothing opens,
+            call{' '}
             <a href={`tel:${CONTACT.phoneHref}`} className="link-rule font-mono">
               {CONTACT.phone}
-            </a>{' '}
-            to book for real in the meantime.
+            </a>
+            .
           </Notice>
         )}
 
@@ -417,18 +417,20 @@ export function StepConfirmed() {
           <h3 className="t-h2">
             {settled
               ? b.firstName
-                ? `You’re booked, ${b.firstName}.`
-                : 'You’re booked.'
+                ? `Request sent, ${b.firstName}.`
+                : 'Request sent.'
               : pending
-                ? 'Payment is being confirmed.'
-                : 'Booking recorded.'}
+                ? 'Request is being confirmed.'
+                : b.firstName
+                  ? `Nearly there, ${b.firstName}.`
+                  : 'Nearly there.'}
           </h3>
           <p className="t-lead max-w-[46ch] text-muted">
             {settled
-              ? `A confirmation is on its way${b.email ? ` to ${b.email}` : ''}, with a prep note for the property.`
+              ? `A reply is on its way${b.email ? ` to ${b.email}` : ''}, with a price for the property and a prep note.`
               : pending
-                ? 'Your slot is held. This page updates as soon as the payment clears — it usually takes a few seconds. You will get a receipt either way.'
-                : 'This run was a demonstration — no payment was taken and no appointment was reserved.'}
+                ? 'Your slot is held while the request is checked. This page updates in a few seconds.'
+                : 'Your email app should have opened with this request written out. Press send there and it is on its way — the reply, with a price for the property, comes back to your inbox.'}
           </p>
         </div>
 
