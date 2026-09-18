@@ -17,6 +17,17 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@shared': fileURLToPath(new URL('./shared', import.meta.url)),
+    },
+  },
+  // `npm run dev:full` starts the booking server on 8787; this makes it reachable
+  // at /api during development, exactly as it will be in production.
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env.KM_API_TARGET ?? 'http://localhost:8787',
+        changeOrigin: true,
+      },
     },
   },
   build: {

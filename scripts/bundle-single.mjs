@@ -61,7 +61,43 @@ try {
   /* No favicon is not a failure. */
 }
 
-const out = join(root, 'arcadia-estates.html');
+/**
+ * Photographs in `public/work/r/` are fetched at runtime, so a file with no
+ * folder beside it would show a broken frame. Carry them inside the document
+ * instead, as data URIs on a global the image layer checks.
+ *
+ * Only the narrower sizes come along: base64 costs a third more than the file,
+ * so carrying every width would put this one document into the tens of
+ * megabytes. 960px is the most a browser panel will ask for; the hosted build
+ * in `dist/` still serves the full set up to 2400.
+ */
+const INLINE_MAX_WIDTH = 960;
+const inline = {};
+try {
+  const dir = join(root, 'public', 'work', 'r');
+  for (const file of await readdir(dir)) {
+    const width = Number(/-(\d+)\.[a-z]+$/.exec(file)?.[1]);
+    if (!Number.isFinite(width) || width > INLINE_MAX_WIDTH) continue;
+    const type = file.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    const bytes = await readFile(join(dir, file));
+    inline[`/work/r/${file}`] = `data:${type};base64,${bytes.toString('base64')}`;
+  }
+} catch {
+  /* No photographs yet is not a failure — the drawn plates still render. */
+}
+
+if (Object.keys(inline).length > 0) {
+  // `<` cannot appear in base64, but the keys are ours, so escape defensively.
+  const payload = JSON.stringify(inline).replace(/</g, '\\u003c');
+  html = html.replace(
+    /<script type="module">/,
+    () => `<script>window.__KM_INLINE__=${payload}<\/script><script type="module">`,
+  );
+  const mb = (payload.length / 1024 / 1024).toFixed(2);
+  console.log(`Inlined ${Object.keys(inline).length} photograph file(s) — ${mb} MB.`);
+}
+
+const out = join(root, 'km-productions.html');
 await writeFile(out, html);
 
 const leftover = html.match(/(src|href)="\.\/assets\//g);
@@ -70,4 +106,4 @@ if (leftover) {
   process.exit(1);
 }
 
-console.log(`arcadia-estates.html — ${(html.length / 1024 / 1024).toFixed(2)} MB, one file, no dependencies.`);
+console.log(`km-productions.html — ${(html.length / 1024 / 1024).toFixed(2)} MB, one file, no dependencies.`);

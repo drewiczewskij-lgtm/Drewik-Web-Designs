@@ -1,50 +1,124 @@
 @import 'tailwindcss';
 
 /* ============================================================================
-   ARCADIA ESTATES — DESIGN SYSTEM
-   A warm, architectural palette. Paper and ink, stone and bronze.
-   The accent is deliberately rationed: it appears on rules, indices and
-   one-word emphases, never on a surface.
+   KM PRODUCTIONS — DESIGN SYSTEM
+   ----------------------------------------------------------------------------
+   Deep black, electric blue, a rationed amount of violet. The accent is light,
+   not paint: it belongs on edges, rules, glows and one-word emphases, and it
+   never fills a surface. That restraint is what keeps a neon interface reading
+   as a production company rather than as a nightclub flyer.
+
+   Three layers, and everything on the site belongs to exactly one:
+     VOID    the page itself, near-black, with slow moving light behind it
+     GLASS   panels that float above the void — blurred, hairline-bordered
+     LIGHT   type, rules and glows, which is where the colour lives
    ========================================================================= */
 
 @theme {
-  --color-paper: #f4f1ea;
-  --color-paper-2: #ece7dd;
-  --color-bone: #e2dbcf;
-  --color-stone: #a39c90;
-  --color-stone-deep: #6e6960;
-  --color-ink: #1c1b17;
-  --color-charcoal: #14130f;
-  --color-charcoal-2: #1e1c17;
-  --color-bronze: #9b7c4e;
-  --color-bronze-soft: #bc9b69;
+  /* — Surfaces — */
+  --color-void: #04060b;
+  --color-void-2: #070a11;
+  --color-ink: #0b1018;
+  --color-ink-2: #111825;
+  --color-line: #1c2636;
+  --color-line-2: #2a374a;
 
-  --font-display: 'Cormorant Garamond', 'Cormorant', 'Times New Roman', Times,
-    'Hoefler Text', Georgia, serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
-    'Helvetica Neue', Arial, sans-serif;
+  /* — Type — */
+  --color-bright: #eef4fd;
+  --color-body: #b6c2d6;
+  --color-muted: #7c8AA3;
+  --color-faint: #4e5a70;
 
+  /* — Accent. Blue leads, cyan highlights, violet is the rare third. — */
+  --color-neon: #2d7dff;
+  --color-neon-soft: #5c9bff;
+  --color-cyan: #22d3ee;
+  --color-cyan-soft: #67e8f9;
+  --color-violet: #8b5cf6;
+  --color-amber: #ffb861;
+
+  /* — Status — */
+  --color-good: #34d399;
+  --color-bad: #fb7185;
+
+  --font-display: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* — Easing. One family, used everywhere. — */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
-
-  /* Interface curves. The page moves cinematically; controls move crisply. */
   --ease-ui: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-ui-inout: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ============================================================================
+   THE PAGE GROUND — DELIBERATELY OUTSIDE @layer
+   ----------------------------------------------------------------------------
+   Everything else in this file sits inside `@layer base`, which is correct:
+   layered rules are easy to override from a component.
+
+   These are not, and must not be. An UNLAYERED rule beats a LAYERED one no
+   matter what order they appear in or how specific either is — that is the
+   whole point of the cascade layers spec. So when this site is embedded in a
+   host that paints its own ground with plain unlayered CSS (a preview frame, a
+   CMS shell, an email client's reader), a `body { background }` inside
+   `@layer base` silently loses, and the host's light ground shows through
+   underneath this site's near-white type. White text on a white page.
+
+   That is not hypothetical: it is exactly what happened the first time this
+   was embedded. These few declarations are the site's floor, so they are
+   written where nothing can quietly outrank them.
+
+   Keep the font here too. A host that sets `font: 14px system-ui` on body in
+   the same unlayered way would otherwise beat the typeface as well.
+   ========================================================================= */
+
+/* `:root`, not `html`, and deliberately. A host that declares
+   `:root { color-scheme: light }` outranks a plain `html` selector — `:root` is
+   a pseudo-class (0,1,0) and `html` a type selector (0,0,1) — so matching it
+   selector-for-selector is what actually wins, given this rule comes later.
+   It decides how native controls, scrollbars and the caret are drawn. */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: var(--color-void);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-void);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: -0.006em;
 }
 
 @layer base {
   :root {
-    --gutter: clamp(1.25rem, 5vw, 5.5rem);
+    --gutter: clamp(1.15rem, 4.5vw, 5rem);
+    --maxw: 88rem;
+    --nav-h: 72px;
+
+    /* Glow recipes, so a glow is never invented twice. */
+    --glow-neon: 0 0 0 1px rgb(45 125 255 / 0.4), 0 0 24px -4px rgb(45 125 255 / 0.55);
+    --glow-neon-lg: 0 0 0 1px rgb(45 125 255 / 0.55), 0 0 44px -6px rgb(45 125 255 / 0.7),
+      0 0 90px -20px rgb(34 211 238 / 0.45);
+    --glow-cyan: 0 0 22px -6px rgb(34 211 238 / 0.65);
   }
 
   * {
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Background and text-size-adjust are set above, outside any layer. */
   html {
-    background-color: var(--color-charcoal);
-    -webkit-text-size-adjust: 100%;
+    scrollbar-color: var(--color-line) transparent;
   }
 
   /* Lenis drives scroll; native smooth would fight it. */
@@ -59,15 +133,9 @@
     overflow: hidden;
   }
 
+  /* Background, colour and font for `body` are set above, outside any layer.
+     Only the properties no host is likely to fight over are left here. */
   body {
-    margin: 0;
-    background-color: var(--color-paper);
-    color: var(--color-ink);
-    font-family: var(--font-sans);
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 1.6;
-    letter-spacing: -0.005em;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -75,27 +143,18 @@
     overflow-x: clip;
   }
 
-  h1,
-  h2,
-  h3,
-  h4 {
-    font-weight: 400;
+  h1, h2, h3, h4, h5 {
     margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--color-bright);
+    letter-spacing: -0.03em;
+    line-height: 1.04;
   }
 
-  p {
-    margin: 0;
-  }
-
-  img {
-    display: block;
-    max-width: 100%;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
+  p { margin: 0; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
 
   button {
     font: inherit;
@@ -106,351 +165,521 @@
     cursor: pointer;
   }
 
+  input, textarea, select { font: inherit; color: inherit; }
+
   ::selection {
-    background: var(--color-ink);
-    color: var(--color-paper);
+    background: var(--color-neon);
+    color: #fff;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-bronze);
-    outline-offset: 4px;
+    outline: 2px solid var(--color-cyan);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
-  /* Only a link that draws its own underline may drop the ring. Everything
-     else — buttons, the walkthrough stage, map markers, plan rooms — keeps it. */
-  .link-rule.focus-bare:focus-visible {
-    outline: none;
-  }
-
-  /* Form fields carry their rule as the indicator, thickened on focus. */
-  .field-line:focus-visible {
-    outline: none;
-    border-bottom-width: 2px;
-    border-bottom-color: var(--color-bronze-soft);
-  }
-
-  input,
-  textarea,
-  select {
-    font: inherit;
-    color: inherit;
-  }
-
-  /* Firefox scrollbar, kept thin and neutral */
-  @supports (scrollbar-width: thin) {
-    html {
-      scrollbar-width: thin;
-      scrollbar-color: var(--color-stone) transparent;
-    }
-  }
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  /* Scrollbar, on the browsers that let us. */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--color-void); }
   ::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--color-stone) 60%, transparent);
+    background: var(--color-line);
+    border-radius: 99px;
+    border: 3px solid var(--color-void);
   }
+  ::-webkit-scrollbar-thumb:hover { background: #33415a; }
 }
 
 /* ============================================================================
-   TYPOGRAPHY PRIMITIVES
+   TYPE
    ========================================================================= */
 
 @layer components {
-  .font-display {
-    font-family: var(--font-display);
-    font-weight: 300;
-    font-variant-ligatures: common-ligatures;
-  }
-
-  /* Editorial display sizes. Restrained: the largest is a hero-only size. */
+  /* The big statements. Clamped so it never needs a breakpoint. */
   .t-display {
     font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(3.2rem, 9.2vw, 9.5rem);
-    line-height: 0.92;
-    letter-spacing: -0.028em;
+    font-weight: 600;
+    font-size: clamp(2.6rem, 8.2vw, 7.2rem);
+    line-height: 0.94;
+    letter-spacing: -0.045em;
+    color: var(--color-bright);
   }
 
   .t-h1 {
     font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(2.6rem, 6.4vw, 6rem);
-    line-height: 0.98;
-    letter-spacing: -0.024em;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 5.6vw, 4.4rem);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
   }
 
   .t-h2 {
     font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(2rem, 4.4vw, 3.9rem);
-    line-height: 1.04;
-    letter-spacing: -0.02em;
+    font-weight: 600;
+    font-size: clamp(1.65rem, 3.6vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
   }
 
   .t-h3 {
     font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(1.5rem, 2.6vw, 2.35rem);
-    line-height: 1.12;
-    letter-spacing: -0.015em;
-  }
-
-  .t-quote {
-    font-family: var(--font-display);
-    font-weight: 300;
-    font-style: italic;
-    font-size: clamp(1.45rem, 2.9vw, 2.6rem);
-    line-height: 1.26;
-    letter-spacing: -0.014em;
-  }
-
-  /* The small uppercase label. Used everywhere; the spine of the layout. */
-  .t-label {
-    font-family: var(--font-sans);
-    font-size: 10px;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: clamp(1.15rem, 1.9vw, 1.6rem);
     line-height: 1.2;
-    letter-spacing: 0.26em;
+    letter-spacing: -0.025em;
+  }
+
+  /* The small tracked mono label. Used for kickers, indices and timecodes —
+     it is the detail that makes the whole thing read as production kit. */
+  .t-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-  }
-
-  @media (min-width: 768px) {
-    .t-label {
-      font-size: 11px;
-    }
-  }
-
-  .t-body {
-    font-size: clamp(0.9375rem, 1.05vw, 1.0625rem);
-    line-height: 1.75;
-    letter-spacing: -0.003em;
+    color: var(--color-muted);
+    line-height: 1.4;
   }
 
   .t-lead {
-    font-size: clamp(1.0625rem, 1.5vw, 1.375rem);
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
     line-height: 1.6;
+    color: var(--color-body);
     letter-spacing: -0.012em;
-    font-weight: 300;
   }
 
-  /* Tabular figures for prices, stats and indices. */
   .t-num {
-    font-variant-numeric: tabular-nums lining-nums;
-    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
   }
 
-}
+  /* One-word emphasis inside a heading. The only place accent touches type. */
+  .t-accent {
+    background: linear-gradient(96deg, var(--color-neon-soft), var(--color-cyan) 60%, var(--color-violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-/* ============================================================================
-   LAYOUT
-   ========================================================================= */
+  /* ==========================================================================
+     LAYOUT
+     ======================================================================= */
 
-@layer components {
   .shell {
+    width: 100%;
+    max-width: var(--maxw);
+    margin-inline: auto;
     padding-inline: var(--gutter);
   }
 
-  /* A 12-column editorial grid used for the asymmetric compositions. */
-  .grid-editorial {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: clamp(1rem, 2.2vw, 2rem);
-  }
-}
-
-/* ============================================================================
-   MOTION PRIMITIVES
-   ========================================================================= */
-
-@layer components {
-  /* Text mask reveal — lines clipped by an overflow box, translated up. */
-  .mask-line {
-    display: block;
-    overflow: hidden;
-    padding-bottom: 0.08em;
-    margin-bottom: -0.08em;
+  .shell-wide {
+    width: 100%;
+    padding-inline: var(--gutter);
   }
 
-  .mask-line > span {
-    display: block;
+  .section {
+    padding-block: clamp(4.5rem, 10vw, 9rem);
+    position: relative;
+  }
+
+  .rule {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-line) 12%,
+      var(--color-line) 88%,
+      transparent
+    );
+  }
+
+  /* ==========================================================================
+     GLASS
+     The panel language. Blur, a hairline that catches light at the top, and a
+     background that is barely there.
+     ======================================================================= */
+
+  .glass {
+    position: relative;
+    background: linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.055) 0%,
+      rgb(255 255 255 / 0.022) 42%,
+      rgb(255 255 255 / 0.012) 100%
+    );
+    border: 1px solid rgb(255 255 255 / 0.08);
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+  }
+
+  /* The specular hairline along the top edge. Small, and it does most of the
+     work of making a flat panel look like a physical object. */
+  .glass::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 0.28) 22%,
+      rgb(255 255 255 / 0.4) 50%,
+      rgb(255 255 255 / 0.28) 78%,
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .glass-deep {
+    background: linear-gradient(180deg, rgb(11 16 24 / 0.86), rgb(4 6 11 / 0.92));
+    border: 1px solid rgb(255 255 255 / 0.09);
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+  }
+
+  /* ==========================================================================
+     CONTROLS
+     Every pressable thing scales on :active. It is the cheapest way to make an
+     interface feel like it is listening.
+     ======================================================================= */
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    padding: 0.95rem 1.7rem;
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition:
+      transform 160ms var(--ease-ui),
+      box-shadow 240ms var(--ease-ui),
+      border-color 240ms var(--ease-ui),
+      background-color 240ms var(--ease-ui),
+      color 240ms var(--ease-ui);
     will-change: transform;
   }
 
-  /* Link with an underline that expands from the left. */
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    color: #fff;
+    background: linear-gradient(140deg, var(--color-neon), #1a5fd6);
+    border: 1px solid rgb(120 175 255 / 0.5);
+    box-shadow:
+      0 0 0 1px rgb(45 125 255 / 0.18),
+      0 10px 30px -12px rgb(45 125 255 / 0.85),
+      inset 0 1px 0 rgb(255 255 255 / 0.22);
+  }
+
+  .btn-ghost {
+    color: var(--color-bright);
+    background: rgb(255 255 255 / 0.035);
+    border: 1px solid rgb(255 255 255 / 0.13);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .btn-quiet {
+    color: var(--color-body);
+    border: 1px solid transparent;
+    padding-inline: 0.75rem;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      box-shadow:
+        0 0 0 1px rgb(120 175 255 / 0.6),
+        0 14px 40px -12px rgb(45 125 255 / 1),
+        0 0 70px -18px rgb(34 211 238 / 0.7),
+        inset 0 1px 0 rgb(255 255 255 / 0.3);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active:hover { transform: scale(0.97); }
+
+    .btn-ghost:hover {
+      border-color: rgb(45 125 255 / 0.55);
+      background: rgb(45 125 255 / 0.1);
+      box-shadow: var(--glow-neon);
+      transform: translateY(-1px);
+    }
+    .btn-ghost:active:hover { transform: scale(0.97); }
+
+    .btn-quiet:hover { color: var(--color-bright); border-color: rgb(255 255 255 / 0.14); }
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    opacity: 0.42;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none !important;
+  }
+
+  /* A link that draws its own rule, so it does not need the focus ring box. */
   .link-rule {
     position: relative;
     display: inline-block;
+    color: var(--color-bright);
+    padding-bottom: 2px;
   }
   .link-rule::after {
     content: '';
     position: absolute;
     left: 0;
-    right: 0;
-    bottom: -0.32em;
+    bottom: 0;
+    width: 100%;
     height: 1px;
     background: currentColor;
-    transform: scaleX(0);
-    transform-origin: right center;
-    transition: transform 0.55s var(--ease-out-expo);
-    opacity: 0.75;
+    opacity: 0.32;
+    transform-origin: left;
+    transition: transform 420ms var(--ease-out-expo), opacity 420ms var(--ease-out-expo);
   }
-  .link-rule:hover::after,
-  .link-rule[data-active='true']::after,
-  .link-rule:focus-visible::after {
-    transform: scaleX(1);
-    transform-origin: left center;
+  @media (hover: hover) and (pointer: fine) {
+    .link-rule:hover::after { opacity: 1; transform: scaleX(1.02); }
   }
+  .link-rule:focus-visible { outline-offset: 5px; }
 
-  /* Arrow that steps right on hover. */
-  .arrow-step {
-    display: inline-block;
-    transition: transform 0.5s var(--ease-out-expo);
-  }
-  .group\/cta:hover .arrow-step,
-  .arrow-host:hover .arrow-step,
-  .arrow-host:focus-visible .arrow-step {
-    transform: translateX(0.45em);
-  }
+  /* ==========================================================================
+     CARDS
+     ======================================================================= */
 
-  /* Image container: the standard hover zoom for editorial figures. */
-  .zoom-host img,
-  .zoom-host .zoom-target {
-    transition:
-      transform 1.4s var(--ease-out-expo),
-      filter 1.4s var(--ease-out-expo);
+  /* The host a picture zooms inside. The overflow lives here, not on the img. */
+  .zoom-host { overflow: hidden; }
+  .zoom-host img {
+    transition: transform 900ms var(--ease-out-expo), filter 600ms var(--ease-ui);
     will-change: transform;
   }
-  .zoom-host:hover img,
-  .zoom-host:hover .zoom-target,
-  .zoom-host:focus-visible img,
-  .zoom-host:focus-visible .zoom-target {
-    transform: scale(1.045);
-  }
-}
-
-/* ============================================================================
-   INTERFACE — the private office panels
-   Controls here answer faster than the page does: nothing over 260ms, every
-   pressable surface acknowledges the press.
-   ========================================================================= */
-
-@layer components {
-  /* Any pressable surface. The scale is small enough to feel, not to see. */
-  .press {
-    transition: transform 160ms var(--ease-ui);
-  }
-  .press:active {
-    transform: scale(0.97);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .press:active {
-      transform: none;
+  @media (hover: hover) and (pointer: fine) {
+    .zoom-host:hover img,
+    a:hover .zoom-host img,
+    button:hover .zoom-host img {
+      transform: scale(1.055);
     }
   }
 
-  /* A row of choices — days, times, cards — that settles in sequence. */
-  .stagger > * {
+  /* The 3D tilt surface. Angle comes from JS as two custom properties; the
+     transform itself is declared here so it stays on the compositor. */
+  .tilt {
+    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
+      translate3d(0, 0, 0);
+    transform-style: preserve-3d;
+    transition: transform 520ms var(--ease-out-expo);
+  }
+  .tilt[data-active='true'] { transition: transform 90ms linear; }
+  .tilt-layer { transform: translateZ(var(--z, 28px)); }
+
+  /* The light that follows the cursor across a card. Pure CSS once the two
+     coordinates are set — no repaint beyond the gradient itself. */
+  .spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      380px circle at var(--mx, 50%) var(--my, 0%),
+      rgb(45 125 255 / 0.16),
+      transparent 62%
+    );
     opacity: 0;
-    transform: translateY(6px);
-    animation: settle 260ms var(--ease-ui) forwards;
+    transition: opacity 420ms var(--ease-ui);
+    pointer-events: none;
   }
-  @keyframes settle {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  @media (hover: hover) and (pointer: fine) {
+    .spotlight:hover::after { opacity: 1; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .stagger > * {
-      opacity: 1;
-      transform: none;
-      animation: none;
+
+  /* An edge that lights up on hover. Used on every card in the site. */
+  .edge {
+    border: 1px solid rgb(255 255 255 / 0.07);
+    transition: border-color 380ms var(--ease-ui), box-shadow 380ms var(--ease-ui);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .edge:hover,
+    a:hover > .edge,
+    .group:hover .edge {
+      border-color: rgb(45 125 255 / 0.42);
+      box-shadow: 0 0 34px -14px rgb(45 125 255 / 0.9);
     }
   }
 
-  /* Field styling shared by the enquiry form and the office panels. */
+  .edge-on {
+    border-color: rgb(45 125 255 / 0.65) !important;
+    box-shadow:
+      0 0 0 1px rgb(45 125 255 / 0.4),
+      0 0 46px -14px rgb(45 125 255 / 0.9),
+      inset 0 0 40px -30px rgb(34 211 238 / 0.9) !important;
+  }
+
+  /* ==========================================================================
+     FIELDS
+     Underlined, not boxed. Boxes on a dark page read as disabled.
+     ======================================================================= */
+
   .field {
     width: 100%;
     background: transparent;
     border: 0;
-    border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-    padding-block: 0.7rem;
-    font-size: 1rem;
-    font-weight: 300;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.75rem 0 0.6rem;
+    color: var(--color-bright);
+    font-size: 15px;
+    transition: border-color 260ms var(--ease-ui), box-shadow 260ms var(--ease-ui);
+    border-radius: 0;
+  }
+  .field::placeholder { color: var(--color-faint); }
+  .field:focus {
     outline: none;
-    transition: border-color 200ms var(--ease-ui);
+    border-bottom-color: var(--color-neon);
+    box-shadow: 0 1px 0 0 var(--color-neon), 0 6px 22px -14px var(--color-neon);
   }
-  .field:focus-visible {
-    outline: none;
-    border-bottom-width: 2px;
-    border-bottom-color: var(--color-bronze-soft);
-  }
-  .field::placeholder {
-    color: color-mix(in srgb, currentColor 32%, transparent);
+  .field[aria-invalid='true'] {
+    border-bottom-color: var(--color-bad);
+    box-shadow: 0 1px 0 0 var(--color-bad);
   }
 
-  /* The scrim behind a panel. */
-  .scrim {
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 9, 7, 0.55);
-    backdrop-filter: blur(2px);
+  /* Native select needs its own arrow once appearance is stripped. */
+  .field-select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--color-muted) 50%),
+      linear-gradient(135deg, var(--color-muted) 50%, transparent 50%);
+    background-position: right 12px top 50%, right 6px top 50%;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 28px;
+    cursor: pointer;
   }
-}
+  .field-select option { background: #0b1018; color: #eef4fd; }
 
-/* ============================================================================
-   TEXTURE — film grain
-   ========================================================================= */
+  /* ==========================================================================
+     BACKGROUND FURNITURE
+     ======================================================================= */
 
-@layer components {
-  .grain-overlay {
-    position: fixed;
-    inset: -50%;
-    width: 200%;
-    height: 200%;
+  /* The perspective floor grid. One element, no children, no repaints. */
+  .grid-floor {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 62vh;
+    background-image:
+      linear-gradient(to right, rgb(45 125 255 / 0.13) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(45 125 255 / 0.13) 1px, transparent 1px);
+    background-size: 64px 64px;
+    transform: perspective(360px) rotateX(64deg);
+    transform-origin: bottom center;
+    mask-image: linear-gradient(to top, #000 0%, transparent 88%);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 88%);
     pointer-events: none;
-    z-index: 60;
-    /* soft-light reads on paper and on charcoal alike; multiply vanishes on
-       the dark sections, which is where the flat areas are largest. */
     opacity: 0.55;
-    mix-blend-mode: soft-light;
-    background-image: var(--grain-url);
-    background-size: 220px 220px;
-    animation: grain-shift 7s steps(6) infinite;
   }
 
-  @keyframes grain-shift {
-    0% {
-      transform: translate3d(0, 0, 0);
-    }
-    16% {
-      transform: translate3d(-3%, 2%, 0);
-    }
-    33% {
-      transform: translate3d(2%, -3%, 0);
-    }
-    50% {
-      transform: translate3d(-2%, -2%, 0);
-    }
-    66% {
-      transform: translate3d(3%, 1%, 0);
-    }
-    83% {
-      transform: translate3d(-1%, 3%, 0);
-    }
-    100% {
-      transform: translate3d(0, 0, 0);
-    }
+  /* A slow-moving field of colour behind a section. */
+  .aurora {
+    position: absolute;
+    inset: -20% -10% auto -10%;
+    height: 120%;
+    pointer-events: none;
+    background:
+      radial-gradient(48% 42% at 18% 22%, rgb(45 125 255 / 0.22), transparent 62%),
+      radial-gradient(42% 38% at 82% 12%, rgb(34 211 238 / 0.16), transparent 60%),
+      radial-gradient(52% 46% at 62% 78%, rgb(139 92 246 / 0.13), transparent 64%);
+    filter: blur(28px);
+    animation: aurora-drift 34s var(--ease-in-out-quart) infinite alternate;
+  }
+
+  @keyframes aurora-drift {
+    from { transform: translate3d(-2.5%, -1.5%, 0) scale(1); }
+    to { transform: translate3d(2.5%, 2%, 0) scale(1.09); }
+  }
+
+  /* A hairline that runs along a section edge and glows at its midpoint. */
+  .beam {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(45 125 255 / 0.55) 30%,
+      rgb(34 211 238 / 0.85) 50%,
+      rgb(45 125 255 / 0.55) 70%,
+      transparent
+    );
+    box-shadow: 0 0 16px -2px rgb(45 125 255 / 0.6);
+  }
+
+  .scrim-b {
+    background: linear-gradient(to top, var(--color-void) 4%, rgb(4 6 11 / 0.72) 38%, transparent 82%);
+  }
+  .scrim-t {
+    background: linear-gradient(to bottom, rgb(4 6 11 / 0.92) 0%, rgb(4 6 11 / 0.35) 55%, transparent 100%);
+  }
+
+  /* Text over a photograph. Never trust a picture to be dark enough. */
+  .on-image { text-shadow: 0 2px 30px rgb(0 0 0 / 0.75), 0 1px 3px rgb(0 0 0 / 0.55); }
+
+  /* ==========================================================================
+     MOTION UTILITIES
+     ======================================================================= */
+
+  /* A clip reveal. Cheaper than animating anything else and it looks like film. */
+  .wipe-in {
+    animation: wipe-in 1s var(--ease-out-expo) both;
+  }
+  @keyframes wipe-in {
+    from { clip-path: inset(0 0 100% 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+
+  .pulse-dot {
+    position: relative;
+  }
+  .pulse-dot::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    opacity: 0;
+    animation: pulse-ring 2.6s var(--ease-out-expo) infinite;
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.85); opacity: 0.7; }
+    70%, 100% { transform: scale(2.1); opacity: 0; }
+  }
+
+  /* The marquee on the portfolio band. Linear, because constant motion is. */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 48s linear infinite;
+  }
+  @keyframes marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+  }
+
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 }
 
 /* ============================================================================
    REDUCED MOTION
-   Everything animated above collapses to a plain, legible state.
+   Not "fewer animations" — no movement at all. Opacity and colour stay,
+   because they carry meaning. Everything that travels stops.
    ========================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -463,14 +692,13 @@
     scroll-behavior: auto !important;
   }
 
-  .grain-overlay {
-    animation: none;
+  .aurora,
+  .marquee-track,
+  .pulse-dot::after {
+    animation: none !important;
   }
-}
 
-/* Hide the custom cursor wherever a fine pointer is unavailable. */
-@media (hover: none), (pointer: coarse) {
-  .cursor-layer {
-    display: none !important;
-  }
+  .tilt { transform: none !important; }
+  .zoom-host img { transform: none !important; }
+  .grid-floor { opacity: 0.3; }
 }
