@@ -408,14 +408,14 @@ export const IMAGES = {
     alt: 'Bryan Miller, photographed from the chest up in a navy suit and a patterned tie against a plain white background.',
     tone: 'studio',
     scene: 'portrait',
-    focus: '50% 30%',
+    focus: '50% 35%',
   },
   gearStill: {
-    src: '',
-    alt: 'Camera bodies, lenses and a drone laid out on a work surface.',
-    tone: 'daylight',
+    src: '/work/r/gear-2400.jpg',
+    alt: 'The kit laid out on a pine table, shot from above: a folding DJI drone with its propellers out, a controller with a built-in screen, a small ducted FPV drone, a Sony mirrorless body with a 12-24mm f/2.8 lens and hood, and a pair of FPV goggles with their battery pack.',
+    tone: 'studio',
     scene: 'gear',
-    focus: '50% 45%',
+    focus: '50% 50%',
   },
 } as const satisfies Record<string, ImageAsset>;
 

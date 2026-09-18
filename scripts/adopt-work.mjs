@@ -214,9 +214,9 @@ const ADOPT = {
     key: 'filmFrameA', slug: 'film-still-doorway', tone: 'interior', focus: '50% 50%',
     alt: 'A frame from a property film, the camera moving through a doorway.',
   },
-  'gear': {
+  'img_0969': {
     key: 'gearStill', slug: 'gear', tone: 'studio', focus: '50% 50%',
-    alt: 'Camera bodies, lenses and a drone laid out on a work surface.',
+    alt: 'The kit laid out on a pine table, shot from above: a folding DJI drone with its propellers out, a controller with a built-in screen, a small ducted FPV drone, a Sony mirrorless body with a 12-24mm f/2.8 lens and hood, and a pair of FPV goggles with their battery pack.',
   },
   'restaurant': {
     key: 'commRestaurant', slug: 'restaurant', tone: 'interior', focus: '50% 50%',
