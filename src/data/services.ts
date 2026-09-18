@@ -170,19 +170,23 @@ export const COMMERCIAL_SECTORS = [
   { id: 'social', label: 'Social advertising', body: 'Vertical-first campaigns built for paid placement, in batches.', image: 'filmFrameA' as ImageKey },
 ];
 
-/** What a commercial project actually costs to run. Ranges, honestly stated. */
+/**
+ * The shapes a commercial project takes. `range` is the shape of the
+ * engagement, not a figure: commercial work is scoped before it is priced, and
+ * a number here would be a guess at somebody else's business.
+ */
 export const COMMERCIAL_SCOPES = [
   {
     id: 'social-batch',
     name: 'Social batch',
-    range: 'From $650',
+    range: 'Half day',
     body: 'A half day on site, cut into six to ten vertical clips and a set of stills. Built for businesses that need to post consistently and have run out of things to post.',
     points: ['Half production day', '6–10 vertical clips', '20+ stills', 'Captions and cutdowns'],
   },
   {
     id: 'brand-film',
     name: 'Brand film',
-    range: 'From $1,800',
+    range: 'Full production day',
     body: 'A full production day, interviews and b-roll, cut to a 90-second film with a 30-second and a 15-second version underneath it. The piece that sits on your homepage for three years.',
     points: ['Treatment and shot list', 'Full production day', '90s film + 30s + 15s', 'Grade, mix and captions'],
   },

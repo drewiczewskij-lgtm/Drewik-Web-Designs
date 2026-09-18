@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { OptionCard } from '../OptionCard';
 import { Notice, IncludeList, Pill } from '@/components/ui/Bits';
 import { Button, Arrow } from '@/components/ui/Button';
@@ -10,7 +9,6 @@ import {
   addonsFor,
   includedAddonsFor,
   getPackage,
-  money,
 } from '@shared/catalog.mjs';
 
 /* ============================================================================
@@ -90,7 +88,6 @@ export function StepPackage() {
               onSelect={() => set('packageId', pkg.id)}
               title={pkg.name}
               meta={`${Math.round(pkg.durationMinutes / 30) / 2} hrs on site`}
-              price={money(pkg.basePriceCents)}
               className="h-full"
             >
               <p className="relative mt-1 text-[13px] leading-relaxed text-muted">{pkg.summary}</p>
@@ -110,12 +107,8 @@ export function StepPackage() {
       </div>
 
       <p className="text-[12.5px] text-faint">
-        Not sure? The <span className="text-body">Photo + Video</span> package covers what most
-        listings need. You can compare them all on the{' '}
-        <Link to="/pricing" className="link-rule">
-          pricing page
-        </Link>
-        .
+        Not sure? <span className="text-body">Photo + Video</span> covers what most listings
+        need. Pick the closest one — it can be changed when the quote comes back.
       </p>
     </div>
   );
@@ -148,7 +141,6 @@ export function StepExtras() {
               onSelect={() => toggleAddon(addon.id)}
               title={addon.name}
               meta={addon.minutes > 0 ? `+${addon.minutes} min on site` : 'No extra time'}
-              price={`+${money(addon.priceCents)}`}
               body={addon.description}
             />
           ))}
@@ -183,7 +175,6 @@ export function StepExtras() {
               selected={draft.sizeTierId === tier.id}
               onSelect={() => set('sizeTierId', tier.id)}
               title={tier.label}
-              price={tier.surchargeCents === 0 ? 'Included' : `+${money(tier.surchargeCents)}`}
               meta={tier.minutes > 0 ? `+${tier.minutes} min` : 'Standard'}
             />
           ))}
@@ -225,7 +216,7 @@ export function StepExtras() {
           <p id="miles-note" className="font-mono text-[11.5px] tracking-wide text-faint">
             {draft.miles <= TRAVEL.includedMiles
               ? 'No travel charge at this distance.'
-              : `Travel: ${money((draft.miles - TRAVEL.includedMiles) * TRAVEL.perMileCents)}`}
+              : `${draft.miles - TRAVEL.includedMiles} miles beyond the included ${TRAVEL.includedMiles}`}
           </p>
         </div>
       </section>

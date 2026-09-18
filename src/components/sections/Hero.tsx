@@ -116,7 +116,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
               className="t-lead max-w-[46ch] text-body"
             >
               Professional real estate photography, cinematic video and aerial imagery that
-              help properties get noticed — booked online, priced up front, delivered the
+              help properties get noticed — booked online, quoted per property, delivered the
               next day.
             </motion.p>
 

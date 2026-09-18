@@ -6,7 +6,7 @@ import { Button, Arrow } from '@/components/ui/Button';
 import { Notice, Pill, IncludeList } from '@/components/ui/Bits';
 import { useBooking } from '@/lib/booking';
 import { CONTACT, BRAND } from '@/data/site';
-import { PROPERTY_TYPES, getPackage, getAddon, getSizeTier, money } from '@shared/catalog.mjs';
+import { PROPERTY_TYPES, getPackage, getAddon, getSizeTier } from '@shared/catalog.mjs';
 import { formatDate, formatTime, TIMEZONE } from '@shared/schedule.mjs';
 import { address, email as emailRule, formatPhone, phone as phoneRule, required, squareFeet } from '@/lib/validate';
 import { EASE_OUT_EXPO } from '@/lib/motion';
@@ -198,11 +198,11 @@ export function StepReview() {
         </ReviewRow>
       </div>
 
-      <Notice title="What happens when you pay">
-        The slot is checked one more time the moment you press pay — if somebody
-        booked it in the last few minutes you will be told before any money moves,
-        not afterwards. Card details are entered on Stripe’s own checkout page and
-        never touch {BRAND.name}.
+      <Notice title="What happens next">
+        Nothing is charged here. {BRAND.name} reads the request, checks the slot is
+        still free, and comes back with a price for this property — every one is
+        different, so every one is quoted on its own. Nothing is confirmed until
+        you have that quote and say yes.
       </Notice>
     </div>
   );
@@ -235,42 +235,35 @@ function ReviewRow({
 }
 
 /** Step 8. */
-export function StepPayment() {
-  const { pricing, submit, submitting, submitError, live, draft } = useBooking();
+export function StepSend() {
+  const { submit, submitting, submitError, live, draft } = useBooking();
   const reduced = usePrefersReducedMotion();
-  if (!pricing?.ok) return null;
-
-  const due = pricing.dueNowCents ?? pricing.totalCents;
 
   return (
     <div className="flex flex-col gap-7">
       <div className="glass edge flex flex-col gap-6 p-6 sm:p-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <p className="t-label">Due now</p>
-            <p className="t-num text-[clamp(2.2rem,5vw,3.2rem)] leading-none text-bright">
-              {money(due)}
-            </p>
-          </div>
-          <div className="flex flex-col items-start gap-2 sm:items-end">
-            <Pill tone="good">
-              <LockIcon /> Secure checkout
-            </Pill>
-            <p className="text-[12px] text-faint">Powered by Stripe</p>
-          </div>
+        <div className="flex flex-col gap-2">
+          <p className="t-label">One more press</p>
+          <p className="font-display text-[clamp(1.5rem,3.4vw,2rem)] leading-tight text-bright">
+            Send this to {BRAND.name}
+          </p>
+          <p className="text-[14px] leading-relaxed text-muted">
+            No card, no deposit, nothing to pay. You get a written price for this
+            property and the slot is held while you decide.
+          </p>
         </div>
 
         <div className="h-px w-full bg-line" aria-hidden="true" />
 
         <ul className="flex flex-col gap-2.5 text-[13px] text-muted">
           <li className="flex gap-3">
-            <Dot /> Card details are entered on Stripe’s page, not on this site.
+            <Dot /> Every property is priced on what it actually needs, not a list.
           </li>
           <li className="flex gap-3">
-            <Dot /> Your slot is re-checked before the charge, so it cannot be taken twice.
+            <Dot /> The slot is re-checked as this is sent, so it cannot be taken twice.
           </li>
           <li className="flex gap-3">
-            <Dot /> Full refund if you cancel more than 24 hours before the shoot.
+            <Dot /> You get a reply {CONTACT.responseTime}.
           </li>
           <li className="flex gap-3">
             <Dot /> Weather reschedules are free, always.
@@ -278,13 +271,15 @@ export function StepPayment() {
         </ul>
 
         {!live && (
-          <Notice tone="warn" title="Demonstration mode — no payment will be taken">
-            This site is not yet connected to a payment server, so pressing the button
-            below will <span className="text-bright">not</span> charge anything and will{' '}
-            <span className="text-bright">not</span> reserve a real appointment. It walks
-            through the confirmation so the flow can be seen end to end. To take real
-            bookings, set <code className="font-mono text-[12px] text-cyan-soft">VITE_API_BASE</code>{' '}
-            and run the server in <code className="font-mono text-[12px] text-cyan-soft">api/</code>.
+          <Notice tone="warn" title="Demonstration mode — this request will not be sent">
+            This site is not yet connected to a server, so pressing the button below
+            will <span className="text-bright">not</span> send anything and will{' '}
+            <span className="text-bright">not</span> reserve a real appointment. It
+            walks through the confirmation so the flow can be seen end to end. Call{' '}
+            <a href={`tel:${CONTACT.phoneHref}`} className="link-rule font-mono">
+              {CONTACT.phone}
+            </a>{' '}
+            to book for real in the meantime.
           </Notice>
         )}
 
@@ -311,17 +306,15 @@ export function StepPayment() {
           {submitting ? (
             <span className="flex items-center gap-3">
               <Spinner />
-              {live ? 'Opening secure checkout…' : 'Confirming…'}
+              Sending…
             </span>
-          ) : live ? (
-            `Pay ${money(due)} and book`
           ) : (
-            `Confirm booking (${money(due)})`
+            'Send my request'
           )}
         </Button>
 
         <p className="text-center text-[12px] text-faint">
-          By booking you agree to the{' '}
+          By sending you agree to the{' '}
           <Link to="/terms" className="link-rule">
             terms
           </Link>
@@ -333,7 +326,7 @@ export function StepPayment() {
       </div>
 
       <p className="text-[12.5px] text-faint">
-        Booking for {draft.customer.name || 'you'} at{' '}
+        Request for {draft.customer.name || 'you'} at{' '}
         {draft.date ? formatDate(draft.date) : 'a date not yet chosen'}
         {draft.time ? `, ${formatTime(draft.time)}` : ''}.
       </p>
@@ -361,10 +354,10 @@ export function StepConfirmed() {
   if (confirmationStatus === 'missing' || !confirmation) {
     return (
       <div className="flex flex-col gap-6">
-        <Notice tone="warn" title="We could not find that booking">
-          The reference in the link did not match anything. If you have just paid,
-          your money is safe — the payment and the booking are recorded separately
-          and a receipt will have come from Stripe. Call{' '}
+        <Notice tone="warn" title="We could not find that request">
+          The reference in the link did not match anything. Nothing was charged —
+          nothing is charged anywhere on this site — so there is nothing to undo.
+          Call{' '}
           <a href={`tel:${CONTACT.phoneHref}`} className="link-rule font-mono">
             {CONTACT.phone}
           </a>{' '}
@@ -452,7 +445,6 @@ export function StepConfirmed() {
         {b.date && <Line label="Date" value={formatDate(b.date)} />}
         {b.time && <Line label="Time" value={formatTime(b.time)} />}
         {b.address && <Line label="Property" value={b.address} />}
-        <Line label={settled ? 'Paid' : 'Total'} value={money(b.totalCents)} />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -516,14 +508,6 @@ function Dot() {
   );
 }
 
-function LockIcon() {
-  return (
-    <svg width="9" height="11" viewBox="0 0 10 12" fill="none" aria-hidden="true">
-      <rect x="1" y="5" width="8" height="6.5" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M3 5V3.2A2 2 0 017 3.2V5" stroke="currentColor" strokeWidth="1.2" />
-    </svg>
-  );
-}
 
 function Spinner() {
   return (

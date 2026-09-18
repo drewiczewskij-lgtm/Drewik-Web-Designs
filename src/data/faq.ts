@@ -22,7 +22,7 @@ export const FAQ_GROUPS: { id: FaqGroup; label: string; blurb: string }[] = [
   { id: 'booking', label: 'Booking', blurb: 'Dates, notice and changes.' },
   { id: 'shoot', label: 'On the day', blurb: 'What happens, and what you need to do.' },
   { id: 'delivery', label: 'Delivery', blurb: 'What you get back, and when.' },
-  { id: 'payment', label: 'Payment', blurb: 'Prices, invoices and refunds.' },
+  { id: 'payment', label: 'Quotes & paying', blurb: 'How pricing works, invoices and cancellations.' },
   { id: 'drone', label: 'Drone & weather', blurb: 'Flying, rules and grey skies.' },
 ];
 
@@ -97,13 +97,13 @@ export const FAQS: FaqItem[] = [
     id: 'payments',
     group: 'payment',
     q: 'How do payments work?',
-    a: 'Payment is taken online when you book, through Stripe. Card details are entered on Stripe’s own checkout and never touch this website or its servers, which is deliberate. You get a receipt from Stripe and a booking confirmation from us. If you would rather be invoiced — brokerages with multiple listings usually would — say so on the contact form and that can be arranged instead.',
+    a: 'Nothing is taken on this website. You send a request with the property, the coverage and the date you want, and you get a written price back for that property. Once you agree it, an invoice follows — brokerages with several listings are usually billed monthly. Payment is due on delivery unless something else has been agreed.',
   },
   {
     id: 'whats-in-total',
     group: 'payment',
-    q: 'Is the price on the screen the price I pay?',
-    a: 'Yes. The total shown at checkout includes the package, every add-on you selected, any property-size adjustment, travel beyond 30 miles and sales tax, all itemised. There is no separate editing fee, licensing fee or delivery fee, because those are not real things.',
+    q: 'Why is there no price list?',
+    a: 'Because no two properties are the same job. A one-bedroom condo and a house on five acres with a pool and a guest wing are not the same day of work, and a single list either overcharges the first or underprices the second. You get a written price for your property, itemised, before anything is booked — and there is no separate editing fee, licensing fee or delivery fee, because those are not real things.',
   },
   {
     id: 'refund',
@@ -121,7 +121,7 @@ export const FAQS: FaqItem[] = [
     id: 'drone-legal',
     group: 'drone',
     q: 'Are there places you cannot fly?',
-    a: 'Some. Controlled airspace near an airport needs authorisation, which is usually granted but is not instant — if your property is close to one, mention it when you book so it can be requested in advance. Flights do not go over people, over moving traffic, or beyond visual line of sight. If a property genuinely cannot be flown, you are told before you pay, not after.',
+    a: 'Some. Controlled airspace near an airport needs authorisation, which is usually granted but is not instant — if your property is close to one, mention it when you book so it can be requested in advance. Flights do not go over people, over moving traffic, or beyond visual line of sight. If a property genuinely cannot be flown, you are told when you are quoted, not after the shoot.',
   },
   {
     id: 'weather',
@@ -145,7 +145,7 @@ export const FAQS: FaqItem[] = [
     id: 'area',
     group: 'booking',
     q: 'Where do you travel?',
-    a: 'The first 30 miles are included in every package. Beyond that, travel is added at cost and the booking screen calculates it before you pay rather than putting it on the invoice afterwards. Further afield is usually possible for a full day or a multi-property booking — ask.',
+    a: 'The first 30 miles are included. Beyond that, travel is added at cost and it appears in the quote, itemised, rather than turning up on the invoice afterwards. Further afield is usually possible for a full day or a multi-property booking — ask.',
   },
 ];
 

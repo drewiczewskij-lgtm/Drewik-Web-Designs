@@ -10,7 +10,6 @@ import { Process } from '@/components/sections/Process';
 import { Seo, serviceSchema, breadcrumbSchema } from '@/lib/seo';
 import { PORTFOLIO, withoutImages } from '@/data/portfolio';
 import { CONTACT } from '@/data/site';
-import { getPackage, money } from '@shared/catalog.mjs';
 import type { ImageKey } from '@/data/images';
 
 /* ============================================================================
@@ -106,7 +105,6 @@ const COVERAGE: Coverage[] = [
 ];
 
 export default function RealEstate() {
-  const photo = getPackage('photo');
   /* The page header, the six service blocks and the pool band all name a
      photograph before this strip runs; it takes what none of them claimed. */
   const spokenFor: ImageKey[] = ['reExteriorTwilight', 'rePool', ...COVERAGE.map((c) => c.image)];
@@ -130,7 +128,6 @@ export default function RealEstate() {
           serviceSchema(
             'Real estate photography and videography',
             'Interior, exterior, twilight, aerial and cinematic video for property listings.',
-            photo?.basePriceCents,
           ),
           breadcrumbSchema([
             { name: 'Home', path: '/' },
@@ -153,8 +150,8 @@ export default function RealEstate() {
           <Button to="/book" size="lg" className="group" trailing={<Arrow />}>
             Book your property shoot
           </Button>
-          <Button to="/pricing" variant="ghost" size="lg">
-            {photo ? `From ${money(photo.basePriceCents)}` : 'See pricing'}
+          <Button to="/contact" variant="ghost" size="lg">
+            Ask a question
           </Button>
         </div>
       </PageHeader>
@@ -165,7 +162,7 @@ export default function RealEstate() {
           <Stat value="24h" label="Photos delivered" note="Shoot in the morning, gallery the next business day." />
           <Stat value="35" label="Finished frames" note="Up to thirty-five edited images on a standard property." />
           <Stat value="4K" label="Film resolution" note="Every property film graded and delivered in 4K." />
-          <Stat value="30mi" label="Travel included" note="Beyond that, billed at cost and shown before you pay." />
+          <Stat value="30mi" label="Travel included" note="Beyond that, billed at cost and itemised in the quote." />
         </div>
       </section>
 
@@ -291,10 +288,10 @@ export default function RealEstate() {
             Book your property shoot in <span className="t-accent">under two minutes.</span>
           </>
         }
-        lead="Pick a package, choose a time that is genuinely free, and see the total before you enter a card."
+        lead="Pick the coverage, choose a time that is genuinely free, and get a written price for the property."
         image="rePool"
         primary={{ label: 'Check availability', to: '/book' }}
-        secondary={{ label: 'Compare packages', to: '/pricing' }}
+        secondary={{ label: 'Ask a question', to: '/contact' }}
       />
 
       <Footer />

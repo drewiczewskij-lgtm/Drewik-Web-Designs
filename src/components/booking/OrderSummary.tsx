@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { money, getPackage } from '@shared/catalog.mjs';
+import { getPackage } from '@shared/catalog.mjs';
 import { formatDate, formatTime } from '@shared/schedule.mjs';
 import { useBooking } from '@/lib/booking';
 import { EASE_UI } from '@/lib/motion';
@@ -26,9 +26,9 @@ export function OrderSummary({ compact = false }: { compact?: boolean }) {
   if (!pricing?.ok) {
     return (
       <div className={cn('glass edge p-6', compact && 'p-5')}>
-        <p className="t-label mb-2">Your order</p>
+        <p className="t-label mb-2">Your request</p>
         <p className="text-[13.5px] text-muted">
-          Choose a package and the total will build here as you go.
+          Choose your coverage and it will be listed here as you go.
         </p>
       </div>
     );
@@ -40,7 +40,7 @@ export function OrderSummary({ compact = false }: { compact?: boolean }) {
   return (
     <div className={cn('glass edge relative overflow-hidden', compact ? 'p-5' : 'p-6 sm:p-7')}>
       <div className="mb-5 flex items-center justify-between gap-3">
-        <p className="t-label">Your order</p>
+        <p className="t-label">Your request</p>
         {pkg && (
           <span className="font-mono text-[10.5px] tracking-[0.14em] text-neon-soft uppercase">
             {pkg.name}
@@ -88,52 +88,17 @@ export function OrderSummary({ compact = false }: { compact?: boolean }) {
               <span className={cn(line.kind === 'package' ? 'text-bright' : 'text-muted')}>
                 {line.label}
               </span>
-              <span
-                className={cn(
-                  'shrink-0 font-mono text-[12.5px] tabular-nums',
-                  line.kind === 'package' ? 'text-bright' : 'text-body',
-                )}
-              >
-                {money(line.amountCents)}
-              </span>
             </motion.li>
           ))}
         </AnimatePresence>
       </ul>
 
+      {/* No total. Every property is quoted on its own, so a number here would
+          be a guess — and a guess a customer has already read is worse than no
+          number at all. What they get instead is the shape of the visit. */}
       <div className="mt-5 flex flex-col gap-2 border-t border-line pt-5">
-        <Row label="Subtotal" value={money(pricing.subtotalCents)} />
-        {pricing.taxCents > 0 && (
-          <Row
-            label={`${pricing.taxLabel} (${((pricing.taxRate ?? 0) * 100).toFixed(0)}%)`}
-            value={money(pricing.taxCents)}
-          />
-        )}
-      </div>
-
-      <div className="mt-5 flex items-end justify-between gap-4 border-t border-line pt-5">
-        <div className="flex flex-col">
-          <span className="t-label">Total</span>
-          {pricing.dueNowCents !== undefined &&
-            pricing.dueNowCents !== pricing.totalCents && (
-              <span className="mt-1 text-[12px] text-faint">
-                {money(pricing.dueNowCents)} due now, {money(pricing.balanceCents ?? 0)} on delivery
-              </span>
-            )}
-        </div>
-
-        <AnimatePresence mode="popLayout">
-          <motion.span
-            key={pricing.totalCents}
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 8, filter: 'blur(3px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8, filter: 'blur(3px)' }}
-            transition={{ duration: 0.26, ease: EASE_UI }}
-            className="t-num text-[clamp(1.5rem,3vw,2rem)] leading-none text-bright"
-          >
-            {money(pricing.totalCents)}
-          </motion.span>
-        </AnimatePresence>
+        <Row label="On site" value={`about ${hours}h${mins ? ` ${mins}m` : ''}`} />
+        <Row label="Price" value="quoted per property" />
       </div>
     </div>
   );
@@ -150,7 +115,8 @@ function Row({ label, value }: { label: string; value: string }) {
 
 /** The docked bar on a phone. Taps open the full summary. */
 export function OrderDock({ onOpen }: { onOpen: () => void }) {
-  const { pricing } = useBooking();
+  const { draft, pricing } = useBooking();
+  const pkg = draft.packageId ? getPackage(draft.packageId) : null;
   if (!pricing?.ok) return null;
 
   return (
@@ -161,9 +127,9 @@ export function OrderDock({ onOpen }: { onOpen: () => void }) {
       style={{ transition: 'transform 160ms cubic-bezier(.23,1,.32,1)' }}
     >
       <span className="flex flex-col">
-        <span className="t-label text-[9.5px]">Total so far</span>
-        <span className="t-num text-[19px] leading-tight text-bright">
-          {money(pricing.totalCents)}
+        <span className="t-label text-[9.5px]">Your request</span>
+        <span className="text-[15px] leading-tight text-bright">
+          {pkg ? pkg.name : 'In progress'}
         </span>
       </span>
       <span className="flex items-center gap-2 font-mono text-[10px] tracking-[0.16em] text-muted uppercase">

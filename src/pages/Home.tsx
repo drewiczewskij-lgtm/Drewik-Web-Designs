@@ -5,7 +5,6 @@ import { Process } from '@/components/sections/Process';
 import { FeaturedWork } from '@/components/sections/FeaturedWork';
 import { WhyUs } from '@/components/sections/WhyUs';
 import { Testimonials } from '@/components/sections/Testimonials';
-import { PricingPreview } from '@/components/sections/PricingPreview';
 import { FaqSection } from '@/components/sections/FaqSection';
 import { CtaBand } from '@/components/sections/CtaBand';
 import { Footer } from '@/components/layout/Footer';
@@ -20,7 +19,7 @@ export default function Home({ ready = true }: { ready?: boolean }) {
     <>
       <Seo
         title="KM Productions — Real Estate Photography, Video & Drone"
-        description={`Professional real estate photography, cinematic property video and licensed aerial coverage in ${CONTACT.serviceArea}. Book online, see the price before you pay, photos back the next business day.`}
+        description={`Professional real estate photography, cinematic property video and licensed aerial coverage in ${CONTACT.serviceArea}. Request a date online, get a written price for the property, photos back the next business day.`}
         path="/"
         schema={localBusinessSchema()}
       />
@@ -70,8 +69,6 @@ export default function Home({ ready = true }: { ready?: boolean }) {
         primary={{ label: 'Book your property shoot', to: '/book' }}
         secondary={{ label: 'See real estate work', to: '/real-estate' }}
       />
-
-      <PricingPreview index="05" />
       <Testimonials />
       <FaqSection index="07" />
 

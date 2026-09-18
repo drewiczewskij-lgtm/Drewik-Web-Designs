@@ -17,7 +17,6 @@ import Home from '@/pages/Home';
 const RealEstate = lazy(() => import('@/pages/RealEstate'));
 const Services = lazy(() => import('@/pages/Services'));
 const Portfolio = lazy(() => import('@/pages/Portfolio'));
-const Pricing = lazy(() => import('@/pages/Pricing'));
 const Book = lazy(() => import('@/pages/Book'));
 const Commercial = lazy(() => import('@/pages/Commercial'));
 const About = lazy(() => import('@/pages/About'));
@@ -152,7 +151,6 @@ export default function App() {
                 <Route path="/real-estate" element={<RealEstate />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/portfolio" element={<Portfolio />} />
-                <Route path="/pricing" element={<Pricing />} />
                 <Route path="/book" element={<Book />} />
                 <Route path="/book/confirmed" element={<Book />} />
                 <Route path="/commercial" element={<Commercial />} />

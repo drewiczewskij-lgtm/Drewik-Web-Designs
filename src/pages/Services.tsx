@@ -8,7 +8,7 @@ import { CtaBand } from '@/components/sections/CtaBand';
 import { Seo, serviceSchema, breadcrumbSchema } from '@/lib/seo';
 import { SERVICES } from '@/data/services';
 import { CONTACT } from '@/data/site';
-import { getPackage, getAddon, money } from '@shared/catalog.mjs';
+import { getAddon } from '@shared/catalog.mjs';
 
 export default function Services() {
   return (
@@ -23,7 +23,7 @@ export default function Services() {
             { name: 'Services', path: '/services' },
           ]),
           ...SERVICES.map((s) =>
-            serviceSchema(s.name, s.summary, getPackage(s.packageId)?.basePriceCents),
+            serviceSchema(s.name, s.summary),
           ),
         ]}
       />
@@ -41,8 +41,8 @@ export default function Services() {
           <Button to="/book" className="group" trailing={<Arrow />}>
             Book a shoot
           </Button>
-          <Button to="/pricing" variant="ghost">
-            See full pricing
+          <Button to="/contact" variant="ghost">
+            Ask a question
           </Button>
         </div>
       </PageHeader>
@@ -50,16 +50,12 @@ export default function Services() {
       <div className="section">
         <div className="shell flex flex-col gap-20 sm:gap-28">
           {SERVICES.map((service, i) => {
-            const pkg = getPackage(service.packageId);
             const addon = service.addonId ? getAddon(service.addonId) : null;
             const flipped = i % 2 === 1;
 
-            // An add-on has its own price; otherwise the package's base applies.
-            const priceLabel = addon
-              ? `${money(addon.priceCents)} as an add-on`
-              : pkg && !pkg.quoteOnly
-                ? `From ${money(pkg.basePriceCents)}`
-                : 'Quoted per project';
+            /* No figure. Every property is quoted on what it needs, so the
+               label says how the work is bought, not what it costs. */
+            const priceLabel = addon ? 'Available as an add-on' : 'Quoted per property';
 
             return (
               <Reveal
@@ -146,8 +142,8 @@ export default function Services() {
             align="center"
           />
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button to="/pricing" size="lg" className="group" trailing={<Arrow />}>
-              Compare packages
+            <Button to="/book" size="lg" className="group" trailing={<Arrow />}>
+              Request a quote
             </Button>
             <Button to="/contact" variant="ghost" size="lg">
               Ask which fits

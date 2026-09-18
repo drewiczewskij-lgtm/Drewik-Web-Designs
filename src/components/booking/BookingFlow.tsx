@@ -5,7 +5,7 @@ import { Progress } from './Progress';
 import { OrderSummary, OrderDock } from './OrderSummary';
 import { StepType, StepPackage, StepExtras } from './steps/Choose';
 import { StepDate, StepTime } from './steps/Schedule';
-import { StepDetails, StepReview, StepPayment, StepConfirmed } from './steps/Checkout';
+import { StepDetails, StepReview, StepSend, StepConfirmed } from './steps/Checkout';
 import { Button, Arrow } from '@/components/ui/Button';
 import { Modal, CloseButton } from '@/components/ui/Modal';
 import { Notice } from '@/components/ui/Bits';
@@ -131,13 +131,13 @@ export function BookingFlow() {
               {step === 'time' && <StepTime />}
               {step === 'details' && <StepDetails />}
               {step === 'review' && <StepReview />}
-              {step === 'payment' && <StepPayment />}
+              {step === 'send' && <StepSend />}
               {step === 'confirmed' && <StepConfirmed />}
             </motion.section>
           </AnimatePresence>
 
           {/* Controls. Payment has its own button; confirmation has no "next". */}
-          {step !== 'payment' && !isConfirmed && (
+          {step !== 'send' && !isConfirmed && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -160,7 +160,7 @@ export function BookingFlow() {
                   className="group"
                   trailing={<Arrow />}
                 >
-                  {step === 'review' ? 'Continue to payment' : 'Continue'}
+                  {step === 'review' ? 'Continue' : 'Continue'}
                 </Button>
 
                 {/* The reason, not just a dead button. */}
@@ -174,7 +174,7 @@ export function BookingFlow() {
             </motion.div>
           )}
 
-          {step === 'payment' && (
+          {step === 'send' && (
             <div className="mt-8 border-t border-line pt-8">
               <Button onClick={back} variant="quiet">
                 ← Back to the order

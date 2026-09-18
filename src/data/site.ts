@@ -38,7 +38,7 @@ export const CONTACT = {
   /** Where you work. Shown on contact, FAQ and in the local-business schema. */
   serviceArea: 'North Mississippi & the Memphis metro', // PLACEHOLDER
   serviceAreaDetail:
-    'Tupelo, Oxford, Starkville, Columbus, Southaven and the surrounding counties. Travel beyond 30 miles is billed at cost — the booking screen works it out before you pay.', // PLACEHOLDER
+    'Tupelo, Oxford, Starkville, Columbus, Southaven and the surrounding counties. Travel beyond 30 miles is billed at cost and appears in the quote.', // PLACEHOLDER
   city: 'Tupelo', // PLACEHOLDER
   region: 'MS', // PLACEHOLDER
   /** Leave the street blank if you work from home — the schema handles it. */
@@ -133,7 +133,6 @@ export const NAV: NavItem[] = [
   { label: 'Services', to: '/services', note: 'Everything we shoot, and what it includes' },
   { label: 'Portfolio', to: '/portfolio', note: 'Selected work across every category' },
   { label: 'Commercial', to: '/commercial', note: 'Brand films for local business' },
-  { label: 'Pricing', to: '/pricing', note: 'Packages, add-ons and what they cost' },
   { label: 'About', to: '/about', note: 'Who shoots your job' },
   { label: 'FAQ', to: '/faq', note: 'How booking, delivery and weather work' },
   { label: 'Contact', to: '/contact', note: 'Phone, email and the enquiry form' },
@@ -142,7 +141,6 @@ export const NAV: NavItem[] = [
 /** The footer's second column. Kept separate — it is not the same list. */
 export const FOOTER_LINKS = [
   { label: 'Book a shoot', to: '/book' },
-  { label: 'Pricing', to: '/pricing' },
   { label: 'Portfolio', to: '/portfolio' },
   { label: 'Commercial quote', to: '/commercial' },
   { label: 'Frequently asked', to: '/faq' },
@@ -203,8 +201,8 @@ export const DIFFERENTIATORS = [
     body: 'Licensed for commercial drone work, so stills, film and aerial are covered in a single appointment instead of three.',
   },
   {
-    title: 'Priced before you book',
-    body: 'The total is on the screen before you enter a card — package, add-ons, property size, travel and tax. No invoice surprises.',
+    title: 'Priced to the property',
+    body: 'Every property is quoted on what it actually needs, in writing, before anything is booked. No list that overcharges a condo to cover an estate.',
   },
   {
     title: 'Built for where listings live',
@@ -223,7 +221,7 @@ export const DIFFERENTIATORS = [
 export const PROCESS = [
   {
     step: 'Book',
-    body: 'Pick a package, add what you need, choose a date and time. The price settles as you go and you pay in the same pass.',
+    body: 'Pick the coverage, choose a date and time that is genuinely free, and send it. A written price for the property comes back the same day.',
   },
   {
     step: 'Prepare',

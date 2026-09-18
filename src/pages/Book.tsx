@@ -12,7 +12,7 @@ export default function Book() {
     <>
       <Seo
         title="Book a Shoot"
-        description={`Book real estate photography, video or drone coverage in ${CONTACT.serviceArea}. Choose a package, pick a time that is genuinely available, and see the total before you pay.`}
+        description={`Book real estate photography, video or drone coverage in ${CONTACT.serviceArea}. Choose your coverage, pick a time that is genuinely available, and get a written price for the property.`}
         path="/book"
         // The confirmation is a private receipt, not a page to be indexed.
         noIndex={step === 'confirmed'}

@@ -4,7 +4,6 @@ import { Reveal } from '@/components/fx/Reveal';
 import { TiltCard } from '@/components/fx/TiltCard';
 import { Arrow } from '@/components/ui/Button';
 import { SERVICES, type Service } from '@/data/services';
-import { getPackage, money } from '@shared/catalog.mjs';
 import { cn } from '@/lib/cn';
 
 /* ============================================================================
@@ -14,14 +13,8 @@ import { cn } from '@/lib/cn';
    moving across six cards does not re-render six components.
    ========================================================================= */
 
-function startingAt(service: Service): string | null {
-  const pkg = getPackage(service.packageId);
-  if (!pkg || pkg.quoteOnly) return null;
-  return money(pkg.basePriceCents);
-}
 
 export function ServiceCard({ service, index }: { service: Service; index: number }) {
-  const price = startingAt(service);
 
   return (
     <Reveal as="li" index={index} className="group">
@@ -57,13 +50,7 @@ export function ServiceCard({ service, index }: { service: Service; index: numbe
                 {service.duration}
               </span>
               <span className="flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] text-bright uppercase">
-                {price ? (
-                  <>
-                    From <span className="text-neon-soft">{price}</span>
-                  </>
-                ) : (
-                  <span className="text-neon-soft">Quoted</span>
-                )}
+                <span className="text-neon-soft">Quoted per property</span>
                 <Arrow />
               </span>
             </div>

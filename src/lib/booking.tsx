@@ -30,16 +30,23 @@ import { isLive } from '@/config/integrations';
    most common way a booking is lost.
    ========================================================================= */
 
+/*
+ * Eight steps, not nine. No price is quoted on this site: every property is
+ * different, so the last step sends a request and the quote comes back by
+ * reply. The pricing engine in `shared/catalog.mjs` is untouched and still
+ * tested — it is simply not shown to a visitor, so turning prices back on is
+ * a matter of restoring the screens rather than rebuilding the arithmetic.
+ */
 export const STEPS = [
   { id: 'type', label: 'Shoot', title: 'What are we shooting?' },
-  { id: 'package', label: 'Package', title: 'Choose your package' },
+  { id: 'package', label: 'Coverage', title: 'What coverage do you need?' },
   { id: 'extras', label: 'Extras', title: 'Add anything else you need' },
   { id: 'date', label: 'Date', title: 'Pick a date' },
   { id: 'time', label: 'Time', title: 'Pick a time' },
   { id: 'details', label: 'Details', title: 'The property, and you' },
-  { id: 'review', label: 'Review', title: 'Check the order' },
-  { id: 'payment', label: 'Payment', title: 'Secure checkout' },
-  { id: 'confirmed', label: 'Done', title: 'Booked' },
+  { id: 'review', label: 'Review', title: 'Check your request' },
+  { id: 'send', label: 'Send', title: 'Send your request' },
+  { id: 'confirmed', label: 'Done', title: 'Request sent' },
 ] as const;
 
 export type StepId = (typeof STEPS)[number]['id'];
@@ -328,7 +335,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       if (s.id === 'confirmed') break;
       if (blockerFor(s.id)) return s.id;
     }
-    return 'payment';
+    return 'send';
   }, [blockerFor]);
 
   const goTo = useCallback(

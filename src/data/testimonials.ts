@@ -70,7 +70,7 @@ export const TESTIMONIALS: Testimonial[] = [
   {
     id: 't5',
     quote:
-      'Booked on a Tuesday, shot on a Thursday, live on Friday. The price on the screen was the price on the invoice.',
+      'Booked on a Tuesday, shot on a Thursday, live on Friday. The quote was the invoice, to the dollar.',
     name: 'Client name',
     role: 'Realtor',
     company: 'Brokerage name',
