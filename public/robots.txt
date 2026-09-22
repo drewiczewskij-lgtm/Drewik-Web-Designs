@@ -6,4 +6,4 @@ Allow: /
 Disallow: /admin
 Disallow: /book/confirmed
 
-Sitemap: https://kmproductions.com/sitemap.xml
+Sitemap: https://killermillerproductions.com/sitemap.xml

@@ -25,8 +25,9 @@ export const BRAND = {
   tagline: 'Make your property stand out.',
   description:
     'Real estate photography, cinematic video, aerial coverage and commercial production.',
-  /** Set this to your live address before launch; it builds canonical + OG URLs. */
-  url: 'https://kmproductions.com', // PLACEHOLDER
+  /** The live address. Canonical URLs, OG tags, sitemap and schema all
+      derive from it, so it is the one place the domain is written down. */
+  url: 'https://killermillerproductions.com',
   founded: 2021, // PLACEHOLDER — the year you started shooting.
 } as const;
 

@@ -31,7 +31,6 @@ const ROUTES = [
   { path: '/', priority: '1.0', changefreq: 'weekly' },
   { path: '/real-estate', priority: '0.9', changefreq: 'monthly' },
   { path: '/portfolio', priority: '0.9', changefreq: 'weekly' },
-  { path: '/pricing', priority: '0.9', changefreq: 'monthly' },
   { path: '/book', priority: '0.9', changefreq: 'monthly' },
   { path: '/services', priority: '0.8', changefreq: 'monthly' },
   { path: '/commercial', priority: '0.8', changefreq: 'monthly' },
