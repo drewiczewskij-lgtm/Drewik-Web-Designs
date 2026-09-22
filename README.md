@@ -3,12 +3,21 @@
 **Make your property stand out.**
 
 A complete site for a real estate and commercial production company: portfolio,
-services, transparent pricing, a nine-step booking flow with live availability,
-and a payment architecture built for Stripe.
+services, an eight-step booking flow with live availability, and a request that
+arrives as an email rather than a form post to somebody else's server.
 
 It is not a brochure with a contact form. A visitor can arrive, see the work,
-understand the packages, pick a date that is genuinely free, see the exact
-total, pay, and get a confirmation — without anybody picking up a phone.
+understand what each service covers, pick a date that is genuinely free, and
+send a request with every detail already in it.
+
+> **Current state.** Prices are not shown anywhere on the site: the same shoot
+> is quoted differently for different agencies, so every service is
+> enquiry-only and the figure follows the brief. The pricing page and its
+> components are gone. The catalog in `shared/catalog.mjs` still holds the
+> numbers and still drives the booking arithmetic and the tests — it is simply
+> not rendered. Sections of this README below still describe the Stripe
+> checkout that was built for that earlier shape; treat those as the plan for
+> when payments come back, not as what ships today.
 
 ---
 
@@ -197,11 +206,10 @@ uploaded yet — it never shows a play button that does nothing.
 
 | Route | What is on it |
 | --- | --- |
-| `/` | Cinematic hero, services, process, selected work, why us, pricing preview, testimonials, FAQ. |
+| `/` | Cinematic hero, services, process, selected work, why us, testimonials, FAQ. |
 | `/real-estate` | Six kinds of coverage in depth, the craft behind them, the process, filterable work. |
-| `/services` | Each service: what is included, how long it takes, what it starts at. |
+| `/services` | Each of the seven services: what is included, how long it takes, how it is quoted. |
 | `/portfolio` | 26 pieces, category filters, full-screen viewer with keyboard navigation. |
-| `/pricing` | Four packages, a live quote calculator, every add-on priced, payment questions. |
 | `/book` | The nine-step booking flow. |
 | `/commercial` | Who commercial work is for, how it is scoped, honest ranges, a quote form. |
 | `/about` | The founder, the kit, what can actually be promised. |
