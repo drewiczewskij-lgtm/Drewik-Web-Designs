@@ -1,90 +1,67 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { PROPERTIES } from '@/data/properties';
-import { BRAND } from '@/data/site';
-import { EASE_OUT_EXPO } from '@/lib/motion';
-import { Figure } from '@/components/Figure';
-import { Footer } from '@/components/Footer';
-import { Cta } from '@/components/Cta';
-import { Label, MaskedLines } from '@/components/Type';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { Footer } from '@/components/layout/Footer';
+import { Button, Arrow } from '@/components/ui/Button';
+import { Reveal } from '@/components/fx/Reveal';
+import { Seo } from '@/lib/seo';
+import { NAV, CONTACT } from '@/data/site';
 
+/** A 404 that offers somewhere to go, rather than just reporting a failure. */
 export default function NotFound() {
-  useEffect(() => {
-    document.title = `Not found — ${BRAND.name}`;
-  }, []);
-
   return (
     <>
-      <section
-        data-nav-theme="light"
-        className="bg-charcoal text-paper on-dark relative flex min-h-[100svh] flex-col justify-end overflow-hidden"
+      <Seo
+        title="Page not found"
+        description="That page does not exist. Here is everything that does."
+        noIndex
+      />
+
+      <PageHeader
+        label="404"
+        title={['That page', 'doesn’t exist.']}
+        lead="The link may be old, or there may be a typo in it. Everything on the site is listed below."
+        compact
       >
-        <div className="absolute inset-0">
-          <motion.div
-            className="h-full w-full"
-            initial={{ scale: 1.08, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 2, ease: EASE_OUT_EXPO }}
-          >
-            <Figure
-              image="aureliaDusk"
-              priority
-              eager
-              className="h-full w-full"
-              sizes="100vw"
-              quality={72}
-            />
-          </motion.div>
-          <div
-            aria-hidden="true"
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(to top, rgba(12,11,9,.9) 0%, rgba(12,11,9,.5) 40%, rgba(12,11,9,.25) 100%)',
-            }}
-          />
-        </div>
+        <Button to="/" className="group" trailing={<Arrow />}>
+          Back to the home page
+        </Button>
+      </PageHeader>
 
-        <div className="shell relative pt-32 pb-[max(2.5rem,7vh)]">
-          <Label index="404" className="text-paper/60">
-            Not in the book
-          </Label>
-          <MaskedLines
-            as="h1"
-            className="t-h1 mt-8 max-w-[16ch]"
-            lines={['This address', 'does not exist.']}
-          />
-          <p className="t-body text-paper/70 mt-8 max-w-[44ch]">
-            The page you asked for has been withdrawn, renamed, or was never here.
-            Everything currently represented is below.
-          </p>
-
-          <ul className="border-paper/20 mt-12 border-t">
-            {PROPERTIES.map((p) => (
-              <li key={p.slug} className="border-paper/12 border-b">
-                <Link
-                  to={`/residences/${p.slug}`}
-                  className="focus-bare arrow-host group/row flex items-baseline justify-between gap-6 py-4"
-                  data-cursor="VIEW"
-                >
-                  <span className="t-h3">{p.name}</span>
-                  <span className="t-label text-paper/50 hidden sm:block">
-                    {p.locationLine}
-                  </span>
-                  <span className="t-label t-num text-paper/70">{p.priceCompact}</span>
-                </Link>
-              </li>
-            ))}
+      <section className="section pt-12">
+        <div className="shell">
+          <ul className="grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+            {[{ label: 'Home', to: '/', note: 'Start here' }, ...NAV, { label: 'Book a shoot', to: '/book', note: 'Live availability and pricing' }].map(
+              (item, i) => (
+                <Reveal as="li" key={item.to} index={i}>
+                  <Link
+                    to={item.to}
+                    className="group flex h-full flex-col gap-2 bg-void p-7 transition-colors duration-400 hover:bg-ink"
+                  >
+                    <span className="flex items-center justify-between gap-3">
+                      <span className="font-display text-[18px] font-semibold text-bright">
+                        {item.label}
+                      </span>
+                      <Arrow />
+                    </span>
+                    {'note' in item && item.note && (
+                      <span className="text-[13px] text-muted">{item.note}</span>
+                    )}
+                  </Link>
+                </Reveal>
+              ),
+            )}
           </ul>
 
-          <div className="mt-12">
-            <Cta to="/" dark>
-              Return Home
-            </Cta>
-          </div>
+          <p className="mt-10 text-[13.5px] text-muted">
+            Still stuck? Call{' '}
+            <a href={`tel:${CONTACT.phoneHref}`} className="link-rule font-mono">
+              {CONTACT.phone}
+            </a>
+            .
+          </p>
         </div>
       </section>
+
       <Footer />
     </>
   );

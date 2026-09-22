@@ -9,5 +9,14 @@ dist-ssr
 .env.*
 !.env.example
 dist-single
-arcadia-estates.html
-arcadia-estates-site.zip
+km-productions.html
+
+# The booking server's data file. It holds real customer names, addresses and
+# phone numbers, and it must never end up in version control.
+#
+# The leading slash matters: `data/` with no slash matches a directory of that
+# name at ANY depth, which silently excluded `src/data/` — the entire content
+# layer of the site — from the repository. Anchored to the root, it means only
+# the one directory it was written for.
+/data/
+*.bookings.json

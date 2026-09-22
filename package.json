@@ -1,17 +1,27 @@
 {
-  "name": "arcadia-estates",
+  "name": "km-productions",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Arcadia Estates \u2014 Properties Worth Remembering. A luxury real-estate brand experience.",
+  "description": "KM Productions \u2014 real estate photography, videography, drone and commercial production, with online booking and Stripe payments.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit false --emitDeclarationOnly false",
+    "typecheck": "tsc -b --force",
     "check:images": "node scripts/check-images.mjs",
-    "build:static": "VITE_ROUTER=hash VITE_BASE=./ npm run build",
-    "build:single": "VITE_SINGLE=1 VITE_ROUTER=hash VITE_BASE=./ tsc -b && VITE_SINGLE=1 VITE_ROUTER=hash VITE_BASE=./ vite build && node scripts/bundle-single.mjs"
+    "server": "node api/server.mjs",
+    "dev:full": "node scripts/dev-full.mjs",
+    "build:static": "node scripts/build-variant.mjs static",
+    "build:single": "node scripts/build-variant.mjs single",
+    "test:booking": "node scripts/test-booking.mjs",
+    "link:work": "node scripts/link-work.mjs",
+    "optimise:work": "node scripts/optimise-work.mjs",
+    "adopt": "node scripts/adopt-work.mjs",
+    "check:work": "node scripts/check-work.mjs",
+    "use:stock": "node scripts/use-stock.mjs",
+    "make:og": "node scripts/make-og.mjs",
+    "make:seo": "node scripts/make-seo.mjs"
   },
   "dependencies": {
     "lenis": "^1.3.26",

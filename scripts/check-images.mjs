@@ -1,24 +1,29 @@
 #!/usr/bin/env node
 /**
- * Verifies every source in src/data/images.ts actually resolves.
- *
- * The library was authored without outbound network access, so the entries
- * have never been checked against a live CDN. Run this before showing the site
- * to anyone:
+ * Checks every image source in `src/data/images.ts`.
  *
  *   npm run check:images
  *
- * Anything reported here can be replaced in src/data/images.ts and nowhere
- * else. A failing entry does not break the page — `Figure` falls back to a
- * generated architectural plate — but it is not the photograph you wanted.
+ * Entries fall into two groups.
+ *
+ * DRAWN — `src` is empty, so the frame renders a plate from `src/lib/scenes.ts`
+ * instead. Nothing is requested and nothing can break. This is the default
+ * state of a fresh install and is NOT a failure; the script lists them so you
+ * can see how much of the site is still standing in for real work.
+ *
+ * SOURCED — `src` points at a file or a URL. Each one is fetched and checked
+ * for a 2xx and an image content type. A failure here does not break the page
+ * (Figure falls back to the plate) but it is not the photograph you wanted, so
+ * the script exits non-zero to make it visible in CI.
  */
 
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = resolve(here, '../src/data/images.ts');
+const root = resolve(here, '..');
+const source = join(root, 'src/data/images.ts');
 
 const text = await readFile(source, 'utf8');
 
@@ -28,52 +33,78 @@ if (!base) {
   process.exit(1);
 }
 
-// Each entry is `key: { src: '…', …`
-const entries = [...text.matchAll(/^\s{2}([A-Za-z0-9_]+):\s*\{\s*\n\s*src:\s*'([^']+)'/gm)].map(
-  ([, key, src]) => ({ key, src }),
-);
+// Each entry is `key: {` then, within the next few lines, `src: '…'`.
+// The source may be empty, which is why the character class allows zero.
+const entries = [
+  ...text.matchAll(/^ {2}([A-Za-z0-9_]+): \{\n(?:[^}]*?)src: '([^']*)'/gm),
+].map(([, key, src]) => ({ key, src }));
 
 if (entries.length === 0) {
   console.error('No image entries found. Has the shape of images.ts changed?');
   process.exit(1);
 }
 
-const url = (src) =>
-  /^https?:\/\//.test(src) || src.startsWith('/')
-    ? src
-    : `${base}${src}?auto=format&fit=crop&w=320&q=40`;
+const drawn = entries.filter((e) => e.src.trim() === '');
+const sourced = entries.filter((e) => e.src.trim() !== '');
+
+console.log(`${entries.length} image entries.\n`);
+
+if (drawn.length) {
+  console.log(`${drawn.length} drawn (no photograph yet — renders a plate):`);
+  for (const e of drawn) console.log(`   ·  ${e.key}`);
+  console.log('');
+}
+
+if (sourced.length === 0) {
+  console.log('No remote or local sources to verify. Nothing can 404.');
+  console.log('\nAdd a `src` to an entry in src/data/images.ts to put real work on the site.');
+  process.exit(0);
+}
+
+const toUrl = (src) =>
+  /^https?:\/\//.test(src) ? src : src.startsWith('/') ? src : `${base}${src}?auto=format&fit=crop&w=320&q=40`;
 
 const CONCURRENCY = 6;
 const results = [];
 let cursor = 0;
 
-async function worker() {
-  while (cursor < entries.length) {
-    const entry = entries[cursor++];
-    const target = url(entry.src);
+async function check(entry) {
+  // A rooted path is a file in `public/`, so check the disk rather than the
+  // network — it is faster and it works before the site is deployed.
+  if (entry.src.startsWith('/') && !/^https?:/.test(entry.src)) {
+    const onDisk = join(root, 'public', entry.src.replace(/^\//, ''));
     try {
-      const res = await fetch(target, { method: 'GET', headers: { Range: 'bytes=0-64' } });
-      const type = res.headers.get('content-type') ?? '';
-      results.push({
-        ...entry,
-        ok: res.ok && type.startsWith('image/'),
-        status: res.status,
-        type,
-      });
-    } catch (error) {
-      results.push({ ...entry, ok: false, status: 0, type: String(error.message ?? error) });
+      const info = await stat(onDisk);
+      return { ...entry, ok: info.isFile() && info.size > 0, status: 'file', type: `${info.size} bytes` };
+    } catch {
+      return { ...entry, ok: false, status: 'missing', type: `not found at public${entry.src}` };
     }
+  }
+
+  try {
+    const res = await fetch(toUrl(entry.src), { method: 'GET', headers: { Range: 'bytes=0-64' } });
+    const type = res.headers.get('content-type') ?? '';
+    return { ...entry, ok: res.ok && type.startsWith('image/'), status: res.status, type };
+  } catch (error) {
+    return { ...entry, ok: false, status: 0, type: String(error?.message ?? error) };
   }
 }
 
-await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+async function worker() {
+  while (cursor < sourced.length) {
+    results.push(await check(sourced[cursor++]));
+  }
+}
+
+await Promise.all(Array.from({ length: Math.min(CONCURRENCY, sourced.length) }, worker));
 results.sort((a, b) => a.key.localeCompare(b.key));
 
 const bad = results.filter((r) => !r.ok);
 
+console.log(`${sourced.length} sourced:`);
 for (const r of results) {
   const mark = r.ok ? '  ok ' : 'FAIL ';
-  console.log(`${mark} ${r.key.padEnd(20)} ${r.src.padEnd(34)} ${r.ok ? '' : `${r.status} ${r.type}`}`);
+  console.log(`${mark} ${r.key.padEnd(22)} ${r.src.slice(0, 44).padEnd(46)} ${r.ok ? '' : `${r.status} ${r.type}`}`);
 }
 
 console.log(`\n${results.length - bad.length}/${results.length} sources resolved.`);
@@ -82,12 +113,12 @@ if (bad.length) {
   const blocked = bad.filter((r) => r.status === 403 || r.status === 0);
   if (blocked.length === results.length) {
     console.log(
-      '\nEvery source failed the same way. That is almost always a network\n' +
-        'policy — a proxy or firewall between you and the CDN — rather than\n' +
-        'bad identifiers. Try again from an unrestricted connection.',
+      '\nEvery source failed the same way. That is almost always a network policy —\n' +
+        'a proxy or firewall between you and the CDN — rather than bad identifiers.\n' +
+        'Try again from an unrestricted connection.',
     );
   } else {
-    console.log('\nReplace these in src/data/images.ts:');
+    console.log('\nFix these in src/data/images.ts:');
     for (const r of bad) console.log(`  ${r.key} → ${r.src}`);
   }
   process.exit(1);

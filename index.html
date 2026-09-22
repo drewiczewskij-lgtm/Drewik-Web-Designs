@@ -3,74 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#14130F" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#04060B" />
+    <meta name="color-scheme" content="dark" />
 
-    <title>Arcadia Estates — Properties Worth Remembering</title>
+    <title>KM Productions — Real Estate Photography, Video &amp; Drone</title>
     <meta
       name="description"
-      content="Arcadia Estates represents architecturally significant homes, waterfront residences and exceptional investment properties across Malibu, Aspen, Miami Beach, Austin and New York."
+      content="Professional real estate photography, cinematic property video and licensed aerial coverage in North Mississippi and the Memphis metro. Book online, quoted per property, photos back the next business day."
     />
-    <meta name="author" content="Arcadia Estates" />
+    <meta name="author" content="KM Productions" />
+    <meta name="robots" content="index, follow" />
+
+    <link rel="canonical" href="https://killermillerproductions.com/" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Arcadia Estates — Properties Worth Remembering" />
+    <meta property="og:url" content="https://killermillerproductions.com/" />
+    <meta property="og:site_name" content="KM Productions" />
+    <meta property="og:title" content="KM Productions — Make Your Property Stand Out" />
     <meta
       property="og:description"
-      content="A brokerage for architecturally significant homes. Malibu. Aspen. Miami Beach. Austin. New York."
+      content="Real estate photography, cinematic video and aerial imagery that help properties get noticed. Booked online, quoted per property, delivered the next day."
+    />
+    <meta property="og:image" content="https://killermillerproductions.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="KM Productions — Make your property stand out."
     />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://killermillerproductions.com/og.png" />
+    <meta name="twitter:title" content="KM Productions — Make Your Property Stand Out" />
+    <meta
+      name="twitter:description"
+      content="Real estate photography, cinematic video and aerial imagery. Booked online, quoted per property."
+    />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
-    <link rel="dns-prefetch" href="https://images.unsplash.com" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
     />
 
     <style>
-      /* Pre-hydration shell: matches the React loader exactly so there is no flash. */
-      html { background: #14130f; }
+      /* Pre-hydration shell: matches the React loader exactly, so there is no
+         flash of a white page before the app owns the screen. */
+      html { background: #04060b; }
       #boot {
         position: fixed;
         inset: 0;
-        background: #14130f;
+        background: #04060b;
         z-index: 999;
       }
-      .no-js-note { display: none; }
     </style>
   </head>
   <body>
     <div id="boot" aria-hidden="true"></div>
     <div id="root"></div>
+
     <noscript>
       <div
         style="
           padding: 12vh 8vw;
-          font-family: Georgia, serif;
-          background: #f4f1ea;
-          color: #1c1b17;
+          font-family: 'Inter', -apple-system, system-ui, sans-serif;
+          background: #04060b;
+          color: #eef4fd;
           min-height: 100vh;
         "
       >
-        <p style="letter-spacing: 0.3em; font-size: 11px; text-transform: uppercase">
-          Arcadia Estates
+        <p style="letter-spacing: 0.24em; font-size: 11px; text-transform: uppercase; color: #7c8aa3">
+          KM Productions
         </p>
-        <h1 style="font-size: 6vw; font-weight: 400; margin: 0.4em 0">
-          Properties Worth Remembering.
+        <h1 style="font-size: clamp(2rem, 7vw, 4rem); font-weight: 600; margin: 0.3em 0; line-height: 1.05">
+          Make your property stand out.
         </h1>
-        <p style="max-width: 40ch; line-height: 1.7">
-          This experience requires JavaScript. To speak with us directly, write to
-          <a href="mailto:private@arcadiaestates.com">private@arcadiaestates.com</a>
-          or call <a href="tel:+13105550147">+1 310 555 0147</a>.
+        <p style="max-width: 46ch; line-height: 1.7; color: #b6c2d6">
+          Real estate photography, cinematic video and aerial imagery across North
+          Mississippi and the Memphis metro. This site needs JavaScript for the booking
+          calendar — to book a shoot or ask a question, call
+          <a href="tel:+16623228022" style="color: #5c9bff">(662) 322-8022</a>
+          or email
+          <a href="mailto:bryan.miller@renasant.com" style="color: #5c9bff"
+            >bryan.miller@renasant.com</a
+          >.
         </p>
       </div>
     </noscript>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

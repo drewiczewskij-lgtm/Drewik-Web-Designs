@@ -1,0 +1,6 @@
+# Every route is drawn by React Router in the browser, so a request for
+# /services or /portfolio has no file behind it. Hand those to index.html
+# with a 200 rather than a redirect, so the URL the visitor typed is the
+# URL they keep. Real files (assets, /work, robots.txt) are served first
+# and never reach this rule.
+/*    /index.html   200
