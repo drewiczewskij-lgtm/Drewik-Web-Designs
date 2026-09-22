@@ -8,9 +8,9 @@ import { cn } from '@/lib/cn';
 
 /* ============================================================================
    SERVICES
-   Six cards with depth. The tilt follows the cursor; the light follows it too.
-   Both come from `useTilt`, which writes to the node rather than to state, so
-   moving across six cards does not re-render six components.
+   One card per service, with depth. The tilt follows the cursor; the light
+   follows it too. Both come from `useTilt`, which writes to the node rather
+   than to state, so moving across the grid does not re-render every card.
    ========================================================================= */
 
 

@@ -14,8 +14,8 @@ export default function Services() {
   return (
     <>
       <Seo
-        title="Services — Photography, Video, Drone & Commercial"
-        description={`Real estate photography and videography, drone stills and aerial video, commercial production and custom projects across ${CONTACT.serviceArea}. What each includes, and what it starts at.`}
+        title="Services — Photography, Video, Drone, Commercial & Events"
+        description={`Real estate photography and videography, drone stills and aerial video, commercial production, event coverage and custom projects across ${CONTACT.serviceArea}. What each one includes and how it is quoted.`}
         path="/services"
         schema={[
           breadcrumbSchema([
@@ -30,8 +30,8 @@ export default function Services() {
 
       <PageHeader
         label="Services"
-        title={['Six services.', 'One person', 'behind all of them.']}
-        lead="What each one includes, how long it takes, and what it starts at. Every price here comes from the same list the checkout uses."
+        title={['Seven services.', 'One person', 'behind all of them.']}
+        lead="What each one includes, how long it takes, and how it is quoted. Every property and every brief is different, so the figure comes after the details rather than off a price list."
         breadcrumb={[
           { name: 'Home', path: '/' },
           { name: 'Services', path: '/services' },
